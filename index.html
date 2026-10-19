@@ -2,16 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-UqnjxroD435R2XsRoEfnwNXmAoN5RqVeHSHgmhi1DRs='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
 <meta name="description" content="Kids bid for chores. The lowest bid wins the job and earns those points. Less negotiating, clearer expectations.">
 <meta name="theme-color" content="#4a2c82">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234a2c82'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23f6b93b' font-family='Arial' font-weight='bold'%3E$%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <script>
+  // Refuse to run inside another website's frame (stops "clickjacking" tricks)
+  if (window.top !== window.self) {
+    document.documentElement.style.display = 'none';
+    try { window.top.location = window.self.location.href; } catch (e) { /* stay hidden */ }
+  }
   /* =====================================================================
      SETTINGS YOU CAN CHANGE
      API_URL:       your Apps Script web app link (ends in /exec)
@@ -24,6 +28,13 @@
 </script>
 
 <style>
+  @font-face{font-family:'Fredoka';font-weight:500;font-display:swap;src:url(fonts/fredoka-latin-500-normal.woff2) format('woff2')}
+  @font-face{font-family:'Fredoka';font-weight:600;font-display:swap;src:url(fonts/fredoka-latin-600-normal.woff2) format('woff2')}
+  @font-face{font-family:'Fredoka';font-weight:700;font-display:swap;src:url(fonts/fredoka-latin-700-normal.woff2) format('woff2')}
+  @font-face{font-family:'Nunito';font-weight:400;font-display:swap;src:url(fonts/nunito-latin-400-normal.woff2) format('woff2')}
+  @font-face{font-family:'Nunito';font-weight:600;font-display:swap;src:url(fonts/nunito-latin-600-normal.woff2) format('woff2')}
+  @font-face{font-family:'Nunito';font-weight:700;font-display:swap;src:url(fonts/nunito-latin-700-normal.woff2) format('woff2')}
+  @font-face{font-family:'Nunito';font-weight:800;font-display:swap;src:url(fonts/nunito-latin-800-normal.woff2) format('woff2')}
   :root{
     --purple:#4a2c82; --purple2:#6c4bb6; --gold:#f6b93b; --gold2:#ffe7a8; --goldl:#fff6dc;
     --bg:#f6f3fb; --card:#ffffff; --ink:#24183d; --muted:#6f6787; --lav:#efe9fb;
@@ -537,7 +548,19 @@ function esc(s) {
 }
 function errMsg(e) { return String(e && e.message ? e.message : e).replace(/^(Exception|Error):\s*/i, ''); }
 function hl(h) { h = Number(h); const x = h % 12 === 0 ? 12 : h % 12; return x + (h < 12 ? ' AM' : ' PM'); }
-function familyLink(fid) { return APP_LINK + '?f=' + (fid || FID); }
+// The family ID goes after #, so browsers never send it to GitHub or any other server.
+function familyLink(fid) { return APP_LINK + '#f=' + (fid || FID); }
+function weakPin(s) {
+  if (/^(\d)\1+$/.test(s)) return true;
+  if ('01234567890123456789'.indexOf(s) > -1 || '98765432109876543210'.indexOf(s) > -1) return true;
+  if (/^(\d\d)\1+$/.test(s) || /^(\d\d\d)\1+$/.test(s)) return true;
+  return ['112233', '696969', '159753', '147258', '789456', '102030', '111222', '123321', '654456'].indexOf(s) > -1;
+}
+function pinProblem(p) {
+  if (!/^\d{6,12}$/.test(p)) return 'Please choose a PIN with 6 to 12 numbers.';
+  if (weakPin(p)) return 'That PIN is too easy to guess. Avoid repeats like 111111 and runs like 123456.';
+  return '';
+}
 function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 function pt(n) { return n + (Math.abs(Number(n)) === 1 ? ' pt' : ' pts'); }
 function points(n) { return n + (Math.abs(Number(n)) === 1 ? ' point' : ' points'); }
@@ -974,7 +997,18 @@ async function api(action, args) {
   } finally { clearTimeout(timer); netBar(false); }
 }
 
-function setToken(t) { TOKEN = t; ss('ca_tok_' + FID, t); }
+function setToken(t) { TOKEN = t; ss('ca_tok_' + FID, t); lastActive = Date.now(); }
+
+// Lock the parent area after 10 minutes without a tap or key press
+const IDLE_LOCK_MS = 10 * 60 * 1000;
+let lastActive = Date.now();
+['click', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, () => { lastActive = Date.now(); }, { passive: true, capture: true }));
+setInterval(async () => {
+  if (!TOKEN || Date.now() - lastActive < IDLE_LOCK_MS) return;
+  try { await api('logout'); } catch (e) { /* ignore */ }
+  setToken(null);
+  if (DATA) { renderApp(); toast('The parent area locked after 10 minutes without use.'); }
+}, 20000);
 
 async function unlock(reason) {
   const demo = isDemo() ? ' The demo PIN is 1234.' : '';
@@ -1023,6 +1057,7 @@ function renderLanding(msg) {
   if (ls('ca_demo_v3')) html += `<a class="btn ghost" href="${esc(APP_LINK)}#demo">Continue the demo</a>`;
   $('landContinue').innerHTML = html;
   FID = null; DATA = null;
+  if (location.hash || location.search) history.replaceState(null, '', APP_LINK);
   show('landing');
 }
 
@@ -1068,7 +1103,8 @@ async function joinGo() {
     const r = await api('join', { code: code });
     ls('ca_fid', r.fid);
     ls('ca_dev_' + r.fid, r.device);
-    location.href = familyLink(r.fid);
+    $('joinGo').disabled = false;
+    openFamily(r.fid);
   } catch (e) {
     FID = prevFid;
     toast(errMsg(e), true);
@@ -1113,14 +1149,14 @@ function wFamily() {
     ${lic}
     <label for="wName">Family name</label>
     <input type="text" id="wName" data-k="name" value="${esc(W.name)}" maxlength="40" placeholder="The Bowers Family">
-    <label for="wPin">Parent PIN (4 to 8 numbers)</label>
-    <input type="password" id="wPin" data-k="pin" value="${esc(W.pin)}" inputmode="numeric" maxlength="8" autocomplete="new-password">
+    <label for="wPin">Parent PIN (6 to 12 numbers)</label>
+    <input type="password" id="wPin" data-k="pin" value="${esc(W.pin)}" inputmode="numeric" maxlength="12" autocomplete="new-password">
     <label for="wPin2">Type the PIN again</label>
-    <input type="password" id="wPin2" data-k="pin2" value="${esc(W.pin2)}" inputmode="numeric" maxlength="8" autocomplete="new-password">
+    <input type="password" id="wPin2" data-k="pin2" value="${esc(W.pin2)}" inputmode="numeric" maxlength="12" autocomplete="new-password">
     <label for="wEmail">Parent email (recommended)</label>
     <input type="email" id="wEmail" data-k="email" value="${esc(W.email)}" maxlength="120" placeholder="you@example.com">
     <p class="desc mt">Used for weekly results and to email your family link if you lose it.</p>
-    <p class="tip">Only parents should know the PIN. It is needed to approve chores, set up kids' devices, and change settings. It is stored scrambled and checked on our server.</p>
+    <p class="tip">Only parents should know the PIN. Pick one your kids could not guess (not a birthday or 123456). It is needed to approve chores, set up kids' devices, and change settings. It is stored scrambled and checked on our server. With an email above, you will hear about wrong-PIN lockouts and new devices.</p>
   </div>`;
 }
 
@@ -1293,7 +1329,8 @@ function wizCheck() {
   if (W.step === 0) {
     if (CONFIG && CONFIG.licenseRequired && !W.license.trim()) return 'Enter the license key from your receipt.';
     if (!W.name.trim()) return 'Enter your family name.';
-    if (!/^\d{4,8}$/.test(W.pin)) return 'The PIN must be 4 to 8 numbers.';
+    const pp = pinProblem(W.pin);
+    if (pp) return pp;
     if (W.pin !== W.pin2) return 'The two PINs do not match.';
     if (W.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(W.email.trim())) return 'That email address does not look right.';
   }
@@ -1373,6 +1410,7 @@ async function copyText(text) {
 /* ============================== FAMILY APP ============================== */
 async function openFamily(fid) {
   FID = fid;
+  if (location.hash !== '#f=' + fid) history.replaceState(null, '', APP_LINK + '#f=' + fid);
   TOKEN = cleanId(ss('ca_tok_' + fid)) || null;
   DEVICE = cleanId(ls('ca_dev_' + fid)) || null;
   await load(true);
@@ -1664,6 +1702,8 @@ function renderParent() {
   const chk = fairnessCheck(d.kids.length, d.chores, d.fairness.limit);
 
   box.innerHTML = `
+  ${d.weakPin ? `<div class="warn">Your parent PIN is short. Choose a new one with 6 to 12 numbers in Family settings below.</div>` : ''}
+  ${!d.demo && !d.email ? `<div class="warn">Add a parent email in Family settings so you hear about wrong-PIN lockouts and new devices, and can recover your link.</div>` : ''}
   <div class="card hl">
     <div class="meta" style="margin:0 0 6px"><h3 class="sec" style="margin:0">Needs your OK</h3><button class="btn ghost small" data-p="lock">Lock parent area</button></div>
     ${ready.length ? ready.map(w => `<div class="item"><span class="nm">${chip(w.winner)} ${esc(w.chore)}<small>Round ${w.round} · ${pt(w.points)} · ready since ${esc(w.statusDate)}</small></span>
@@ -1765,9 +1805,9 @@ function renderParent() {
     <button class="btn full mt" data-p="saveFam">Save</button>
     <label class="mt">Change the parent PIN</label>
     <div class="row">
-      <input type="password" id="pinOld" inputmode="numeric" placeholder="Current PIN" autocomplete="off">
-      <input type="password" id="pinNew" inputmode="numeric" placeholder="New PIN" autocomplete="new-password">
-      <input type="password" id="pinNew2" inputmode="numeric" placeholder="New PIN again" autocomplete="new-password">
+      <input type="password" id="pinOld" inputmode="numeric" placeholder="Current PIN" autocomplete="off" maxlength="12">
+      <input type="password" id="pinNew" inputmode="numeric" placeholder="New PIN (6-12 numbers)" autocomplete="new-password" maxlength="12">
+      <input type="password" id="pinNew2" inputmode="numeric" placeholder="New PIN again" autocomplete="new-password" maxlength="12">
     </div>
     <button class="btn ghost full mt" data-p="pin">Change PIN</button>
     <div class="card danger mt" style="margin-bottom:0">
@@ -1855,7 +1895,8 @@ async function parentClick(e) {
     case 'addReward': return act(() => pcall('saveReward', { name: v('nrName'), cost: Number(v('nrCost')) }));
     case 'saveFam': return act(() => pcall('saveFamily', { name: v('fName'), email: v('fEmail'), appLink: APP_LINK }));
     case 'pin': {
-      if (!/^\d{4,8}$/.test(v('pinNew'))) return toast('The new PIN must be 4 to 8 numbers.', true);
+      const pp = isDemo() ? '' : pinProblem(v('pinNew'));
+      if (pp) return toast(pp, true);
       if (v('pinNew') !== v('pinNew2')) return toast('The new PINs do not match.', true);
       return act(() => pcall('changePin', { oldPin: v('pinOld'), newPin: v('pinNew') }));
     }
@@ -1863,7 +1904,7 @@ async function parentClick(e) {
       if (d.demo) { Demo.reset(); setToken(null); CUR_TAB = 'bid'; toast('The demo was reset.'); return load(); }
       const pin = await ask('Delete this family?', 'This permanently deletes all kids, chores, bids, and points. It cannot be undone. Enter the parent PIN to confirm.', 'pin');
       if (!pin) return;
-      try { await pcall('deleteFamily', { pin: pin }); forget(FID); location.href = APP_LINK; }
+      try { await pcall('deleteFamily', { pin: pin }); forget(FID); setToken(null); renderLanding('Your family was deleted.'); }
       catch (err) { if (errMsg(err) !== 'CANCELLED') toast(errMsg(err), true); }
       return;
     }
@@ -1908,22 +1949,26 @@ $('supportLink').textContent = SUPPORT_EMAIL;
 $('supportLink').href = 'mailto:' + SUPPORT_EMAIL + '?subject=' + encodeURIComponent('The Chore Auction');
 $('priceNote').textContent = PRICE_NOTE;
 
-// Direct links: .../#demo, .../#setup, .../#join
+// Direct links: .../#f=FAMILY, .../#demo, .../#setup, .../#join
 function routeHash() {
-  const go = (location.hash || '').replace('#', '').toLowerCase();
+  const raw = (location.hash || '').replace('#', '');
+  const m = /^f=([A-Za-z0-9]{20,80})$/.exec(raw);
+  if (m) { if (m[1] !== FID) openFamily(m[1]); return true; }
+  const go = raw.toLowerCase();
   if (go === 'demo') { openDemo(); return true; }
   const to = { setup: startWizard, join: showJoin }[go];
   if (!to) return false;
-  history.replaceState(null, '', location.pathname + location.search);
+  history.replaceState(null, '', location.pathname);
   to();
   return true;
 }
-window.addEventListener('hashchange', () => { if (!FID || isDemo()) routeHash(); });
+window.addEventListener('hashchange', routeHash);
 
 (function start() {
-  const fid = cleanId(new URLSearchParams(location.search).get('f'));
-  if (fid) openFamily(fid);
-  else if (!routeHash()) renderLanding();
+  // Old links put the family ID after "?f=". Move it after "#" so it stops being sent to servers.
+  const old = cleanId(new URLSearchParams(location.search).get('f'));
+  if (old) history.replaceState(null, '', APP_LINK + '#f=' + old);
+  if (!routeHash()) renderLanding();
 })();
 </script>
 </body>
