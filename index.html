@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-ldm571mNlJpz5tZAjgiYhlz6DZNO3Yjmz1Qmv9uyRRk='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-b0USmGNuJKUVT3Idg359IHJt/EasoNmNRP7CoV3OpJ4='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -287,6 +287,9 @@
   .count{display:inline-block;min-width:20px;padding:1px 7px;border-radius:999px;background:var(--red);color:#fff;font-size:12px;margin-left:5px;vertical-align:1px}
   .codepill{display:inline-block;background:var(--lav);color:var(--purple);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:800}
   .codepill.no{background:#fff1e6;color:#7a3d00}
+  .mine.sent{background:var(--greenl);color:#11622f;font-weight:800}
+  .mine.notyet{background:#fff1e6;color:#7a3d00;font-weight:800}
+  .unsent{color:#b45309;font-weight:800;font-size:14px;margin:0 0 8px;text-align:center}
 </style>
 </head>
 <body>
@@ -553,6 +556,7 @@ const STEPS = ['Family', 'Kids', 'Chores', 'Rewards', 'Rules'];
 const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
 const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
+const APP_VERSION = '5.1';
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
@@ -1710,7 +1714,12 @@ function viewKid() {
 function kidBid() {
   const me = DATA.me, f = DATA.fairness;
   const list = DATA.chores.filter(c => canDo(c, me));
-  const rules = `<p class="tip">Pick the <b>fewest points</b> you would do each job for, then tap <b>Place my bid</b>. The lowest bid wins when the auction closes <b>${esc(DATA.schedule.label)}</b>. You can change a bid until then.${f.limit ? ' To keep it fair, each kid can only win so much work.' : ''}</p>`;
+  const bidOn = list.filter(c => c.mine != null).length;
+  const leftover = f.unclaimed === 'auto'
+    ? ' <b>Chores nobody bids on get handed out at the lowest pay</b>, so bid on the ones you want!'
+    : ' A parent hands out chores nobody bids on.';
+  const rules = `<div class="card"><div class="done-all"><h3 class="sec" style="margin:0">You have bid on ${bidOn} of ${plural(list.length, 'chore')}</h3></div>
+    <p class="desc" style="margin:6px 0 0">Pick the <b>fewest points</b> you would do a job for, then tap the gold button to send your bid. The lowest bid wins when the auction closes <b>${esc(DATA.schedule.label)}</b>.${leftover}${f.limit ? ' To keep it fair, each kid can only win so much work.' : ''}</p></div>`;
   if (!list.length) return rules + '<div class="card empty">No chores up for auction right now.</div>';
   return rules + `<div class="grid">${list.map(c => {
     const i = DATA.chores.indexOf(c);
@@ -1721,13 +1730,15 @@ function kidBid() {
       <h3>${esc(c.name)}</h3>
       ${c.desc ? `<p class="desc">${esc(c.desc)}</p>` : ''}
       <div class="meta"><span class="tags"><span class="tag">Pays ${c.min} to ${c.max}</span><span class="tag size">${SIZES[c.size] || ''}</span></span><span>${others ? plural(others, 'other bid') : 'No other bids yet'}</span></div>
-      ${mine != null ? `<div class="mine"><span>Your bid: <b>${pt(mine)}</b></span><button class="link red" data-a="withdraw" data-i="${i}">Take back</button></div>` : ''}
+      ${mine != null ? `<div class="mine sent"><span>&#10003; Your bid is in: <b>${pt(mine)}</b></span><button class="link red" data-a="withdraw" data-i="${i}">Take back</button></div>`
+        : `<div class="mine notyet">You have not bid on this yet</div>`}
       <div class="stepper">
         <button data-a="dn" data-i="${i}" aria-label="Less">-</button>
         <input type="number" id="bid${i}" value="${v}" min="${c.min}" max="${c.max}" aria-label="Bid">
         <button data-a="up" data-i="${i}" aria-label="More">+</button>
       </div>
-      <button class="btn gold full" data-a="bid" data-i="${i}">${mine != null ? 'Change my bid' : 'Place my bid'}</button>
+      <p class="unsent hidden" id="uns${i}">Not sent yet. Tap the button to bid.</p>
+      <button class="btn gold full" data-a="bid" data-i="${i}" id="bb${i}">${bidLabel(c, v)}</button>
     </div>`;
   }).join('')}</div>`;
 }
@@ -1739,7 +1750,7 @@ function kidMine() {
   const done = DATA.winners.filter(w => w.winner === me && w.status === 'Done').slice(0, 5);
   return `<div class="card">
       <h3 class="sec">To do</h3>
-      ${todo.length ? todo.map(w => `<div class="approve"><div class="what"><b>${esc(w.chore)}</b><small>Worth ${pt(w.points)}</small></div>
+      ${todo.length ? todo.map(w => `<div class="approve"><div class="what"><b>${esc(w.chore)}</b><small>Worth ${pt(w.points)} · ${esc(howKid(w.how))}</small></div>
         <button class="btn green" data-a="ready" data-row="${w.row}">I finished it!</button></div>`).join('')
         : '<p class="desc" style="margin:0">Nothing to do right now. Bid on chores to earn points!</p>'}
     </div>
@@ -1763,6 +1774,16 @@ function kidPoints() {
     </div>`;
 }
 
+// Plain words for kids about how they got a chore
+function howKid(how) {
+  const h = String(how || '');
+  if (/^Nobody won it/.test(h)) return 'Nobody bid on this, so it was given to you at the lowest pay';
+  if (/parent/i.test(h)) return 'A parent gave you this one';
+  if (/Next lowest/.test(h)) return 'You won it (the lowest bidder already had enough work)';
+  if (/Tied/.test(h)) return 'You won a tie, because you had less work';
+  return 'You won this with your bid';
+}
+
 async function kidSignOut(msg) {
   const k = KSESS;
   KSESS = null;
@@ -1772,11 +1793,19 @@ async function kidSignOut(msg) {
   await load();
 }
 
+function bidLabel(c, v) {
+  if (c.mine != null) return Number(v) === c.mine ? 'Bid sent: ' + pt(v) : 'Change my bid to ' + pt(v);
+  return 'Place my bid: ' + pt(v);
+}
 function clampBid(i, v) {
   const c = DATA.chores[i];
   v = Math.max(c.min, Math.min(c.max, Math.round(Number(v) || c.min)));
   const el = $('bid' + i); if (el) el.value = v;
   BID_VALUES[c.name] = v;
+  // make it obvious when a number was picked but not sent
+  const btn = $('bb' + i), uns = $('uns' + i);
+  if (btn) btn.textContent = bidLabel(c, v);
+  if (uns) uns.classList.toggle('hidden', c.mine === v);
   return v;
 }
 
@@ -1833,10 +1862,16 @@ function parentWeek() {
       : '<p class="desc" style="margin:0">Nothing in progress right now.</p>'}
   </div>
   <div class="card"><h3 class="sec">${last >= 1 ? 'Last auction (round ' + last + ')' : 'Last auction'}</h3>
-    ${latest.length ? latest.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>${esc(w.how)}</small></span>
+    ${latest.length ? latest.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>${esc(howParent(w.how))}</small></span>
       ${w.status === 'No Bids' ? '<span class="status s-NoBids">No winner</span>' : `<span>${chip(w.winner)} ${pt(w.points)}</span>`}</div>`).join('')
       : '<p class="desc" style="margin:0">No auction has closed yet.</p>'}
   </div>`;
+}
+
+function howParent(how) {
+  const h = String(how || '');
+  if (/^Nobody won it/.test(h)) return 'Nobody bid, so it went to the kid with the least work, at the lowest pay';
+  return h;
 }
 
 function parentPoints() {
@@ -2011,7 +2046,7 @@ function showHelp() {
       <li><b>Settings:</b> devices, kids' secret codes, chores, rewards, and rules.</li></ol>`]
   }[m];
   $('hmTitle').textContent = H[0];
-  $('hmBody').innerHTML = H[1];
+  $('hmBody').innerHTML = H[1] + `<p class="desc mt" style="margin-bottom:0;font-size:12px">App version ${APP_VERSION}</p>`;
   $('hm').className = 'overlay show';
 }
 
