@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-UqnjxroD435R2XsRoEfnwNXmAoN5RqVeHSHgmhi1DRs='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-iceHrB8jtsgI6Qpo5z/3bvyNFKjSKGt1YlvXNt3Lw3M='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -301,7 +301,7 @@
     <div class="card">
       <h3 class="sec">Privacy and safety, in plain words</h3>
       <ul class="plain desc" style="padding-left:20px;margin:0">
-        <li>Your family's information (first names, chores, points) is kept in its own Google Sheet in the app owner's private Google Drive. It is not shared or sold. The app owner can see it in order to give support.</li>
+        <li>The app never asks for last names, addresses, birthdays, or photos. Your family's information (a family nickname, kids' first names, chores, and points) is kept in its own Google Sheet in the app owner's private Google Drive. It is not shared or sold. The app owner can see it in order to give support.</li>
         <li>Your family link lets a device view your family's chores and points. Treat it like a house key and only share it within your household.</li>
         <li>Only devices a parent sets up can bid, and each one bids as one kid. Switching kids needs the parent PIN.</li>
         <li>Join codes work once and expire after 10 minutes.</li>
@@ -931,7 +931,7 @@ const Demo = (function () {
     },
     saveSchedule(a) { S.day = a.day; S.hour = int(a.hour, 0, 23, 'The hour'); return 'The auction now closes every ' + S.day + ' at ' + hl(S.hour) + '.'; },
     saveFairness(a) { S.limit = int(a.limit, 0, 30, 'The work limit'); S.noRepeat = !!a.noRepeat; S.unclaimed = a.unclaimed === 'parent' ? 'parent' : 'auto'; return 'Fairness rules saved.'; },
-    saveFamily(a) { S.family = txt(a.name, 40, 'family name'); S.email = String(a.email || '').trim(); return 'Family settings saved.'; },
+    saveFamily(a) { S.family = txt(a.name, 40, 'family nickname'); S.email = String(a.email || '').trim(); return 'Family settings saved.'; },
     changePin(a) {
       if (String(a.oldPin).trim() !== S.pin) throw new Error('Wrong PIN.');
       if (!/^\d{4,8}$/.test(String(a.newPin))) throw new Error('The PIN must be 4 to 8 numbers.');
@@ -1147,8 +1147,9 @@ function wFamily() {
   return `<div class="card">
     <h2>Your family</h2>
     ${lic}
-    <label for="wName">Family name</label>
-    <input type="text" id="wName" data-k="name" value="${esc(W.name)}" maxlength="40" placeholder="The Bowers Family">
+    <label for="wName">Family nickname</label>
+    <input type="text" id="wName" data-k="name" value="${esc(W.name)}" maxlength="40" placeholder="The Super Squad">
+    <p class="desc mt">Please do not use your last name. A fun nickname is all the app needs, and it is what your kids will see at the top.</p>
     <label for="wPin">Parent PIN (6 to 12 numbers)</label>
     <input type="password" id="wPin" data-k="pin" value="${esc(W.pin)}" inputmode="numeric" maxlength="12" autocomplete="new-password">
     <label for="wPin2">Type the PIN again</label>
@@ -1163,7 +1164,7 @@ function wFamily() {
 function wKids() {
   return `<div class="card">
     <h2>Who is bidding?</h2>
-    <p class="desc">Add each kid and pick a color for their name.</p>
+    <p class="desc">Add each kid and pick a color for their name. First names or nicknames only, no last names.</p>
     ${W.kids.map((k, i) => `
       <div class="row" style="margin-bottom:8px;align-items:center">
         <input type="color" data-k="kids.${i}.color" value="${esc(k.color)}" aria-label="Color">
@@ -1328,7 +1329,7 @@ function wizClick(e) {
 function wizCheck() {
   if (W.step === 0) {
     if (CONFIG && CONFIG.licenseRequired && !W.license.trim()) return 'Enter the license key from your receipt.';
-    if (!W.name.trim()) return 'Enter your family name.';
+    if (!W.name.trim()) return 'Enter a family nickname.';
     const pp = pinProblem(W.pin);
     if (pp) return pp;
     if (W.pin !== W.pin2) return 'The two PINs do not match.';
@@ -1800,7 +1801,7 @@ function renderParent() {
     </div>`)}
 
   ${section('family', 'Family settings', `
-    <label>Family name</label><input type="text" id="fName" maxlength="40" value="${esc(d.family)}">
+    <label>Family nickname (no last names)</label><input type="text" id="fName" maxlength="40" value="${esc(d.family)}">
     <label>Parent email (weekly results and lost-link emails)</label><input type="email" id="fEmail" maxlength="120" value="${esc(d.email)}">
     <button class="btn full mt" data-p="saveFam">Save</button>
     <label class="mt">Change the parent PIN</label>
