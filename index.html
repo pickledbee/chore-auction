@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-iceHrB8jtsgI6Qpo5z/3bvyNFKjSKGt1YlvXNt3Lw3M='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-MudaeHl97m7MMevwtQ+pyfPL8xTOKNEdAG8iyBApx/E='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -308,6 +308,7 @@
         <li>Parent actions need your PIN. It is stored scrambled and checked on the server, and it locks for 10 minutes after 5 wrong tries.</li>
         <li>You can delete your family and all of its data at any time from the Parent tab.</li>
       </ul>
+      <p class="desc mt" style="margin-bottom:0">Full details: <a href="privacy.html">Privacy Policy</a> and <a href="terms.html">Terms and refunds</a>.</p>
     </div>
     <div class="card">
       <h3 class="sec">Lost your family link?</h3>
@@ -316,7 +317,7 @@
       <p class="desc mt" style="margin-bottom:0">Forgot your PIN? Email <span class="js-support"></span> from your parent email address. After checking it is you, we will reset it.</p>
     </div>
   </div>
-  <footer class="small">The Chore Auction</footer>
+  <footer class="small">The Chore Auction · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms and refunds</a></footer>
 </div>
 
 <!-- ================= BUSY ================= -->
@@ -1157,6 +1158,7 @@ function wFamily() {
     <label for="wEmail">Parent email (recommended)</label>
     <input type="email" id="wEmail" data-k="email" value="${esc(W.email)}" maxlength="120" placeholder="you@example.com">
     <p class="desc mt">Used for weekly results and to email your family link if you lose it.</p>
+    <p class="desc">By creating a family, you agree to the <a href="terms.html" target="_blank" rel="noopener">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</p>
     <p class="tip">Only parents should know the PIN. Pick one your kids could not guess (not a birthday or 123456). It is needed to approve chores, set up kids' devices, and change settings. It is stored scrambled and checked on our server. With an email above, you will hear about wrong-PIN lockouts and new devices.</p>
   </div>`;
 }
