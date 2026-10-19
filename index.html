@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
-<meta name="description" content="Kids bid for chores. Lowest bid wins. Points buy screen time. The arguing stops.">
+<meta name="description" content="Kids bid for chores. The lowest bid wins the job and earns those points. Less negotiating, clearer expectations.">
 <meta name="theme-color" content="#4a2c82">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234a2c82'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23f6b93b' font-family='Arial' font-weight='bold'%3E$%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,17 +13,21 @@
 
 <script>
   /* =====================================================================
-     PASTE YOUR APPS SCRIPT WEB APP LINK BETWEEN THE QUOTES BELOW.
-     It is the link that ends in /exec (Deploy > Manage deployments).
+     SETTINGS YOU CAN CHANGE
+     API_URL:       your Apps Script web app link (ends in /exec)
+     SUPPORT_EMAIL: where families can reach you for help
+     PRICE_NOTE:    what the home page says about price
      ===================================================================== */
   const API_URL = 'https://script.google.com/macros/s/AKfycbx1XSIkao8m2vuZzXi6nGD892w2RIAXFkhpBoqZbBrWoH5-myMEBJ66X3SMXYxBj11UGg/exec';
+  const SUPPORT_EMAIL = 'stradman100@gmail.com';
+  const PRICE_NOTE = 'Free during early access. No subscription and no ads.';
 </script>
 
 <style>
   :root{
     --purple:#4a2c82; --purple2:#6c4bb6; --gold:#f6b93b; --gold2:#ffe7a8; --goldl:#fff6dc;
     --bg:#f6f3fb; --card:#ffffff; --ink:#24183d; --muted:#6f6787; --lav:#efe9fb;
-    --green:#1b9a4b; --red:#d64545; --line:#e6e0f2; --radius:16px;
+    --green:#1b9a4b; --greenl:#e3f6ea; --red:#d64545; --line:#e6e0f2; --radius:16px;
   }
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
@@ -35,26 +39,29 @@
   .screen{display:none}
   .screen.on{display:block}
 
-  /* top progress bar while talking to the server */
   #net{position:fixed;top:0;left:0;height:3px;width:0;background:var(--gold);z-index:100;transition:width .4s ease,opacity .3s}
   #net.on{width:85%;transition:width 6s cubic-bezier(.1,.7,.3,1)}
   #net.done{width:100%;opacity:0}
 
   /* landing */
-  .hero{background:linear-gradient(140deg,var(--purple),var(--purple2));color:#fff;padding:48px 0 56px;position:relative;overflow:hidden}
+  .hero{background:linear-gradient(140deg,var(--purple),var(--purple2));color:#fff;padding:44px 0 56px;position:relative;overflow:hidden}
   .hero:after{content:"";position:absolute;right:-80px;top:-80px;width:280px;height:280px;border-radius:50%;background:rgba(246,185,59,.18)}
   .hero h1{font-size:44px;margin:0 0 10px;position:relative;z-index:1}
   .hero h1 span{color:var(--gold)}
-  .hero p{font-size:19px;max-width:560px;margin:0 0 24px;opacity:.95;position:relative;z-index:1}
+  .hero p{font-size:19px;max-width:580px;margin:0 0 22px;opacity:.95;position:relative;z-index:1}
   .hero .btns{display:flex;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
-  .hero .btn{font-size:17px;padding:15px 22px}
-  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:-28px 0 18px;position:relative;z-index:2}
-  .three .card{margin:0}
-  .num{display:inline-flex;width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--ink);font:700 18px 'Fredoka',sans-serif;align-items:center;justify-content:center;margin-bottom:8px}
+  .hero .btn{font-size:17px;padding:14px 20px}
+  .lift{margin-top:-30px;position:relative;z-index:2}
+  .story{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .story .st{background:var(--bg);border-radius:14px;padding:14px;position:relative}
+  .story .st b.n{display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--ink);font:700 15px 'Fredoka',sans-serif;align-items:center;justify-content:center;margin-bottom:8px}
+  .story .st p{margin:6px 0 0;font-size:14px;color:var(--muted)}
+  .mini-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-weight:800;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:6px}
   .feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 22px}
   .feat div{padding-left:26px;position:relative}
   .feat div:before{content:"";position:absolute;left:4px;top:7px;width:10px;height:10px;border-radius:3px;background:var(--gold)}
-  .notice{background:var(--goldl);border-left:4px solid var(--gold);border-radius:10px;padding:12px 14px;margin:16px 0;font-weight:600}
+  .plain li{margin:6px 0}
+  .notice{background:var(--goldl);border-left:4px solid var(--gold);border-radius:10px;padding:12px 14px;margin:16px 0;font-weight:700}
   .continue{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
 
   /* app header */
@@ -64,31 +71,36 @@
   header.app h1 span{color:var(--gold)}
   .sub{opacity:.92;font-size:14px;margin-top:2px}
   .pills{display:flex;gap:8px;flex-wrap:wrap}
-  .pill{background:rgba(255,255,255,.16);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700}
-  .banner{background:var(--gold2);color:#4d3600;padding:10px 0;font-size:14px;font-weight:600}
+  .pill{background:rgba(255,255,255,.16);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800}
+  .banner{background:var(--gold2);color:#4d3600;padding:10px 0;font-size:14px;font-weight:700}
   .banner .wrap{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .banner .bb{display:flex;gap:8px;flex-wrap:wrap}
   nav.tabs{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
   nav.tabs .wrap{display:flex;overflow-x:auto;padding:0}
-  nav.tabs button{flex:1;min-width:76px;border:0;background:none;padding:14px 8px;font:800 15px 'Nunito',sans-serif;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer}
+  nav.tabs button{flex:1;min-width:74px;border:0;background:none;padding:14px 6px;font:800 15px 'Nunito',sans-serif;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;position:relative}
   nav.tabs button.on{color:var(--purple);border-bottom-color:var(--gold)}
+  .badge{display:inline-block;min-width:20px;padding:1px 6px;border-radius:999px;background:var(--red);color:#fff;font-size:12px;margin-left:4px}
   main{padding:16px 0 40px}
   section.tab{display:none}
   section.tab.on{display:block}
 
   /* common */
   .card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(74,44,130,.07);border:1px solid var(--line)}
-  .step{font:600 18px 'Fredoka',sans-serif;margin:4px 0 10px;color:var(--purple)}
+  .card.hl{border:2px solid var(--gold)}
   h2{font-size:22px;margin:4px 0 12px;color:var(--purple)}
   h3.sec{font-size:18px;margin:0 0 10px}
   .desc{color:var(--muted);font-size:14px;margin:0 0 10px}
   .tip{background:var(--lav);border-radius:10px;padding:10px 12px;font-size:14px;margin:0 0 10px}
+  .warn{background:#fff1e6;border-left:4px solid #f08a24;border-radius:10px;padding:10px 12px;font-size:14px;margin:8px 0 10px;font-weight:700;color:#7a3d00}
+  .good{background:var(--greenl);border-radius:10px;padding:10px 12px;font-size:14px;margin:8px 0 10px;font-weight:700;color:#11622f}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-  .kidrow{display:flex;flex-wrap:wrap;gap:10px}
-  .kidbtn{border:3px solid transparent;border-radius:14px;padding:12px 18px;font:600 18px 'Fredoka',sans-serif;color:#fff;cursor:pointer;min-width:104px}
-  .kidbtn.sel{border-color:var(--ink);transform:scale(1.05);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+  .who{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .who .big{font:700 20px 'Fredoka',sans-serif}
   .chore h3{margin:0 0 4px;font-size:19px;color:var(--ink)}
   .meta{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:10px;gap:8px;flex-wrap:wrap}
-  .tag{background:var(--gold2);color:#6b4a00;border-radius:999px;padding:3px 10px;font-weight:800;font-size:12px}
+  .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .tag{background:var(--gold2);color:#6b4a00;border-radius:999px;padding:3px 10px;font-weight:800;font-size:12px;white-space:nowrap}
+  .tag.size{background:var(--lav);color:var(--purple)}
   .stepper{display:flex;align-items:center;gap:8px;margin-bottom:10px}
   .stepper button{width:46px;height:46px;border-radius:12px;border:0;background:var(--bg);font:700 24px 'Fredoka',sans-serif;color:var(--purple);cursor:pointer;flex:0 0 46px}
   .stepper input{flex:1;height:46px;text-align:center;font:700 22px 'Fredoka',sans-serif;border:2px solid var(--line);border-radius:12px;min-width:0}
@@ -104,15 +116,18 @@
   .btn:disabled{opacity:.5;cursor:default}
   .shrink{flex:0 0 auto!important;min-width:0!important}
   .mine{background:var(--lav);border-radius:10px;padding:8px 10px;font-size:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .link{background:none;border:0;color:var(--red);font-weight:800;cursor:pointer;font-size:14px;padding:0}
+  .link{background:none;border:0;color:var(--purple);font-weight:800;cursor:pointer;font-size:14px;padding:0;text-decoration:underline}
+  .link.red{color:var(--red)}
   .chip{display:inline-block;color:#fff;border-radius:999px;padding:4px 12px;font-weight:800;font-size:14px;margin:2px 4px 2px 0}
   .dot{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-right:6px}
-  .empty{color:var(--muted);text-align:center;padding:22px 8px}
+  .empty{color:var(--muted);text-align:center;padding:18px 8px}
   .status{border-radius:999px;padding:3px 10px;font-weight:800;font-size:12px;white-space:nowrap}
   .s-Assigned{background:#fff3c4;color:#7a5a00}
+  .s-Ready{background:#dbe8ff;color:#1d4fa8}
   .s-Done{background:#d4f4dd;color:#11622f}
   .s-NotDone{background:#fbd5d5;color:#8a1f1f}
   .s-NoBids{background:#e8e8e8;color:#555}
+  .s-Skipped{background:#eee;color:#777}
   .how{font-size:12px;color:var(--muted);margin-top:4px}
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
   .row > *{flex:1;min-width:110px}
@@ -121,9 +136,14 @@
   input:focus,select:focus{outline:none;border-color:var(--purple2)}
   input[type=color]{width:52px;height:48px;border:0;background:none;padding:0;flex:0 0 52px!important;min-width:52px!important;cursor:pointer}
   label{font-weight:800;font-size:14px;color:var(--muted);display:block;margin:10px 0 4px}
-  .bal{text-align:center;color:#fff;border-radius:var(--radius);padding:18px 10px}
-  .bal .n{font:700 44px 'Fredoka',sans-serif;line-height:1}
-  .bal .k{font:600 18px 'Fredoka',sans-serif;margin-top:6px}
+  .bal{color:#fff;border-radius:var(--radius);padding:16px 14px}
+  .bal .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .bal .n{font:700 40px 'Fredoka',sans-serif;line-height:1}
+  .bal .k{font:600 20px 'Fredoka',sans-serif}
+  .bal .goal{margin-top:10px;background:rgba(255,255,255,.2);border-radius:10px;padding:8px 10px;font-weight:800;font-size:14px}
+  .bar{height:8px;background:rgba(255,255,255,.3);border-radius:999px;margin-top:6px;overflow:hidden}
+  .bar i{display:block;height:100%;background:#fff;border-radius:999px}
+  .goalline{background:var(--goldl);border-radius:10px;padding:10px 12px;font-weight:800;margin-top:10px}
   table{width:100%;border-collapse:collapse;font-size:14px}
   th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
   th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
@@ -132,22 +152,34 @@
   .tablewrap{overflow-x:auto}
   .item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);gap:8px;flex-wrap:wrap}
   .item:last-child{border-bottom:0}
-  .item .nm{flex:1;min-width:140px;font-weight:700}
+  .item .nm{flex:1;min-width:150px;font-weight:700}
   .item .nm small{display:block;color:var(--muted);font-weight:600}
-  .mini{width:70px!important;padding:8px!important;text-align:center}
+  .acts{display:flex;gap:6px;flex-wrap:wrap}
+  .mini{width:66px!important;padding:8px!important;text-align:center}
+  .sel-mini{width:auto!important;padding:8px!important;font-size:14px!important}
+  .pay{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-weight:800;flex-wrap:wrap}
+  .kidchecks{display:flex;gap:10px;flex-wrap:wrap;font-size:14px;font-weight:700;color:var(--muted)}
+  .kidchecks label{display:flex;align-items:center;gap:4px;margin:0;color:var(--ink)}
   .board-kid{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
-  .toggle{display:flex;gap:12px;align-items:flex-start;padding:10px 0;cursor:pointer}
+  .toggle{display:flex;gap:12px;align-items:flex-start;padding:10px 0;cursor:pointer;margin:0}
   .toggle input{width:22px;height:22px;flex:0 0 22px;margin-top:2px;accent-color:var(--purple)}
-  .toggle b{display:block}
-  .toggle span{color:var(--muted);font-size:14px}
+  .toggle b{display:block;color:var(--ink)}
+  .toggle span{color:var(--muted);font-size:14px;font-weight:600}
   .linkbox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .linkbox input{flex:1;min-width:200px;font-size:13px!important}
-  .site{font:700 20px 'Fredoka',sans-serif;color:var(--purple);word-break:break-all}
+  .danger{border-color:#f3c9c9}
+  .site{font:700 19px 'Fredoka',sans-serif;color:var(--purple);word-break:break-all}
   .codebig{font:700 44px 'Fredoka',sans-serif;letter-spacing:4px;color:var(--ink);background:var(--goldl);border:2px dashed var(--gold);border-radius:14px;text-align:center;padding:12px 8px;margin:10px 0 6px}
   .codein{font:700 34px 'Fredoka',sans-serif!important;letter-spacing:5px;text-align:center;text-transform:uppercase}
   .steps-sm{margin:6px 0 10px;padding-left:22px}
   .steps-sm li{margin:4px 0}
-  .danger{border-color:#f3c9c9}
+  details.sec{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:10px;box-shadow:0 2px 8px rgba(74,44,130,.05)}
+  details.sec > summary{list-style:none;cursor:pointer;padding:15px 16px;font:600 17px 'Fredoka',sans-serif;display:flex;justify-content:space-between;align-items:center}
+  details.sec > summary::-webkit-details-marker{display:none}
+  details.sec > summary:after{content:"+";font:700 22px 'Fredoka',sans-serif;color:var(--purple)}
+  details.sec[open] > summary:after{content:"\2212"}
+  details.sec > div{padding:0 16px 16px}
+  .busy-err{max-width:460px;margin:16px auto 0;text-align:left}
 
   /* wizard */
   .wiz-head{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;padding:18px 0 14px}
@@ -168,13 +200,16 @@
   .pick .nm{flex:1;min-width:150px}
   .pick .nm b{display:block}
   .pick .nm small{color:var(--muted)}
-  .pick .pay{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-weight:700}
   .pick.off .nm,.pick.off .pay{opacity:.45}
+  .radio{display:flex;gap:10px;align-items:flex-start;padding:8px 0;margin:0;cursor:pointer}
+  .radio input{width:20px;height:20px;accent-color:var(--purple);margin-top:2px;flex:0 0 20px}
+  .radio b{display:block;color:var(--ink)}
+  .radio span{color:var(--muted);font-size:14px;font-weight:600}
   .big-check{width:72px;height:72px;border-radius:50%;background:var(--green);color:#fff;font:700 40px 'Fredoka',sans-serif;display:flex;align-items:center;justify-content:center;margin:8px auto 12px}
   .spin{width:48px;height:48px;border-radius:50%;border:5px solid var(--line);border-top-color:var(--purple);animation:sp 1s linear infinite;margin:0 auto 18px}
   @keyframes sp{to{transform:rotate(360deg)}}
 
-  #toast{visibility:hidden;opacity:0;transition:transform .25s,opacity .25s,visibility .25s;position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(140px);background:var(--ink);color:#fff;padding:14px 18px;border-radius:14px;font-weight:800;max-width:92%;z-index:60;text-align:center}
+  #toast{visibility:hidden;opacity:0;position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(140px);background:var(--ink);color:#fff;padding:14px 18px;border-radius:14px;font-weight:800;max-width:92%;z-index:60;text-align:center;transition:transform .25s,opacity .25s,visibility .25s}
   #toast.show{transform:translateX(-50%) translateY(0);visibility:visible;opacity:1}
   #toast.err{background:var(--red)}
   #modal{position:fixed;inset:0;background:rgba(20,10,40,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
@@ -184,11 +219,11 @@
   footer.small{color:var(--muted);font-size:13px;text-align:center;padding:20px 16px 30px}
 
   @media (max-width:560px){
-    .hero{padding:36px 0 50px}
+    .hero{padding:34px 0 50px}
     .hero h1{font-size:34px}
     .hero p{font-size:17px}
     header.app h1{font-size:21px}
-    .bal .n{font-size:36px}
+    .bal .n{font-size:34px}
   }
 </style>
 </head>
@@ -200,36 +235,74 @@
   <div class="hero">
     <div class="wrap">
       <h1>The Chore <span>Auction</span></h1>
-      <p>Kids bid for chores. The lowest bid wins the job and earns those points. Points buy screen time. The arguing stops, because everyone chose.</p>
+      <p>Kids bid for chores. The lowest bid wins the job and earns those points when a parent checks the work. Less negotiating, clearer expectations, and kids who chose their own jobs.</p>
       <div class="btns">
-        <button class="btn gold" id="btnDemo">Try the demo family</button>
+        <button class="btn gold" id="btnDemo">Try the demo</button>
         <button class="btn line" id="btnSetup">Set up my family</button>
         <button class="btn white" id="btnJoin">Enter a join code</button>
       </div>
     </div>
   </div>
   <div class="wrap">
-    <div class="three">
-      <div class="card"><div class="num">1</div><h3 class="sec">Kids bid</h3><p class="desc">Each kid says how few points they would take to do a chore. Bids stay secret.</p></div>
-      <div class="card"><div class="num">2</div><h3 class="sec">Lowest bid wins</h3><p class="desc">Once a week the auction closes on its own and picks a fair winner for every chore.</p></div>
-      <div class="card"><div class="num">3</div><h3 class="sec">Do it, earn it</h3><p class="desc">A parent checks the chore and taps Done. Points go in the bank for rewards.</p></div>
+    <div class="card lift">
+      <h3 class="sec">See it in action</h3>
+      <div class="story">
+        <div class="st"><b class="n">1</b>
+          <div class="mini-card"><span>Take out trash</span><span class="tag">Maya bids 3</span></div>
+          <p>Maya would take out the trash for 3 points. Leo asks for 5.</p></div>
+        <div class="st"><b class="n">2</b>
+          <div class="mini-card"><span>Lowest bid wins</span><span class="chip" style="background:#e85d75;margin:0">Maya</span></div>
+          <p>When the weekly auction closes, Maya wins the chore.</p></div>
+        <div class="st"><b class="n">3</b>
+          <div class="mini-card"><span>Ready for inspection</span><span class="status s-Ready">Waiting</span></div>
+          <p>Maya takes out the trash and taps Ready. A parent checks it and taps Approve.</p></div>
+        <div class="st"><b class="n">4</b>
+          <div class="mini-card"><span>Maya earns 3 points</span><span class="tag">15 pts</span></div>
+          <p>She now has 15 points. 3 more and she can trade them for an hour of screen time.</p></div>
+      </div>
     </div>
     <div id="landMsg" class="notice hidden"></div>
     <div id="landContinue" class="continue"></div>
     <div class="card">
       <h3 class="sec">Built to be fair</h3>
       <div class="feat">
-        <div>A limit on how many chores one kid can win, so nobody grabs everything by bidding 1.</div>
-        <div>A minimum pay for every chore that you set, so no chore is ever done for nothing.</div>
-        <div>Chores rotate, so the same kid does not get stuck with the same job every week.</div>
-        <div>Ties go to the kid with fewer chores.</div>
-        <div>No chore is left undone. Leftover jobs go to whoever has the fewest, at full pay.</div>
-        <div>Every point earned or spent is listed, so kids can see it is fair.</div>
+        <div>A work limit counts the size of each job, so no one wins everything by bidding 1 and no one gets stuck with all the big jobs.</div>
+        <div>Every chore has a lowest pay that you set, so no chore is done for nothing.</div>
+        <div>Skipping the auction never pays more. Leftover chores go to the kid with the least work, at the lowest pay.</div>
+        <div>Chores rotate, so the same kid is not stuck with the same job every week.</div>
+        <div>You can limit a chore to the kids who are old enough for it.</div>
+        <div>Every point earned or spent is listed, so kids can see how it adds up.</div>
       </div>
     </div>
     <div class="card">
-      <h3 class="sec">Private by design</h3>
-      <p class="desc" style="margin:0">Each family's information is kept in its own private file that only this app can open. Your family link is long and random. Parent actions need your PIN, which is stored scrambled and checked on the server, not in this page.</p>
+      <h3 class="sec">Rewards and screen time</h3>
+      <p class="desc" style="margin:0">You choose the rewards and what they cost. The app keeps track of points and what each kid buys. You hand out the reward yourself. The app does not lock, unlock, or time any devices.</p>
+    </div>
+    <div class="card">
+      <h3 class="sec">What you get</h3>
+      <ul class="plain desc" style="padding-left:20px;margin:0">
+        <li id="priceNote"></li>
+        <li>Works in the web browser on any phone, tablet, or computer. Nothing to install.</li>
+        <li>A private space for your family, a weekly auction that closes on its own, and an approval list for parents.</li>
+        <li>Questions or help: <a id="supportLink" href="#"></a></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="sec">Privacy and safety, in plain words</h3>
+      <ul class="plain desc" style="padding-left:20px;margin:0">
+        <li>Your family's information (first names, chores, points) is kept in its own Google Sheet in the app owner's private Google Drive. It is not shared or sold. The app owner can see it in order to give support.</li>
+        <li>Your family link lets a device view your family's chores and points. Treat it like a house key and only share it within your household.</li>
+        <li>Only devices a parent sets up can bid, and each one bids as one kid. Switching kids needs the parent PIN.</li>
+        <li>Join codes work once and expire after 10 minutes.</li>
+        <li>Parent actions need your PIN. It is stored scrambled and checked on the server, and it locks for 10 minutes after 5 wrong tries.</li>
+        <li>You can delete your family and all of its data at any time from the Parent tab.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="sec">Lost your family link?</h3>
+      <p class="desc">Enter the parent email you used during setup and we will email the link to you.</p>
+      <div class="row"><input type="email" id="recEmail" placeholder="you@example.com" maxlength="120"><button class="btn shrink" id="recGo">Email me my link</button></div>
+      <p class="desc mt" style="margin-bottom:0">Forgot your PIN? Email <span class="js-support"></span> from your parent email address. After checking it is you, we will reset it.</p>
     </div>
   </div>
   <footer class="small">The Chore Auction</footer>
@@ -237,18 +310,23 @@
 
 <!-- ================= BUSY ================= -->
 <div id="s-busy" class="screen">
-  <div class="wrap" style="padding-top:80px;text-align:center">
-    <div class="spin"></div>
+  <div class="wrap" style="padding-top:70px;text-align:center">
+    <div class="spin" id="busySpin"></div>
     <h2 id="busyMsg">Loading...</h2>
+    <p class="desc" id="busyStep"></p>
+    <div id="busyErr" class="card busy-err hidden">
+      <p class="warn" id="busyErrText" style="margin-top:0"></p>
+      <div class="row"><button class="btn" id="busyRetry">Try again</button><button class="btn ghost" id="busyBack">Back</button></div>
+    </div>
   </div>
 </div>
 
 <!-- ================= JOIN WITH A CODE ================= -->
 <div id="s-join" class="screen">
-  <div class="wiz-head"><div class="wrap"><h1 style="margin:0">Join your family</h1></div></div>
+  <div class="wiz-head"><div class="wrap"><h1 style="margin:0">Set up this device</h1></div></div>
   <div class="wrap" style="padding-top:20px;max-width:520px">
     <div class="card">
-      <p class="desc">Ask a parent to open the app on their phone, go to the <b>Parent</b> tab, and tap <b>Get a join code</b>. Then type the code here.</p>
+      <p class="desc">Ask a parent to open the app on their phone, go to <b>Parent</b>, then <b>Set up kids' devices</b>, pick your name, and tap <b>Get a join code</b>. Type the code here.</p>
       <label for="joinInput">Join code</label>
       <input type="text" id="joinInput" class="codein" maxlength="7" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC-123">
       <button class="btn gold full mt" id="joinGo">Join</button>
@@ -281,28 +359,24 @@
     <div class="card" style="text-align:center">
       <div class="big-check">&#10003;</div>
       <h2 style="margin-bottom:6px">Your family is ready!</h2>
-      <p class="desc">This is your family's private link. This device will remember it, and you can bookmark it too.</p>
+      <p class="desc">This is your family's private link. This device will remember it. Bookmark it too, or send it to your own phone.</p>
       <div class="linkbox"><input type="text" id="doneLink" readonly><button class="btn shrink" id="doneShare">Share</button></div>
       <a class="btn gold full mt" id="doneOpen" href="#">Open my Chore Auction</a>
     </div>
     <div class="card">
-      <h3 class="sec">Adding your kids' tablets</h3>
-      <p class="desc">No links to text and nothing to scan. On each kid's tablet or phone:</p>
+      <h3 class="sec">Next: set up each kid's device</h3>
+      <p class="desc">Kids can only bid on a device a parent has set up for them. For each kid:</p>
       <ol class="steps-sm">
-        <li>Go to <span class="site js-site"></span></li>
-        <li>Tap <b>Enter a join code</b></li>
-        <li>Type the code from your <b>Parent</b> tab (tap <b>Get a join code</b>)</li>
+        <li>On your phone, open the app, go to <b>Parent</b>, then <b>Set up kids' devices</b>. Pick the kid and tap <b>Get a join code</b>.</li>
+        <li>On the kid's tablet or phone, go to <span class="site js-site"></span> and tap <b>Enter a join code</b>.</li>
+        <li>Type the code. That device now bids only as that kid.</li>
       </ol>
-      <p class="desc" style="margin:0">Each code works once and expires in 10 minutes, so it is useless to anyone else.</p>
+      <p class="desc" style="margin:0">One tablet shared by several kids? Use <b>Set up this device</b> on the Bid tab, and switch kids with your PIN.</p>
     </div>
     <div class="card">
       <h3 class="sec">Add it to the home screen</h3>
       <p class="desc">iPhone or iPad: open the link in Safari, tap the Share button, then Add to Home Screen.</p>
       <p class="desc" style="margin:0">Android: open the link in Chrome, tap the three dots, then Add to Home screen.</p>
-    </div>
-    <div class="card">
-      <h3 class="sec">Keep the link in the family</h3>
-      <p class="desc" style="margin:0">Anyone with the link can see your chores and place bids. Only someone with your PIN can approve chores, give points, or change settings.</p>
     </div>
   </div>
 </div>
@@ -323,8 +397,8 @@
   </header>
   <div class="banner hidden" id="demoBanner">
     <div class="wrap">
-      <span>You are exploring a demo family with three made-up kids. Parent PIN: 1234. Try bidding, running the auction, approving chores, and buying rewards.</span>
-      <button class="btn small" id="btnRealFamily">Set up my real family</button>
+      <span>Demo family with made-up kids. Everything stays on this device. Parent PIN: 1234.</span>
+      <span class="bb"><button class="btn small ghost" id="btnDemoReset">Start over</button><button class="btn small" id="btnRealFamily">Set up my real family</button></span>
     </div>
   </div>
   <nav class="tabs">
@@ -333,17 +407,13 @@
       <button data-tab="board">Board</button>
       <button data-tab="chores">Chores</button>
       <button data-tab="points">Points</button>
-      <button data-tab="parent">Parent</button>
+      <button data-tab="parent">Parent<span id="parentBadge"></span></button>
     </div>
   </nav>
   <main class="wrap">
     <section class="tab on" id="tab-bid">
-      <div class="card">
-        <div class="step">Step 1: Tap your name</div>
-        <div class="kidrow" id="kidButtons"></div>
-      </div>
+      <div id="whoCard"></div>
       <div class="tip" id="fairNote"></div>
-      <div class="step" style="margin-left:4px">Step 2: Bid the fewest points you would do it for</div>
       <div class="grid" id="choreCards"></div>
     </section>
 
@@ -358,10 +428,15 @@
     </section>
 
     <section class="tab" id="tab-chores">
-      <h2 id="resultsTitle">Chore Winners</h2>
+      <div id="myChores"></div>
+      <div class="card">
+        <h3 class="sec">Everyone's chores in progress</h3>
+        <div id="openChores"></div>
+      </div>
+      <h2 id="resultsTitle">Latest auction</h2>
       <div class="grid" id="resultCards"></div>
       <div class="card mt">
-        <h3 class="sec">Earlier rounds</h3>
+        <h3 class="sec">Earlier</h3>
         <div class="tablewrap" id="history"></div>
       </div>
     </section>
@@ -370,7 +445,8 @@
       <h2>Points</h2>
       <div class="grid" id="balances"></div>
       <div class="card mt">
-        <h3 class="sec">Spend points on a reward</h3>
+        <h3 class="sec">Trade points for a reward</h3>
+        <p class="desc">A parent approves each trade and then gives the reward. The app does not control screen time on any device.</p>
         <label for="redeemKid">Who is buying?</label>
         <select id="redeemKid"></select>
         <div id="rewardList" class="mt"></div>
@@ -393,6 +469,7 @@
   <div class="mbox">
     <h3 id="mTitle"></h3>
     <p class="desc" id="mText"></p>
+    <select id="mSelect" class="hidden" style="margin-bottom:12px"></select>
     <input type="password" id="mInput" inputmode="numeric" autocomplete="off" placeholder="Parent PIN" style="margin-bottom:12px">
     <div class="row">
       <button class="btn ghost" id="mCancel">Cancel</button>
@@ -403,23 +480,24 @@
 
 <script>
 /* ============================== SETUP DATA ============================== */
+// [name, description, lowest pay, highest pay, picked by default, size 1-3]
 const LIB_CHORES = [
-  ['Take out trash', 'Kitchen and bathroom trash to the curb', 1, 6, 1],
-  ['Unload dishwasher', 'Put away every clean dish', 2, 8, 1],
-  ['Feed the pets', 'Morning and evening, all week', 1, 6, 1],
-  ['Vacuum living room', 'Move small things, vacuum under the couch', 4, 12, 1],
-  ['Wipe bathroom sink', 'Sink, faucet, and mirror', 2, 6, 1],
-  ['Fold laundry', 'Fold and deliver one full basket', 3, 8, 1],
-  ['Set the table', 'Plates, cups, forks, napkins', 1, 4, 0],
-  ['Clear the table', 'Dishes to the sink, wipe the table', 1, 4, 0],
-  ['Load dishwasher', 'Rinse and load after dinner', 2, 6, 0],
-  ['Water the plants', 'Inside plants, twice a week', 1, 4, 0],
-  ['Sweep the kitchen', 'Under the table too', 2, 8, 0],
-  ['Walk the dog', 'A real walk, at least 15 minutes', 2, 8, 0],
-  ['Clean a bathroom', 'Toilet, sink, mirror, and floor', 6, 15, 0],
-  ['Clean out the car', 'Trash out, mats shaken, seats wiped', 5, 15, 0],
-  ['Make school lunches', 'Lunches packed for everyone', 3, 8, 0],
-  ['Rake leaves or shovel snow', 'Front walk and driveway', 6, 20, 0]
+  ['Take out trash', 'Kitchen and bathroom trash to the curb', 1, 6, 1, 1],
+  ['Unload dishwasher', 'Put away every clean dish', 2, 8, 1, 2],
+  ['Feed the pets', 'Morning and evening, all week', 1, 6, 1, 2],
+  ['Vacuum living room', 'Move small things, vacuum under the couch', 4, 12, 1, 3],
+  ['Wipe bathroom sink', 'Sink, faucet, and mirror', 2, 6, 1, 1],
+  ['Fold laundry', 'Fold and deliver one full basket', 3, 8, 1, 2],
+  ['Set the table', 'Plates, cups, forks, napkins', 1, 4, 0, 1],
+  ['Clear the table', 'Dishes to the sink, wipe the table', 1, 4, 0, 1],
+  ['Load dishwasher', 'Rinse and load after dinner', 2, 6, 0, 2],
+  ['Water the plants', 'Inside plants, twice a week', 1, 4, 0, 1],
+  ['Sweep the kitchen', 'Under the table too', 2, 8, 0, 2],
+  ['Walk the dog', 'A real walk, at least 15 minutes', 2, 8, 0, 2],
+  ['Clean a bathroom', 'Toilet, sink, mirror, and floor', 6, 15, 0, 3],
+  ['Clean out the car', 'Trash out, mats shaken, seats wiped', 5, 15, 0, 3],
+  ['Make school lunches', 'Lunches packed for everyone', 3, 8, 0, 2],
+  ['Rake leaves or shovel snow', 'Front walk and driveway', 6, 20, 0, 3]
 ];
 const LIB_REWARDS = [
   ['15 minutes screen time', 5, 1], ['30 minutes screen time', 10, 1], ['1 hour screen time', 18, 1],
@@ -429,14 +507,17 @@ const LIB_REWARDS = [
 const COLORS = ['#e85d75', '#3a86ff', '#2a9d8f', '#f08a24', '#8e5cd9', '#c99400', '#d6336c', '#495057', '#1c9fc4', '#5f8f3e'];
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const STEPS = ['Family', 'Kids', 'Chores', 'Rewards', 'Rules'];
+const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
+const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
 const SITE = APP_LINK.replace(/^https?:\/\//, '').replace(/\/(index\.html)?$/, '');
 const TZ = (function () { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago'; } catch (e) { return 'America/Chicago'; } })();
-let FID = null, TOKEN = null, DATA = null, KID = null, W = null, CONFIG = null;
+let FID = null, TOKEN = null, DEVICE = null, DATA = null, W = null, CONFIG = null;
 let CUR_TAB = 'bid';
 const BID_VALUES = {};
+const OPEN_SECTIONS = new Set();
 
 /* ============================== HELPERS ============================== */
 const $ = id => document.getElementById(id);
@@ -457,8 +538,10 @@ function esc(s) {
 function errMsg(e) { return String(e && e.message ? e.message : e).replace(/^(Exception|Error):\s*/i, ''); }
 function hl(h) { h = Number(h); const x = h % 12 === 0 ? 12 : h % 12; return x + (h < 12 ? ' AM' : ' PM'); }
 function familyLink(fid) { return APP_LINK + '?f=' + (fid || FID); }
-function pt(n) { return n + (Math.abs(Number(n)) === 1 ? ' pt' : ' pts'); }
 function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+function pt(n) { return n + (Math.abs(Number(n)) === 1 ? ' pt' : ' pts'); }
+function points(n) { return n + (Math.abs(Number(n)) === 1 ? ' point' : ' points'); }
+const isDemo = () => FID === 'demo';
 
 let toastTimer = null;
 function toast(msg, isErr) {
@@ -466,34 +549,387 @@ function toast(msg, isErr) {
   t.textContent = msg;
   t.className = isErr ? 'show err' : 'show';
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.className = isErr ? 'err' : ''; }, isErr ? 5000 : 3500);
+  toastTimer = setTimeout(() => { t.className = isErr ? 'err' : ''; }, isErr ? 5500 : 3500);
 }
 
 function show(name) {
+  stopBusyTimer();
   ['landing', 'busy', 'join', 'wizard', 'done', 'app'].forEach(n => $('s-' + n).classList.toggle('on', n === name));
   window.scrollTo(0, 0);
 }
-function busy(msg) { $('busyMsg').textContent = msg; show('busy'); }
 
-function ask(title, text, mode) {
+/* ---------- busy screen: progress steps, timeout, retry ---------- */
+let busyTimer = null;
+function stopBusyTimer() { clearInterval(busyTimer); busyTimer = null; }
+function busy(msg, steps) {
+  show('busy');
+  $('busyMsg').textContent = msg;
+  $('busySpin').classList.remove('hidden');
+  $('busyErr').classList.add('hidden');
+  const list = steps || [];
+  let i = 0;
+  $('busyStep').textContent = list[0] || '';
+  if (list.length > 1) busyTimer = setInterval(() => { i = Math.min(i + 1, list.length - 1); $('busyStep').textContent = list[i]; }, 3500);
+}
+function busyFail(message, retry, back) {
+  stopBusyTimer();
+  $('busySpin').classList.add('hidden');
+  $('busyStep').textContent = '';
+  $('busyErrText').textContent = message;
+  $('busyErr').classList.remove('hidden');
+  $('busyRetry').onclick = retry;
+  $('busyBack').onclick = back;
+}
+
+function ask(title, text, mode, options) {
   return new Promise(resolve => {
-    const inp = $('mInput');
+    const inp = $('mInput'), sel = $('mSelect');
     $('mTitle').textContent = title;
     $('mText').textContent = text || '';
     inp.classList.toggle('hidden', mode !== 'pin');
+    sel.classList.toggle('hidden', mode !== 'select');
     inp.value = '';
+    if (mode === 'select') sel.innerHTML = (options || []).map(o => `<option>${esc(o)}</option>`).join('');
     $('modal').className = 'show';
     if (mode === 'pin') setTimeout(() => inp.focus(), 60);
     const done = ok => {
       $('modal').className = '';
       $('mOk').onclick = $('mCancel').onclick = inp.onkeydown = null;
-      resolve(ok ? (mode === 'pin' ? inp.value : true) : null);
+      resolve(ok ? (mode === 'pin' ? inp.value : mode === 'select' ? sel.value : true) : null);
     };
     $('mOk').onclick = () => done(true);
     $('mCancel').onclick = () => done(false);
     inp.onkeydown = e => { if (e.key === 'Enter') done(true); };
   });
 }
+
+/* ============================== IN-BROWSER DEMO ==============================
+   The demo family lives only in this browser. It uses the same auction rules
+   as the real backend (allocate_ below is an exact copy), but nothing is sent
+   to the server and no files are created.                                   */
+
+// Exact copy of allocate_ from Code.gs
+function allocate_(chores, kids, bids, prev, opts) {
+  const size = {}, can = {};
+  chores.forEach(function (ch) {
+    size[ch.name] = ch.size || 1;
+    can[ch.name] = ch.who && ch.who.length ? ch.who : kids;
+  });
+  const load = {};
+  kids.forEach(function (k) { load[k] = 0; });
+  const pl = function (k) { return prev.prevLoad[k] || 0; };
+  const fits = function (k, chore) { return !opts.limit || load[k] + size[chore] <= opts.limit; };
+  const valid = bids.filter(function (b) {
+    return size[b.chore] && load[b.kid] !== undefined && can[b.chore].indexOf(b.kid) > -1;
+  });
+  const assigned = {};
+
+  (opts.noRepeat ? [false, true] : [true]).forEach(function (allowRepeat) {
+    for (;;) {
+      const cand = valid.filter(function (b) {
+        return !assigned[b.chore] && fits(b.kid, b.chore) && (allowRepeat || prev.lastWinner[b.chore] !== b.kid);
+      });
+      if (!cand.length) break;
+      cand.sort(function (a, b) {
+        return a.pts - b.pts || load[a.kid] - load[b.kid] || pl(a.kid) - pl(b.kid) || a.time - b.time;
+      });
+      const w = cand[0];
+      assigned[w.chore] = w;
+      load[w.kid] += size[w.chore];
+    }
+  });
+
+  const order = opts.order || kids;
+  return chores.map(function (ch) {
+    const cb = valid.filter(function (b) { return b.chore === ch.name; });
+    const a = assigned[ch.name];
+    if (a) {
+      const low = Math.min.apply(null, cb.map(function (b) { return b.pts; }));
+      let how = 'Lowest bid';
+      if (a.pts > low) how = 'Next lowest bid (fairness rule)';
+      else if (cb.filter(function (b) { return b.pts === low; }).length > 1) how = 'Tied bid, went to the kid with less work';
+      return { chore: ch.name, kid: a.kid, pts: a.pts, total: cb.length, status: 'Assigned', how: how, row: a.row };
+    }
+    if (opts.unclaimed === 'auto') {
+      const last = prev.lastWinner[ch.name];
+      const pick = order.filter(function (k) { return can[ch.name].indexOf(k) > -1 && fits(k, ch.name); })
+        .sort(function (x, y) { return load[x] - load[y] || pl(x) - pl(y) || (last === x ? 1 : 0) - (last === y ? 1 : 0); })[0];
+      if (pick) {
+        load[pick] += size[ch.name];
+        return { chore: ch.name, kid: pick, pts: ch.min, total: cb.length, status: 'Assigned',
+                 how: 'Nobody won it, so it went to the kid with the least work, at the lowest pay' };
+      }
+      return { chore: ch.name, kid: '(no winner)', pts: '', total: cb.length, status: 'No Bids',
+               how: 'It would put everyone over the work limit. A parent can assign it.' };
+    }
+    return { chore: ch.name, kid: '(no winner)', pts: '', total: cb.length, status: 'No Bids',
+             how: cb.length ? 'Everyone who bid was at their work limit. A parent can assign it.' : 'No bids. A parent can assign it.' };
+  });
+}
+
+const Demo = (function () {
+  const KEY = 'ca_demo_v3';
+  let S = null, session = false;
+  const day = 864e5, hr = 36e5;
+
+  function seed() {
+    const now = Date.now();
+    const d = (daysAgo, hrs) => now - daysAgo * day + (hrs || 0) * hr;
+    const s = {
+      v: 3, family: 'The Demo Family', round: 3, pin: '1234', day: 'Sunday', hour: 18,
+      limit: 7, noRepeat: true, unclaimed: 'auto', me: 'Sam', email: '', nextRow: 2,
+      kids: [{ name: 'Maya', color: '#e85d75', active: true }, { name: 'Leo', color: '#3a86ff', active: true }, { name: 'Sam', color: '#2a9d8f', active: true }],
+      chores: [
+        ['Take out trash', 'Kitchen and bathroom trash to the curb', 1, 6, 1],
+        ['Unload dishwasher', 'Put away every clean dish', 2, 8, 2],
+        ['Feed the pets', 'Morning and evening, all week', 1, 6, 2],
+        ['Vacuum living room', 'Move small things, vacuum under the couch', 4, 12, 3],
+        ['Wipe bathroom sink', 'Sink, faucet, and mirror', 2, 6, 1],
+        ['Fold laundry', 'Fold and deliver one full basket', 3, 8, 2],
+        ['Set the table', 'Plates, cups, forks, napkins', 1, 4, 1],
+        ['Water the plants', 'Inside plants, twice this week', 1, 4, 1],
+        ['Sweep the kitchen', 'Under the table too', 2, 8, 2],
+        ['Clean out the car', 'Trash out, mats shaken, seats wiped', 5, 15, 3, ['Maya', 'Leo']]
+      ].map(c => ({ name: c[0], desc: c[1], min: c[2], max: c[3], size: c[4], who: c[5] || [], active: true })),
+      rewards: [['15 minutes screen time', 5], ['30 minutes screen time', 10], ['1 hour screen time', 18],
+                ['Pick the family movie', 15], ['Stay up 30 minutes late', 20], ['Friend sleepover', 40]].map(r => ({ name: r[0], cost: r[1], active: true })),
+      winners: [], ledger: [], bids: [],
+      devices: [{ key: 'demo-this', kid: 'Sam', added: d(10), lastSeen: now }, { key: 'demo-maya', kid: 'Maya', added: d(10), lastSeen: d(1) }]
+    };
+    const w = (round, date, chore, kid, pts, total, status, sdate, how) => {
+      s.winners.push({ row: s.nextRow++, round, date, chore, winner: kid, points: pts, total, status, statusDate: sdate || null, how });
+      if (status === 'Done') s.ledger.push({ time: sdate, kid, points: pts, type: 'Earned', details: 'Round ' + round + ': ' + chore });
+    };
+    const r1 = d(14), r2 = d(7);
+    w(1, r1, 'Take out trash', 'Leo', 3, 3, 'Done', d(12), 'Lowest bid');
+    w(1, r1, 'Unload dishwasher', 'Maya', 5, 2, 'Done', d(12), 'Lowest bid');
+    w(1, r1, 'Feed the pets', 'Sam', 2, 2, 'Done', d(9), 'Lowest bid');
+    w(1, r1, 'Vacuum living room', 'Leo', 9, 1, 'Done', d(11), 'Lowest bid');
+    w(1, r1, 'Wipe bathroom sink', 'Maya', 3, 2, 'Not Done', d(8), 'Lowest bid');
+    w(1, r1, 'Fold laundry', 'Sam', 5, 2, 'Done', d(10), 'Tied bid, went to the kid with less work');
+    w(1, r1, 'Set the table', 'Sam', 1, 3, 'Done', d(9), 'Lowest bid');
+    w(1, r1, 'Water the plants', 'Maya', 2, 1, 'Done', d(10), 'Lowest bid');
+    w(1, r1, 'Sweep the kitchen', 'Leo', 4, 2, 'Done', d(11), 'Next lowest bid (fairness rule)');
+    w(1, r1, 'Clean out the car', 'Maya', 5, 0, 'Done', d(9), 'Nobody won it, so it went to the kid with the least work, at the lowest pay');
+    w(2, r2, 'Take out trash', 'Maya', 3, 3, 'Done', d(5), 'Lowest bid');
+    w(2, r2, 'Unload dishwasher', 'Leo', 5, 2, 'Done', d(5), 'Lowest bid');
+    w(2, r2, 'Feed the pets', 'Maya', 2, 2, 'Done', d(2), 'Next lowest bid (fairness rule)');
+    w(2, r2, 'Vacuum living room', 'Sam', 8, 2, 'Assigned', null, 'Lowest bid');
+    w(2, r2, 'Wipe bathroom sink', 'Leo', 3, 1, 'Done', d(4), 'Lowest bid');
+    w(2, r2, 'Fold laundry', 'Maya', 6, 2, 'Ready', d(0, -3), 'Lowest bid');
+    w(2, r2, 'Set the table', 'Leo', 1, 3, 'Done', d(3), 'Tied bid, went to the kid with less work');
+    w(2, r2, 'Water the plants', 'Sam', 1, 1, 'Ready', d(0, -5), 'Lowest bid');
+    w(2, r2, 'Sweep the kitchen', 'Sam', 4, 2, 'Assigned', null, 'Lowest bid');
+    w(2, r2, 'Clean out the car', 'Leo', 12, 1, 'Assigned', null, 'Lowest bid');
+    s.ledger.push({ time: d(10, 3), kid: 'Leo', points: -10, type: 'Spent', details: '30 minutes screen time' });
+    s.ledger.push({ time: d(5, 2), kid: 'Maya', points: 3, type: 'Bonus', details: 'Helped carry in the groceries' });
+    s.ledger.push({ time: d(4, 1), kid: 'Sam', points: -5, type: 'Spent', details: '15 minutes screen time' });
+    s.ledger.sort((a, b) => a.time - b.time);
+    const b = (hrsAgo, kid, chore, pts) => s.bids.push({ time: now - hrsAgo * hr, round: 3, kid, chore, pts, status: 'Active' });
+    // Sam bids 1 point on lots of chores, to show the work limit at work
+    b(40, 'Sam', 'Take out trash', 1); b(39, 'Sam', 'Feed the pets', 1); b(38, 'Sam', 'Set the table', 1);
+    b(37, 'Sam', 'Water the plants', 1); b(36, 'Sam', 'Unload dishwasher', 2); b(35, 'Sam', 'Wipe bathroom sink', 2);
+    b(30, 'Maya', 'Take out trash', 3); b(29, 'Maya', 'Unload dishwasher', 4); b(28, 'Maya', 'Feed the pets', 2);
+    b(27, 'Maya', 'Sweep the kitchen', 4); b(26, 'Maya', 'Fold laundry', 5);
+    b(20, 'Leo', 'Take out trash', 2); b(19, 'Leo', 'Vacuum living room', 7); b(18, 'Leo', 'Clean out the car', 10);
+    b(17, 'Leo', 'Set the table', 2); b(15, 'Leo', 'Water the plants', 2);
+    return s;
+  }
+  function load() {
+    if (S) return;
+    try { const j = localStorage.getItem(KEY); if (j) S = JSON.parse(j); } catch (e) { S = null; }
+    if (!S || S.v !== 3) { S = seed(); save(); }
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* demo still works without saving */ } }
+  const fmt = ms => ms ? new Date(ms).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+  const kidsOn = () => S.kids.filter(k => k.active).map(k => k.name);
+  const choresOn = () => S.chores.filter(c => c.active);
+  const P = n => n + (Math.abs(n) === 1 ? ' point' : ' points');
+  const needKid = n => { if (kidsOn().indexOf(n) === -1) throw new Error('Pick a kid.'); return n; };
+  const mustMe = () => { if (!S.me || kidsOn().indexOf(S.me) === -1) throw new Error('NO_DEVICE'); return S.me; };
+  const bal = () => { const b = {}; S.ledger.forEach(l => { b[l.kid] = (b[l.kid] || 0) + l.points; }); return b; };
+  const win = row => { const w = S.winners.find(x => x.row === Number(row)); if (!w) throw new Error('Row not found.'); return w; };
+  const int = (v, lo, hi, label) => { const n = Math.round(Number(v)); if (v === '' || v == null || !isFinite(n) || n < lo || n > hi) throw new Error(label + ' must be a number from ' + lo + ' to ' + hi + '.'); return n; };
+  const txt = (v, max, label) => { const s = String(v || '').trim().replace(/\s+/g, ' ').replace(/,/g, ''); if (!s) throw new Error('Please enter ' + label + '.'); return s.slice(0, max); };
+  const PARENT = ['runAuction', 'joinCode', 'bindDevice', 'removeDevice', 'markChore', 'assignChore', 'redeem', 'adjust', 'saveKid',
+    'saveChore', 'saveReward', 'remove', 'saveSchedule', 'saveFairness', 'saveFamily', 'changePin', 'deleteFamily'];
+
+  const H = {
+    data() {
+      const me = S.me && kidsOn().indexOf(S.me) > -1 ? S.me : '';
+      const kids = S.kids.filter(k => k.active).map(k => ({ name: k.name, color: k.color }));
+      const bids = S.bids.filter(b => b.round === S.round && b.status === 'Active');
+      const b = bal();
+      const all = S.winners.map(w => Object.assign({}, w, { date: fmt(w.date), statusDate: fmt(w.statusDate) }));
+      const open = all.filter(w => w.status === 'Assigned' || w.status === 'Ready' || w.status === 'No Bids');
+      const rest = all.filter(w => open.indexOf(w) === -1).reverse().slice(0, 150);
+      return {
+        fid: 'demo', demo: true, family: S.family, round: S.round,
+        schedule: { day: S.day, hour: S.hour, label: S.day + ' at ' + hl(S.hour), tz: TZ },
+        fairness: { limit: S.limit, noRepeat: S.noRepeat, unclaimed: S.unclaimed }, me,
+        kids,
+        chores: choresOn().map(c => {
+          const cb = bids.filter(x => x.chore === c.name);
+          const mine = me ? cb.find(x => x.kid === me) : null;
+          return { name: c.name, desc: c.desc, min: c.min, max: c.max, size: c.size, who: c.who.slice(), bidders: cb.map(x => x.kid), mine: mine ? mine.pts : null };
+        }),
+        balances: kids.map(k => ({ name: k.name, color: k.color, points: b[k.name] || 0 })),
+        winners: open.concat(rest),
+        rewards: S.rewards.filter(r => r.active).map(r => ({ name: r.name, cost: r.cost })),
+        ledger: S.ledger.slice(-50).reverse().map(l => ({ date: fmt(l.time), kid: l.kid, points: l.points, type: l.type, details: l.details })),
+        parent: session, email: session ? S.email : '',
+        devices: session ? S.devices.map(x => ({ key: x.key, kid: x.kid, added: fmt(x.added), lastSeen: fmt(x.lastSeen) + (x.key === 'demo-this' ? ' (this device)' : '') })) : []
+      };
+    },
+    login(a) { if (String(a.pin || '').trim() !== S.pin) throw new Error('Wrong PIN. In the demo, the PIN is ' + S.pin + '.'); session = true; return { token: 'demo-session' }; },
+    logout() { session = false; return 'Locked.'; },
+    bid(a) {
+      const me = mustMe();
+      const c = choresOn().find(x => x.name === a.chore);
+      if (!c) throw new Error('That chore is not up for auction.');
+      if (c.who.length && c.who.indexOf(me) === -1) throw new Error(c.name + ' is not on ' + me + '\'s list.');
+      const p = Math.round(Number(a.points));
+      if (!isFinite(p) || p < c.min || p > c.max) throw new Error('Bids for ' + c.name + ' must be from ' + c.min + ' to ' + P(c.max) + '.');
+      const ex = S.bids.find(b => b.round === S.round && b.status === 'Active' && b.kid === me && b.chore === c.name);
+      if (ex) { ex.pts = p; ex.time = Date.now(); return 'Changed your bid on ' + c.name + ' to ' + P(p) + '.'; }
+      S.bids.push({ time: Date.now(), round: S.round, kid: me, chore: c.name, pts: p, status: 'Active' });
+      return 'Bid placed: ' + P(p) + ' for ' + c.name + '.';
+    },
+    withdraw(a) {
+      const me = mustMe();
+      const ex = S.bids.find(b => b.round === S.round && b.status === 'Active' && b.kid === me && b.chore === a.chore);
+      if (!ex) throw new Error('There is no bid to take back.');
+      ex.status = 'Withdrawn';
+      return 'Took back your bid on ' + a.chore + '.';
+    },
+    ready(a) {
+      const me = mustMe(), w = win(a.row);
+      if (w.winner !== me) throw new Error('That chore belongs to someone else.');
+      if (w.status !== 'Assigned') throw new Error('That chore is already ' + w.status.toLowerCase() + '.');
+      w.status = 'Ready'; w.statusDate = Date.now();
+      return 'Nice work! ' + w.chore + ' is waiting for a parent to check it.';
+    },
+    runAuction() {
+      const kids = kidsOn(), chores = choresOn();
+      if (!chores.length) throw new Error('There are no chores to auction.');
+      const sizeOf = {}; chores.forEach(c => { sizeOf[c.name] = c.size; });
+      const roundBids = S.bids.filter(b => b.round === S.round && b.status === 'Active');
+      const bids = roundBids.map((b, i) => ({ row: i + 1, kid: b.kid, chore: b.chore, pts: b.pts, time: b.time, ref: b }));
+      const lastWinner = {}, prevLoad = {};
+      S.winners.filter(w => w.round === S.round - 1 && w.status !== 'No Bids' && w.status !== 'Skipped').forEach(w => {
+        lastWinner[w.chore] = w.winner; prevLoad[w.winner] = (prevLoad[w.winner] || 0) + (sizeOf[w.chore] || 1);
+      });
+      const order = kids.slice().sort(() => Math.random() - 0.5);
+      const res = allocate_(chores.map(c => ({ name: c.name, min: c.min, max: c.max, size: c.size, who: c.who })), kids, bids,
+        { lastWinner, prevLoad }, { limit: S.limit, noRepeat: S.noRepeat, unclaimed: S.unclaimed, order });
+      const wonRows = res.map(r => r.row).filter(Boolean);
+      bids.forEach(b => { b.ref.status = wonRows.indexOf(b.row) > -1 ? 'Won' : 'Lost'; });
+      const now = Date.now();
+      res.forEach(r => S.winners.push({ row: S.nextRow++, round: S.round, date: now, chore: r.chore, winner: r.kid, points: r.pts, total: r.total, status: r.status, statusDate: null, how: r.how }));
+      S.round++;
+      return 'Round ' + (S.round - 1) + ' is closed.';
+    },
+    joinCode(a) { needKid(a.kid); return { code: 'DEM-' + String(Math.floor(100 + Math.random() * 899)).replace(/[01]/g, '7'), seconds: 600, kid: a.kid, demo: true }; },
+    bindDevice(a) {
+      const kid = needKid(a.kid);
+      S.me = kid;
+      const d = S.devices.find(x => x.key === 'demo-this');
+      if (d) { d.kid = kid; d.lastSeen = Date.now(); } else S.devices.push({ key: 'demo-this', kid, added: Date.now(), lastSeen: Date.now() });
+      return { device: 'demo', kid };
+    },
+    removeDevice(a) {
+      const i = S.devices.findIndex(x => x.key === a.key);
+      if (i === -1) throw new Error('That device was already removed.');
+      const kid = S.devices[i].kid;
+      if (a.key === 'demo-this') S.me = '';
+      S.devices.splice(i, 1);
+      return 'Device removed. It can no longer bid for ' + kid + '.';
+    },
+    markChore(a) {
+      const w = win(a.row);
+      const to = { 'Done': 'Done', 'Not Done': 'Not Done', 'Again': 'Assigned', 'Skip': 'Skipped' }[a.status];
+      if (!to) throw new Error('Unknown status.');
+      if (a.status === 'Skip' && w.status !== 'No Bids') throw new Error('Only chores with no winner can be skipped.');
+      if (a.status === 'Again' && w.status !== 'Ready') throw new Error('Only chores waiting for inspection can be sent back.');
+      if ((a.status === 'Done' || a.status === 'Not Done') && w.status !== 'Assigned' && w.status !== 'Ready') throw new Error('That chore was already marked ' + w.status + '.');
+      w.status = to; w.statusDate = Date.now();
+      if (to === 'Done') { S.ledger.push({ time: Date.now(), kid: w.winner, points: w.points, type: 'Earned', details: 'Round ' + w.round + ': ' + w.chore }); return w.winner + ' earned ' + P(w.points) + ' for ' + w.chore + '.'; }
+      if (to === 'Assigned') return w.chore + ' sent back to ' + w.winner + ' for a little more work.';
+      if (to === 'Skipped') return w.chore + ' skipped this round.';
+      return w.chore + ' marked Not done. No points given.';
+    },
+    assignChore(a) {
+      const w = win(a.row), kid = needKid(a.kid), p = int(a.points, 0, 1000, 'Points');
+      if (w.status !== 'No Bids') throw new Error('Only chores with no winner can be assigned.');
+      Object.assign(w, { winner: kid, points: p, status: 'Assigned', statusDate: Date.now(), how: 'Assigned by a parent' });
+      return w.chore + ' assigned to ' + kid + ' for ' + P(p) + '.';
+    },
+    redeem(a) {
+      const kid = needKid(a.kid), r = S.rewards.find(x => x.active && x.name === a.reward);
+      if (!r) throw new Error('Reward not found.');
+      const b = bal()[kid] || 0;
+      if (b < r.cost) throw new Error(kid + ' has ' + P(b) + '. ' + r.name + ' costs ' + r.cost + '.');
+      S.ledger.push({ time: Date.now(), kid, points: -r.cost, type: 'Spent', details: r.name });
+      return kid + ' got ' + r.name + '. ' + P(b - r.cost) + ' left. Remember to give the reward!';
+    },
+    adjust(a) {
+      const kid = needKid(a.kid), p = int(a.points, -1000, 1000, 'Points');
+      if (!p) throw new Error('Enter some points (use a minus sign to take points away).');
+      S.ledger.push({ time: Date.now(), kid, points: p, type: p > 0 ? 'Bonus' : 'Adjustment', details: String(a.reason || '').trim().slice(0, 80) || 'Parent adjustment' });
+      return (p > 0 ? 'Gave ' : 'Took ') + P(Math.abs(p)) + ' ' + (p > 0 ? 'to ' : 'from ') + kid + '.';
+    },
+    saveKid(a) {
+      const n = txt(a.name, 24, 'kid name'), old = S.kids.find(k => k.name.toLowerCase() === n.toLowerCase());
+      if (old) { old.active = true; old.color = a.color || old.color; return old.name + ' saved.'; }
+      if (kidsOn().length >= 10) throw new Error('You can have up to 10 kids.');
+      S.kids.push({ name: n, color: a.color || '#6c4bb6', active: true }); return n + ' added.';
+    },
+    saveChore(a) {
+      const n = txt(a.name, 40, 'chore name'), mn = int(a.min, 1, 100, 'The lowest pay'), mx = int(a.max, mn, 100, 'The highest pay');
+      const old = S.chores.find(c => c.name.toLowerCase() === n.toLowerCase());
+      let who = old ? old.who : [];
+      if (Array.isArray(a.who)) { who = a.who.filter(k => kidsOn().indexOf(k) > -1); if (who.length === kidsOn().length) who = []; }
+      const size = a.size == null ? (old ? old.size : 1) : Math.max(1, Math.min(3, Number(a.size) || 1));
+      if (old) { Object.assign(old, { min: mn, max: mx, size, who, active: true, desc: a.desc == null ? old.desc : String(a.desc).slice(0, 80) }); return old.name + ' saved.'; }
+      S.chores.push({ name: n, desc: String(a.desc || '').slice(0, 80), min: mn, max: mx, size, who, active: true }); return n + ' added.';
+    },
+    saveReward(a) {
+      const n = txt(a.name, 40, 'reward name'), cost = int(a.cost, 1, 1000, 'The cost');
+      const old = S.rewards.find(r => r.name.toLowerCase() === n.toLowerCase());
+      if (old) { old.cost = cost; old.active = true; return old.name + ' saved.'; }
+      S.rewards.push({ name: n, cost, active: true }); return n + ' added.';
+    },
+    remove(a) {
+      const list = { kid: S.kids, chore: S.chores, reward: S.rewards }[a.type];
+      const it = list && list.find(x => x.name === a.name && x.active);
+      if (!it) throw new Error('Not found.');
+      if (a.type === 'kid' && kidsOn().length <= 1) throw new Error('A family needs at least one kid.');
+      it.active = false; return a.name + ' removed. Their history is kept.';
+    },
+    saveSchedule(a) { S.day = a.day; S.hour = int(a.hour, 0, 23, 'The hour'); return 'The auction now closes every ' + S.day + ' at ' + hl(S.hour) + '.'; },
+    saveFairness(a) { S.limit = int(a.limit, 0, 30, 'The work limit'); S.noRepeat = !!a.noRepeat; S.unclaimed = a.unclaimed === 'parent' ? 'parent' : 'auto'; return 'Fairness rules saved.'; },
+    saveFamily(a) { S.family = txt(a.name, 40, 'family name'); S.email = String(a.email || '').trim(); return 'Family settings saved.'; },
+    changePin(a) {
+      if (String(a.oldPin).trim() !== S.pin) throw new Error('Wrong PIN.');
+      if (!/^\d{4,8}$/.test(String(a.newPin))) throw new Error('The PIN must be 4 to 8 numbers.');
+      S.pin = String(a.newPin); return 'PIN changed. (In the demo, Start over sets it back to 1234.)';
+    },
+    deleteFamily() { S = seed(); session = false; return 'The demo was reset.'; }
+  };
+
+  return {
+    call(action, args) {
+      load();
+      if (PARENT.indexOf(action) > -1 && !session) throw new Error('PARENT_LOCKED');
+      const fn = H[action];
+      if (!fn) throw new Error('That is not available in the demo.');
+      const out = fn(args || {});
+      save();
+      return JSON.parse(JSON.stringify(out));
+    },
+    reset() { S = seed(); session = false; save(); }
+  };
+})();
 
 /* ============================== SERVER ============================== */
 let inFlight = 0;
@@ -504,40 +940,48 @@ function netBar(on) {
   else { n.className = 'done'; setTimeout(() => { if (!inFlight) n.className = ''; }, 400); }
 }
 
+const SLOW = { createFamily: 75000, runAuction: 45000 };
 async function api(action, args) {
+  args = Object.assign({}, args || {});
+  if (DEVICE && !('device' in args)) args.device = DEVICE;
+  if (isDemo() && action !== 'config' && action !== 'join' && action !== 'recover' && action !== 'createFamily') {
+    netBar(true);
+    try { await new Promise(r => setTimeout(r, 150)); return Demo.call(action, args); }
+    finally { netBar(false); }
+  }
   if (!/^https:\/\//.test(API_URL)) {
     throw new Error('This app is not connected yet. Paste the Apps Script web app link into API_URL near the top of index.html.');
   }
   netBar(true);
+  const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = setTimeout(() => { if (ctrl) ctrl.abort(); }, SLOW[action] || 30000);
   try {
     let res;
     try {
       // Sent as plain text on purpose: this lets the browser talk to Google Apps Script without extra permission checks.
       res = await fetch(API_URL, {
-        method: 'POST',
-        redirect: 'follow',
-        body: JSON.stringify({ action: action, fid: FID || '', token: TOKEN || '', args: args || {} })
+        method: 'POST', redirect: 'follow', signal: ctrl ? ctrl.signal : undefined,
+        body: JSON.stringify({ action: action, fid: FID || '', token: TOKEN || '', args: args })
       });
     } catch (e) {
+      if (e && e.name === 'AbortError') throw new Error('The server took too long to answer. Check your internet connection and try again.');
       throw new Error('Could not reach the server. Check your internet connection and try again.');
     }
     let body;
     try { body = await res.json(); } catch (e) { throw new Error('The server sent back something unexpected. Please try again in a moment.'); }
     if (!body.ok) throw new Error(body.error || 'Something went wrong.');
     return body.data;
-  } finally { netBar(false); }
+  } finally { clearTimeout(timer); netBar(false); }
 }
 
+function setToken(t) { TOKEN = t; ss('ca_tok_' + FID, t); }
+
 async function unlock(reason) {
-  const demo = DATA && DATA.demo ? ' The demo PIN is 1234.' : '';
+  const demo = isDemo() ? ' The demo PIN is 1234.' : '';
   const pin = await ask('Parent PIN', (reason ? reason + ' ' : '') + 'Enter the parent PIN.' + demo, 'pin');
   if (!pin) return false;
-  try {
-    const r = await api('login', { pin: pin });
-    TOKEN = r.token;
-    ss('ca_tok_' + FID, TOKEN);
-    return true;
-  } catch (e) { toast(errMsg(e), true); return false; }
+  try { setToken((await api('login', { pin: pin })).token); return true; }
+  catch (e) { toast(errMsg(e), true); return false; }
 }
 
 async function pcall(action, args) {
@@ -545,7 +989,7 @@ async function pcall(action, args) {
   try { return await api(action, args); }
   catch (e) {
     if (errMsg(e) !== 'PARENT_LOCKED') throw e;
-    TOKEN = null; ss('ca_tok_' + FID, null);
+    setToken(null);
     if (await unlock('Your parent session timed out.')) return await api(action, args);
     throw new Error('CANCELLED');
   }
@@ -563,6 +1007,7 @@ async function act(fn) {
     await load();
   } catch (e) {
     const m = errMsg(e);
+    if (m === 'NO_DEVICE') { DEVICE = null; ls('ca_dev_' + FID, null); toast('This device is not set up for a kid. Ask a parent to set it up.', true); await load(); return; }
     if (m !== 'CANCELLED') toast(m, true);
   }
 }
@@ -572,27 +1017,63 @@ function renderLanding(msg) {
   const m = $('landMsg');
   m.textContent = msg || '';
   m.classList.toggle('hidden', !msg);
-  const fam = cleanId(ls('ca_fid')), demo = cleanId(ls('ca_demo'));
+  const fam = cleanId(ls('ca_fid'));
   let html = '';
   if (fam) html += `<a class="btn" href="${esc(familyLink(fam))}">Open my family</a>`;
-  if (demo) html += `<a class="btn ghost" href="${esc(familyLink(demo))}">Continue the demo</a>`;
+  if (ls('ca_demo_v3')) html += `<a class="btn ghost" href="${esc(APP_LINK)}#demo">Continue the demo</a>`;
   $('landContinue').innerHTML = html;
+  FID = null; DATA = null;
   show('landing');
 }
 
-async function tryDemo() {
-  busy('Building your demo family. This takes about 10 seconds...');
-  try {
-    const r = await api('createDemo', { tz: TZ, appLink: APP_LINK });
-    ls('ca_demo', r.fid);
-    location.href = familyLink(r.fid);
-  } catch (e) { renderLanding(errMsg(e)); }
+function openDemo() {
+  FID = 'demo'; TOKEN = null; DEVICE = null; CUR_TAB = 'bid';
+  history.replaceState(null, '', APP_LINK + '#demo');
+  load(true);
+}
+
+async function recover() {
+  const email = $('recEmail').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast('Enter the parent email you used during setup.', true);
+  $('recGo').disabled = true;
+  try { toast(await api('recover', { email: email, appLink: APP_LINK })); }
+  catch (e) { toast(errMsg(e), true); }
+  $('recGo').disabled = false;
 }
 
 function forget(fid) {
   if (ls('ca_fid') === fid) ls('ca_fid', null);
-  if (ls('ca_demo') === fid) ls('ca_demo', null);
+  ls('ca_dev_' + fid, null);
   ss('ca_tok_' + fid, null);
+}
+
+/* ============================== JOIN ============================== */
+function showJoin() {
+  $('joinInput').value = '';
+  show('join');
+  setTimeout(() => $('joinInput').focus(), 60);
+}
+function formatCode(v) {
+  const k = String(v).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+  return k.length > 3 ? k.slice(0, 3) + '-' + k.slice(3) : k;
+}
+async function joinGo() {
+  const code = $('joinInput').value;
+  if (code.replace(/[^A-Za-z0-9]/g, '').length !== 6) return toast('A join code has 6 letters and numbers.', true);
+  if (/^DEM/i.test(code)) return toast('Codes that start with DEM are only for the demo. Ask a parent for a real code.', true);
+  $('joinGo').disabled = true;
+  const prevFid = FID;
+  try {
+    FID = null;
+    const r = await api('join', { code: code });
+    ls('ca_fid', r.fid);
+    ls('ca_dev_' + r.fid, r.device);
+    location.href = familyLink(r.fid);
+  } catch (e) {
+    FID = prevFid;
+    toast(errMsg(e), true);
+    $('joinGo').disabled = false;
+  }
 }
 
 /* ============================== WIZARD ============================== */
@@ -600,15 +1081,15 @@ async function startWizard() {
   if (!CONFIG) {
     busy('Getting things ready...');
     try { CONFIG = await api('config'); }
-    catch (e) { if (FID && DATA) { show('app'); toast(errMsg(e), true); } else renderLanding(errMsg(e)); return; }
+    catch (e) { busyFail(errMsg(e), startWizard, () => (DATA ? show('app') : renderLanding())); return; }
   }
   W = {
     step: 0, license: '', name: '', pin: '', pin2: '', email: '',
     kids: [{ name: '', color: COLORS[0] }, { name: '', color: COLORS[1] }],
-    chores: LIB_CHORES.map(c => ({ name: c[0], desc: c[1], min: c[2], max: c[3], on: !!c[4] })),
+    chores: LIB_CHORES.map(c => ({ name: c[0], desc: c[1], min: c[2], max: c[3], on: !!c[4], size: c[5] })),
     rewards: LIB_REWARDS.map(r => ({ name: r[0], cost: r[1], on: !!r[2] })),
-    newChore: { name: '', min: 2, max: 6 }, newReward: { name: '', cost: 10 },
-    day: 'Sunday', hour: 18, cap: 3, noRepeat: true, autoAssign: true
+    newChore: { name: '', min: 2, max: 6, size: 1 }, newReward: { name: '', cost: 10 },
+    day: 'Sunday', hour: 18, limit: null, noRepeat: true, unclaimed: 'auto'
   };
   show('wizard');
   renderWizard();
@@ -636,26 +1117,30 @@ function wFamily() {
     <input type="password" id="wPin" data-k="pin" value="${esc(W.pin)}" inputmode="numeric" maxlength="8" autocomplete="new-password">
     <label for="wPin2">Type the PIN again</label>
     <input type="password" id="wPin2" data-k="pin2" value="${esc(W.pin2)}" inputmode="numeric" maxlength="8" autocomplete="new-password">
-    <label for="wEmail">Parent email for weekly results (optional)</label>
+    <label for="wEmail">Parent email (recommended)</label>
     <input type="email" id="wEmail" data-k="email" value="${esc(W.email)}" maxlength="120" placeholder="you@example.com">
-    <p class="tip mt">Only parents should know the PIN. It is needed to approve chores, give points, and change settings. It is stored scrambled and checked on our server.</p>
+    <p class="desc mt">Used for weekly results and to email your family link if you lose it.</p>
+    <p class="tip">Only parents should know the PIN. It is needed to approve chores, set up kids' devices, and change settings. It is stored scrambled and checked on our server.</p>
   </div>`;
 }
 
 function wKids() {
   return `<div class="card">
     <h2>Who is bidding?</h2>
-    <p class="desc">Add each kid and pick a color for their button.</p>
+    <p class="desc">Add each kid and pick a color for their name.</p>
     ${W.kids.map((k, i) => `
       <div class="row" style="margin-bottom:8px;align-items:center">
         <input type="color" data-k="kids.${i}.color" value="${esc(k.color)}" aria-label="Color">
         <input type="text" data-k="kids.${i}.name" value="${esc(k.name)}" maxlength="24" placeholder="Kid ${i + 1} name">
-        ${W.kids.length > 1 ? `<button class="btn ghost small shrink" data-w="delKid" data-i="${i}" aria-label="Remove">Remove</button>` : ''}
+        ${W.kids.length > 1 ? `<button class="btn ghost small shrink" data-w="delKid" data-i="${i}">Remove</button>` : ''}
       </div>`).join('')}
     ${W.kids.length < 10 ? `<button class="btn ghost mt" data-w="addKid">Add another kid</button>` : ''}
   </div>`;
 }
 
+function sizeSelect(path, val) {
+  return `<select class="sel-mini" data-k="${path}" data-num="1" aria-label="Size">${[1, 2, 3].map(n => `<option value="${n}" ${Number(val) === n ? 'selected' : ''}>${SIZE_SHORT[n]}</option>`).join('')}</select>`;
+}
 function payInputs(path, item) {
   return `<span class="pay">Pays <input type="number" class="mini" data-k="${path}.min" data-num="1" value="${esc(item.min)}" min="1" max="100"> to
     <input type="number" class="mini" data-k="${path}.max" data-num="1" value="${esc(item.max)}" min="1" max="100"> pts</span>`;
@@ -664,19 +1149,21 @@ function payInputs(path, item) {
 function wChores() {
   return `<div class="card">
     <h2>Pick the chores</h2>
-    <p class="desc">Kids can bid anywhere from the lowest to the highest pay. The lowest pay is your minimum reward, so no one can win a chore for nothing. You can change all of this later.</p>
+    <p class="desc">Kids bid anywhere from the lowest to the highest pay. The lowest pay is your minimum reward. The size (small, medium, big) is how much work it is, so the work limit stays fair. You can change all of this later, and limit chores to certain kids.</p>
     ${W.chores.map((c, i) => `
       <div class="pick ${c.on ? '' : 'off'}">
         <input type="checkbox" data-k="chores.${i}.on" data-re="1" ${c.on ? 'checked' : ''} aria-label="${esc(c.name)}">
         <div class="nm"><b>${esc(c.name)}</b><small>${esc(c.desc)}</small></div>
         ${payInputs('chores.' + i, c)}
+        ${sizeSelect('chores.' + i + '.size', c.size)}
       </div>`).join('')}
   </div>
   <div class="card">
     <h3 class="sec">Add your own chore</h3>
-    <div class="row">
+    <div class="row" style="align-items:center">
       <input type="text" data-k="newChore.name" value="${esc(W.newChore.name)}" maxlength="40" placeholder="Chore name">
       ${payInputs('newChore', W.newChore)}
+      ${sizeSelect('newChore.size', W.newChore.size)}
       <button class="btn shrink" data-w="addChore">Add</button>
     </div>
   </div>`;
@@ -685,7 +1172,7 @@ function wChores() {
 function wRewards() {
   return `<div class="card">
     <h2>Pick the rewards</h2>
-    <p class="desc">This is what points can buy. A kid who works steadily should be able to earn something small every week and something bigger every few weeks.</p>
+    <p class="desc">This is what points can buy. You hand out each reward yourself. A kid who works steadily should be able to earn something small every week and something bigger every few weeks.</p>
     ${W.rewards.map((r, i) => `
       <div class="pick ${r.on ? '' : 'off'}">
         <input type="checkbox" data-k="rewards.${i}.on" data-re="1" ${r.on ? 'checked' : ''} aria-label="${esc(r.name)}">
@@ -695,7 +1182,7 @@ function wRewards() {
   </div>
   <div class="card">
     <h3 class="sec">Add your own reward</h3>
-    <div class="row">
+    <div class="row" style="align-items:center">
       <input type="text" data-k="newReward.name" value="${esc(W.newReward.name)}" maxlength="40" placeholder="Reward">
       <span class="pay shrink">Costs <input type="number" class="mini" data-k="newReward.cost" data-num="1" value="${esc(W.newReward.cost)}" min="1" max="1000"> pts</span>
       <button class="btn shrink" data-w="addReward">Add</button>
@@ -703,28 +1190,48 @@ function wRewards() {
   </div>`;
 }
 
-function capOpts(sel) {
+function limitOpts(sel) {
   let s = `<option value="0" ${!Number(sel) ? 'selected' : ''}>No limit</option>`;
-  for (let i = 1; i <= 8; i++) s += `<option value="${i}" ${i === Number(sel) ? 'selected' : ''}>${plural(i, 'chore')}</option>`;
+  for (let i = 1; i <= 15; i++) s += `<option value="${i}" ${i === Number(sel) ? 'selected' : ''}>${plural(i, 'work point')}</option>`;
   return s;
 }
-function hourOpts(sel) {
-  let s = '';
-  for (let h = 0; h < 24; h++) s += `<option value="${h}" ${h === Number(sel) ? 'selected' : ''}>${hl(h)}</option>`;
-  return s;
-}
+function hourOpts(sel) { let s = ''; for (let h = 0; h < 24; h++) s += `<option value="${h}" ${h === Number(sel) ? 'selected' : ''}>${hl(h)}</option>`; return s; }
 function dayOpts(sel) { return DAYS.map(d => `<option ${d === sel ? 'selected' : ''}>${d}</option>`).join(''); }
 function toggleHtml(id, on, title, text, dataK) {
   return `<label class="toggle"><input type="checkbox" id="${id}" ${dataK ? `data-k="${dataK}"` : ''} ${on ? 'checked' : ''}>
     <div><b>${title}</b><span>${text}</span></div></label>`;
 }
+function unclaimedHtml(name, val, dataK) {
+  const opt = (v, t, d) => `<label class="radio"><input type="radio" name="${name}" value="${v}" ${dataK ? `data-k="${dataK}"` : ''} ${val === v ? 'checked' : ''}>
+    <div><b>${t}</b><span>${d}</span></div></label>`;
+  return opt('auto', 'Give them to the kid with the least work, at the lowest pay', 'Skipping the auction never pays more than bidding. The work limit still applies.') +
+         opt('parent', 'Wait for me to assign them', 'They show up on your Parent page with the kid and points for you to pick.');
+}
 const RULE_REPEAT = ['Rotate chores', 'A kid who did a chore last round only gets it again if nobody else bid on it.'];
-const RULE_AUTO = ['Never leave a chore undone', 'Chores nobody wins go to the kid with the fewest chores, paid at the highest amount.'];
+
+// Plain-language check that the rules can all be met
+function fairnessCheck(kidsCount, chores, limit) {
+  const total = chores.reduce((s, c) => s + (Number(c.size) || 1), 0);
+  if (!limit) return { cls: 'good', text: 'No work limit: the lowest bid always wins, even if one kid wins a lot.' };
+  const cap = kidsCount * limit;
+  const tooBig = chores.filter(c => (Number(c.size) || 1) > limit).map(c => c.name);
+  if (tooBig.length) return { cls: 'warn', text: 'Heads up: ' + tooBig.join(', ') + (tooBig.length === 1 ? ' is' : ' are') + ' bigger than the work limit, so nobody can win ' + (tooBig.length === 1 ? 'it' : 'them') + '. Raise the limit or make the chore smaller.' };
+  if (total > cap) return { cls: 'warn', text: `Heads up: your chores add up to ${total} work points, but ${plural(kidsCount, 'kid')} × ${limit} = ${cap}. About ${total - cap} work points of chores will not fit each round and will wait for you to assign. The limit is never broken.` };
+  return { cls: 'good', text: `Your chores add up to ${total} work points. ${plural(kidsCount, 'kid')} × ${limit} = room for ${cap}, so every chore can find someone.` };
+}
+function suggestLimit(kidsCount, chores) {
+  const total = chores.reduce((s, c) => s + (Number(c.size) || 1), 0);
+  return Math.max(3, Math.min(15, Math.ceil(total / Math.max(1, kidsCount)) + 1));
+}
 
 function wRules() {
+  const kids = W.kids.filter(k => k.name.trim()).length;
+  const chores = W.chores.filter(c => c.on);
+  if (W.limit == null) W.limit = suggestLimit(kids, chores);
+  const chk = fairnessCheck(kids, chores, W.limit);
   return `<div class="card">
     <h2>When does the auction close?</h2>
-    <p class="desc">Kids bid all week. The auction closes on its own at this time every week, and you can also run it early.</p>
+    <p class="desc">Kids bid all week. The auction closes on its own at this time every week, and you can also close it early.</p>
     <div class="row">
       <div><label>Day</label><select data-k="day">${dayOpts(W.day)}</select></div>
       <div><label>Time</label><select data-k="hour" data-num="1">${hourOpts(W.hour)}</select></div>
@@ -732,12 +1239,14 @@ function wRules() {
   </div>
   <div class="card">
     <h2>Fairness rules</h2>
-    <label>Most chores one kid can win each round</label>
-    <select data-k="cap" data-num="1">${capOpts(W.cap)}</select>
-    <p class="desc mt">This stops one kid from winning everything by bidding 1 point. When a kid reaches the limit, their extra chores go to the next lowest bid.</p>
+    <label>Work limit per kid each round</label>
+    <select data-k="limit" data-num="1" data-re="1">${limitOpts(W.limit)}</select>
+    <p class="desc mt">A small job counts 1, a medium job 2, and a big job 3. Once a kid's next win would go over the limit, that chore goes to the next lowest bid.</p>
+    <div class="${chk.cls}">${esc(chk.text)}</div>
     ${toggleHtml('wRepeat', W.noRepeat, RULE_REPEAT[0], RULE_REPEAT[1], 'noRepeat')}
-    ${toggleHtml('wAuto', W.autoAssign, RULE_AUTO[0], RULE_AUTO[1], 'autoAssign')}
-    <p class="tip mt">Ties always go to the kid with fewer chores.</p>
+    <label>Chores nobody wins</label>
+    ${unclaimedHtml('wUnc', W.unclaimed, 'unclaimed')}
+    <p class="tip mt">Ties go to the kid with less work.</p>
   </div>`;
 }
 
@@ -747,35 +1256,31 @@ function setPath(path, val) {
   for (let i = 0; i < parts.length - 1; i++) o = o[parts[i]];
   o[parts[parts.length - 1]] = val;
 }
-
 function wizInput(e) {
   const t = e.target;
   if (!t.dataset || !t.dataset.k) return;
+  if (t.type === 'radio' && !t.checked) return;
   let v = t.type === 'checkbox' ? t.checked : t.value;
   if (t.dataset.num && t.type !== 'checkbox') v = t.value === '' ? '' : Number(t.value);
   setPath(t.dataset.k, v);
   if (t.dataset.re && e.type === 'change') renderWizard();
 }
-
 function wizClick(e) {
   const b = e.target.closest('[data-w]');
   if (!b) return;
-  const i = Number(b.dataset.i);
-  const what = b.dataset.w;
+  const i = Number(b.dataset.i), what = b.dataset.w;
   if (what === 'addKid') W.kids.push({ name: '', color: COLORS[W.kids.length % COLORS.length] });
   if (what === 'delKid') W.kids.splice(i, 1);
   if (what === 'addChore') {
-    const n = W.newChore;
-    const name = String(n.name || '').trim();
+    const n = W.newChore, name = String(n.name || '').trim();
     if (!name) return toast('Type a chore name first.', true);
     if (W.chores.some(c => c.name.toLowerCase() === name.toLowerCase())) return toast('That chore is already on the list.', true);
     if (!(n.min >= 1 && n.max >= n.min && n.max <= 100)) return toast('The pay should be from 1 to 100, lowest first.', true);
-    W.chores.push({ name: name, desc: 'Your chore', min: n.min, max: n.max, on: true });
-    W.newChore = { name: '', min: 2, max: 6 };
+    W.chores.push({ name: name, desc: 'Your chore', min: n.min, max: n.max, size: n.size || 1, on: true });
+    W.newChore = { name: '', min: 2, max: 6, size: 1 };
   }
   if (what === 'addReward') {
-    const n = W.newReward;
-    const name = String(n.name || '').trim();
+    const n = W.newReward, name = String(n.name || '').trim();
     if (!name) return toast('Type a reward first.', true);
     if (W.rewards.some(r => r.name.toLowerCase() === name.toLowerCase())) return toast('That reward is already on the list.', true);
     if (!(n.cost >= 1 && n.cost <= 1000)) return toast('The cost should be from 1 to 1000 points.', true);
@@ -784,7 +1289,6 @@ function wizClick(e) {
   }
   renderWizard();
 }
-
 function wizCheck() {
   if (W.step === 0) {
     if (CONFIG && CONFIG.licenseRequired && !W.license.trim()) return 'Enter the license key from your receipt.';
@@ -804,6 +1308,7 @@ function wizCheck() {
     if (!on.length) return 'Pick at least one chore.';
     const bad = on.find(c => !(c.min >= 1 && c.max >= c.min && c.max <= 100));
     if (bad) return 'Check the pay for ' + bad.name + '. The lowest must be at least 1 and the highest can be up to 100.';
+    W.limit = null; // recompute the suggested limit for the chosen chores
   }
   if (W.step === 3) {
     const bad = W.rewards.filter(r => r.on).find(r => !(r.cost >= 1 && r.cost <= 1000));
@@ -811,38 +1316,34 @@ function wizCheck() {
   }
   return '';
 }
-
 async function wizNext() {
   const err = wizCheck();
   if (err) return toast(err, true);
   if (W.step < STEPS.length - 1) { W.step++; renderWizard(); window.scrollTo(0, 0); return; }
-  busy('Setting up your family. This takes about 10 seconds...');
-  try {
-    const r = await api('createFamily', {
-      license: W.license.trim(), name: W.name.trim(), pin: W.pin, email: W.email.trim(), tz: TZ, appLink: APP_LINK,
-      kids: W.kids.filter(k => k.name.trim()).map(k => ({ name: k.name.trim(), color: k.color })),
-      chores: W.chores.filter(c => c.on).map(c => ({ name: c.name, desc: c.desc, min: c.min, max: c.max })),
-      rewards: W.rewards.filter(r => r.on).map(r => ({ name: r.name, cost: r.cost })),
-      day: W.day, hour: W.hour, cap: W.cap, noRepeat: W.noRepeat, autoAssign: W.autoAssign
-    });
-    W = null;
-    ls('ca_fid', r.fid);
-    renderDone(r.fid);
-  } catch (e) {
-    show('wizard');
-    toast(errMsg(e), true);
-  }
+  const payload = {
+    license: W.license.trim(), name: W.name.trim(), pin: W.pin, email: W.email.trim(), tz: TZ, appLink: APP_LINK,
+    kids: W.kids.filter(k => k.name.trim()).map(k => ({ name: k.name.trim(), color: k.color })),
+    chores: W.chores.filter(c => c.on).map(c => ({ name: c.name, desc: c.desc, min: c.min, max: c.max, size: c.size })),
+    rewards: W.rewards.filter(r => r.on).map(r => ({ name: r.name, cost: r.cost })),
+    day: W.day, hour: W.hour, limit: W.limit || 0, noRepeat: W.noRepeat, unclaimed: W.unclaimed
+  };
+  const go = async () => {
+    busy('Setting up your family...', ['Creating your family\'s private space...', 'Adding kids, chores, and rewards...', 'Almost ready...', 'Still working. Slow connections can take up to a minute...']);
+    try {
+      FID = null;
+      const r = await api('createFamily', payload);
+      W = null;
+      ls('ca_fid', r.fid);
+      renderDone(r.fid);
+    } catch (e) {
+      busyFail(errMsg(e) + ' If you try again, check the Parent page afterwards so you do not end up with two families.', go, () => { show('wizard'); });
+    }
+  };
+  go();
 }
-
 function wizBack() {
-  if (W.step === 0) {
-    if (FID && DATA) { show('app'); return; }
-    renderLanding();
-    return;
-  }
-  W.step--;
-  renderWizard();
-  window.scrollTo(0, 0);
+  if (W.step === 0) { if (FID && DATA) { show('app'); return; } renderLanding(); return; }
+  W.step--; renderWizard(); window.scrollTo(0, 0);
 }
 
 function renderDone(fid) {
@@ -852,7 +1353,6 @@ function renderDone(fid) {
   $('doneShare').onclick = () => shareLink(link);
   show('done');
 }
-
 async function shareLink(link) {
   if (navigator.share) {
     try { await navigator.share({ title: 'Our Chore Auction', text: 'Our family Chore Auction', url: link }); return; }
@@ -860,33 +1360,6 @@ async function shareLink(link) {
   }
   copyText(link);
 }
-
-/* ---------- Join with a code ---------- */
-function showJoin() {
-  $('joinInput').value = '';
-  show('join');
-  setTimeout(() => $('joinInput').focus(), 60);
-}
-
-function formatCode(v) {
-  const k = String(v).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
-  return k.length > 3 ? k.slice(0, 3) + '-' + k.slice(3) : k;
-}
-
-async function joinGo() {
-  const code = $('joinInput').value;
-  if (code.replace(/[^A-Za-z0-9]/g, '').length !== 6) return toast('A join code has 6 letters and numbers.', true);
-  $('joinGo').disabled = true;
-  try {
-    const r = await api('join', { code: code });
-    ls('ca_fid', r.fid);
-    location.href = familyLink(r.fid);
-  } catch (e) {
-    toast(errMsg(e), true);
-    $('joinGo').disabled = false;
-  }
-}
-
 async function copyText(text) {
   try { await navigator.clipboard.writeText(text); toast('Link copied.'); }
   catch (e) {
@@ -901,39 +1374,41 @@ async function copyText(text) {
 async function openFamily(fid) {
   FID = fid;
   TOKEN = cleanId(ss('ca_tok_' + fid)) || null;
-  busy('Opening your Chore Auction...');
+  DEVICE = cleanId(ls('ca_dev_' + fid)) || null;
   await load(true);
 }
 
 async function load(first) {
+  if (first && !isDemo()) busy('Opening your Chore Auction...', ['Connecting...', 'Getting your family\'s chores...', 'Still working. This can take a few seconds on a slow connection...']);
   let d;
   try {
-    d = await api('data', { kid: KID || '' });
+    d = await api('data', {});
   } catch (e) {
     const m = errMsg(e);
     if (m === 'NOT_FOUND') {
       forget(FID);
-      FID = null; DATA = null;
       history.replaceState(null, '', APP_LINK);
-      renderLanding('That family link does not work anymore. The family may have been deleted, or the demo ended.');
+      renderLanding('That family link does not work anymore. The family may have been deleted. If you lost your link, use "Lost your family link?" below.');
       return;
     }
-    if (first) { renderLanding('Could not open the app. ' + m); return; }
+    if (first) { busyFail(m, () => load(true), () => renderLanding()); return; }
     toast(m, true);
     return;
   }
   DATA = d;
-  if (TOKEN && !DATA.parent) { TOKEN = null; ss('ca_tok_' + FID, null); }
-  if (KID && !DATA.kids.some(k => k.name === KID)) KID = null;
-  ls(DATA.demo ? 'ca_demo' : 'ca_fid', FID);
+  if (TOKEN && !DATA.parent) setToken(null);
+  if (!isDemo()) {
+    if (DEVICE && !DATA.me) { DEVICE = null; ls('ca_dev_' + FID, null); }
+    ls('ca_fid', FID);
+  }
   renderApp();
   if (first) show('app');
 }
 
-function kidColor(name) {
-  const k = DATA.kids.find(x => x.name === name);
-  return k ? k.color : '#8a8a8a';
-}
+function kidColor(name) { const k = DATA.kids.find(x => x.name === name); return k ? k.color : '#8a8a8a'; }
+function chip(name) { return `<span class="chip" style="background:${esc(kidColor(name))}">${esc(name)}</span>`; }
+function canDo(c, kid) { return !c.who || !c.who.length || c.who.indexOf(kid) > -1; }
+const openRows = () => DATA.winners.filter(w => w.status === 'Assigned' || w.status === 'Ready');
 
 function renderApp() {
   document.title = DATA.family + ' - The Chore Auction';
@@ -941,206 +1416,241 @@ function renderApp() {
   $('roundPill').textContent = 'Round ' + DATA.round;
   $('closePill').textContent = 'Closes ' + DATA.schedule.label;
   $('demoBanner').classList.toggle('hidden', !DATA.demo);
-  renderBid(); renderBoard(); renderResults(); renderPoints(); renderParent();
+  const waiting = DATA.winners.filter(w => w.status === 'Ready').length;
+  $('parentBadge').innerHTML = waiting ? `<span class="badge">${waiting}</span>` : '';
+  renderBid(); renderBoard(); renderChores(); renderPoints(); renderParent();
   showTab(CUR_TAB);
 }
-
 function showTab(name) {
   CUR_TAB = name;
   document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
   document.querySelectorAll('section.tab').forEach(s => s.classList.toggle('on', s.id === 'tab-' + name));
 }
 
+function goalFor(kid) {
+  const b = DATA.balances.find(x => x.name === kid);
+  const pts = b ? b.points : 0;
+  const rw = DATA.rewards.slice().sort((x, y) => x.cost - y.cost);
+  const next = rw.find(r => r.cost > pts);
+  const can = rw.filter(r => r.cost <= pts).pop();
+  if (!rw.length) return { pts, text: '', pct: 0 };
+  if (next) return { pts, text: `${next.cost - pts} more for ${next.name}` + (can ? ` (or trade now for ${can.name})` : ''), pct: Math.round(pts / next.cost * 100) };
+  return { pts, text: `Enough for ${can.name}`, pct: 100 };
+}
+
 function fairText() {
   const f = DATA.fairness;
   const parts = ['Lowest bid wins.'];
-  if (f.cap) parts.push('Each kid can win up to ' + plural(f.cap, 'chore') + ' per round.');
-  parts.push('Ties go to whoever has fewer chores.');
-  if (f.noRepeat) parts.push('Chores rotate, so last round\'s winner gets a chore again only if nobody else bids.');
+  if (f.limit) parts.push('Each kid can win up to ' + plural(f.limit, 'work point') + ' per round (small job 1, medium 2, big 3).');
+  parts.push('Ties go to whoever has less work.');
+  if (f.noRepeat) parts.push('Chores rotate.');
+  parts.push(f.unclaimed === 'auto' ? 'Chores nobody bids on go to the kid with the least work, at the lowest pay.' : 'A parent assigns chores nobody wins.');
   return parts.join(' ');
 }
 
 /* ---------- Bid ---------- */
 function renderBid() {
-  const kb = $('kidButtons');
-  kb.innerHTML = DATA.kids.length ? DATA.kids.map(k =>
-    `<button class="kidbtn ${KID === k.name ? 'sel' : ''}" style="background:${esc(k.color)}" data-kid="${esc(k.name)}">${esc(k.name)}</button>`).join('')
-    : '<div class="empty">No kids yet. A parent can add them in the Parent tab.</div>';
+  const me = DATA.me;
+  if (me) {
+    const g = goalFor(me);
+    $('whoCard').innerHTML = `<div class="card">
+      <div class="who">${chip(me)}<span class="big">You are bidding as ${esc(me)}</span></div>
+      ${g.text ? `<div class="goalline">You have ${points(g.pts)}. ${esc(g.text)}.</div>` : ''}
+      <p class="desc mt" style="margin-bottom:0">Not ${esc(me)}? <button class="link" data-x="switch">Switch kid</button> (a parent needs to approve).</p>
+    </div>`;
+  } else {
+    $('whoCard').innerHTML = `<div class="card hl">
+      <h3 class="sec">This device is not set up for a kid yet</h3>
+      <p class="desc">Anyone with your family link can look around. To bid, a parent sets this device up for one kid, so siblings cannot bid for each other.</p>
+      <button class="btn gold" data-x="switch">Set up this device for a kid</button>
+      <p class="desc mt" style="margin-bottom:0">On a kid's own tablet, a parent can also use <b>Parent</b> then <b>Set up kids' devices</b> to get a join code.</p>
+    </div>`;
+  }
   $('fairNote').textContent = fairText();
 
+  const list = DATA.chores.filter(c => !me || canDo(c, me));
   const cc = $('choreCards');
-  if (!DATA.chores.length) { cc.innerHTML = '<div class="card empty">No chores up for auction. A parent can add some in the Parent tab.</div>'; return; }
-  cc.innerHTML = DATA.chores.map((c, i) => {
-    const mine = KID && c.mine != null ? c.mine : null;
+  if (!list.length) { cc.innerHTML = '<div class="card empty">No chores up for auction right now.</div>'; return; }
+  cc.innerHTML = list.map(c => {
+    const i = DATA.chores.indexOf(c);
+    const mine = me && c.mine != null ? c.mine : null;
     const v = BID_VALUES[c.name] != null ? BID_VALUES[c.name] : (mine != null ? mine : Math.round((c.min + c.max) / 2));
+    const only = c.who && c.who.length ? `<span class="tag size">Only ${esc(c.who.join(', '))}</span>` : '';
     return `<div class="card chore">
       <h3>${esc(c.name)}</h3>
       ${c.desc ? `<p class="desc">${esc(c.desc)}</p>` : ''}
-      <div class="meta"><span class="tag">Pays ${c.min} to ${c.max} pts</span><span>${plural(c.bidders.length, 'bid')} so far</span></div>
-      ${mine != null ? `<div class="mine"><span>Your bid: <b>${pt(mine)}</b></span><button class="link" data-wd="${i}">Take back</button></div>` : ''}
-      <div class="stepper">
+      <div class="meta"><span class="tags"><span class="tag">Pays ${c.min} to ${c.max}</span><span class="tag size">${SIZES[c.size] || ''}</span>${only}</span><span>${plural(c.bidders.length, 'bid')}</span></div>
+      ${mine != null ? `<div class="mine"><span>Your bid: <b>${pt(mine)}</b></span><button class="link red" data-wd="${i}">Take back</button></div>` : ''}
+      ${me ? `<div class="stepper">
         <button data-dn="${i}" aria-label="Less">-</button>
         <input type="number" id="bid${i}" value="${v}" min="${c.min}" max="${c.max}" aria-label="Bid">
         <button data-up="${i}" aria-label="More">+</button>
       </div>
-      <button class="btn gold full" data-bid="${i}" ${KID ? '' : 'disabled'}>${KID ? (mine != null ? 'Change my bid' : 'Place my bid') : 'Tap your name first'}</button>
+      <button class="btn gold full" data-bid="${i}">${mine != null ? 'Change my bid' : 'Place my bid'}</button>`
+      : `<button class="btn ghost full" data-x="switch">Set up this device to bid</button>`}
     </div>`;
   }).join('');
+}
+
+async function switchKid() {
+  const kids = DATA.kids.map(k => k.name);
+  if (!kids.length) return toast('Add a kid first in the Parent tab.', true);
+  if (!TOKEN && !(await unlock('A parent needs to approve which kid uses this device.'))) return;
+  const kid = await ask('Who uses this device?', 'This device will bid only as this kid. Switching later needs the parent PIN again.', 'select', kids);
+  if (!kid) return;
+  try {
+    const r = await pcall('bindDevice', { kid: kid, device: DEVICE || '' });
+    if (!isDemo()) { DEVICE = r.device; ls('ca_dev_' + FID, r.device); }
+    try { await api('logout'); } catch (e) { /* ignore */ }
+    setToken(null);
+    Object.keys(BID_VALUES).forEach(k => delete BID_VALUES[k]);
+    CUR_TAB = 'bid';
+    toast('This device now bids as ' + r.kid + '. The parent area was locked.');
+    await load();
+  } catch (e) { if (errMsg(e) !== 'CANCELLED') toast(errMsg(e), true); }
 }
 
 function clampBid(i, v) {
   const c = DATA.chores[i];
   v = Math.max(c.min, Math.min(c.max, Math.round(Number(v) || c.min)));
-  $('bid' + i).value = v;
+  const el = $('bid' + i); if (el) el.value = v;
   BID_VALUES[c.name] = v;
   return v;
 }
-
 function bidClick(e) {
   const t = e.target.closest('button');
   if (!t) return;
-  if (t.dataset.kid) {
-    KID = t.dataset.kid;
-    Object.keys(BID_VALUES).forEach(k => delete BID_VALUES[k]);
-    renderBid();
-    load();
-    return;
-  }
+  if (t.dataset.x === 'switch') return switchKid();
   if (t.dataset.dn) clampBid(+t.dataset.dn, Number($('bid' + t.dataset.dn).value) - 1);
   if (t.dataset.up) clampBid(+t.dataset.up, Number($('bid' + t.dataset.up).value) + 1);
-  if (t.dataset.bid && KID) {
-    const i = +t.dataset.bid;
-    const v = clampBid(i, $('bid' + i).value);
-    const name = DATA.chores[i].name;
+  if (t.dataset.bid) {
+    const i = +t.dataset.bid, v = clampBid(i, $('bid' + i).value), name = DATA.chores[i].name;
     delete BID_VALUES[name];
-    act(() => api('bid', { kid: KID, chore: name, points: v }));
+    act(() => api('bid', { chore: name, points: v }));
   }
-  if (t.dataset.wd && KID) {
-    const name = DATA.chores[+t.dataset.wd].name;
-    act(() => api('withdraw', { kid: KID, chore: name }));
-  }
+  if (t.dataset.wd) act(() => api('withdraw', { chore: DATA.chores[+t.dataset.wd].name }));
 }
 
 /* ---------- Board ---------- */
 function renderBoard() {
   $('boardCards').innerHTML = DATA.chores.length ? DATA.chores.map(c => `
     <div class="card chore"><h3>${esc(c.name)}</h3>
-      <div class="meta"><span class="tag">Pays ${c.min} to ${c.max} pts</span><span>Lowest bid: secret</span></div>
-      ${c.bidders.length ? c.bidders.map(k => `<span class="chip" style="background:${esc(kidColor(k))}">${esc(k)}</span>`).join('')
-        : '<p class="desc" style="margin:0">No bids yet. Be the first!</p>'}
+      <div class="meta"><span class="tags"><span class="tag">Pays ${c.min} to ${c.max}</span><span class="tag size">${SIZES[c.size] || ''}</span></span><span>Lowest bid: secret</span></div>
+      ${c.bidders.length ? c.bidders.map(chip).join('') : '<p class="desc" style="margin:0">No bids yet.</p>'}
     </div>`).join('') : '<div class="card empty">No chores up for auction.</div>';
-
   const counts = {};
   DATA.kids.forEach(k => counts[k.name] = 0);
   DATA.chores.forEach(c => c.bidders.forEach(k => counts[k] = (counts[k] || 0) + 1));
   $('boardKids').innerHTML = DATA.kids.map(k =>
-    `<div class="board-kid"><span class="chip" style="background:${esc(k.color)}">${esc(k.name)}</span><b>${counts[k.name]} of ${DATA.chores.length} chores</b></div>`).join('')
-    || '<div class="empty">No kids yet.</div>';
+    `<div class="board-kid">${chip(k.name)}<b>${counts[k.name]} of ${DATA.chores.filter(c => canDo(c, k.name)).length} chores</b></div>`).join('') || '<div class="empty">No kids yet.</div>';
 }
 
-/* ---------- Chores (results) ---------- */
+/* ---------- Chores ---------- */
 function statusClass(s) { return 's-' + String(s).replace(/\s/g, ''); }
-function statusLabel(s) { return s === 'No Bids' ? 'No winner' : s; }
+function statusLabel(s) { return { 'No Bids': 'No winner', 'Ready': 'Waiting for parent', 'Assigned': 'To do' }[s] || s; }
 
-function renderResults() {
+function renderChores() {
+  const me = DATA.me;
+  const open = openRows();
+  if (me) {
+    const mine = open.filter(w => w.winner === me);
+    $('myChores').innerHTML = `<div class="card hl"><h3 class="sec">My chores (${esc(me)})</h3>
+      ${mine.length ? mine.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>Round ${w.round} · ${pt(w.points)}</small></span>
+        ${w.status === 'Assigned' ? `<button class="btn green small" data-ready="${w.row}">Ready for inspection</button>` : `<span class="status s-Ready">Waiting for parent approval</span>`}</div>`).join('')
+      : '<p class="desc" style="margin:0">Nothing to do right now. Bid on chores to earn points!</p>'}</div>`;
+  } else $('myChores').innerHTML = '';
+
+  const byKid = {};
+  open.forEach(w => { (byKid[w.winner] = byKid[w.winner] || []).push(w); });
+  $('openChores').innerHTML = Object.keys(byKid).length ? Object.keys(byKid).map(k => `<div style="margin-bottom:8px">${chip(k)}
+      ${byKid[k].map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>Round ${w.round} · ${pt(w.points)}</small></span><span class="status ${statusClass(w.status)}">${statusLabel(w.status)}</span></div>`).join('')}</div>`).join('')
+    : '<p class="desc" style="margin:0">No chores in progress.</p>';
+
   const last = DATA.round - 1;
-  const latest = DATA.winners.filter(w => w.round === last).slice().reverse();
-  $('resultsTitle').textContent = last >= 1 ? 'Chore Winners: Round ' + last : 'Chore Winners';
-  const rc = $('resultCards');
-  if (!latest.length) {
-    rc.innerHTML = '<div class="card empty">No auction has run yet. Winners show up here after the first auction closes.</div>';
-  } else {
-    const kidOpts = DATA.kids.map(k => `<option>${esc(k.name)}</option>`).join('');
-    rc.innerHTML = latest.map(w => {
-      let body;
-      if (w.status === 'No Bids') {
-        body = `<p class="desc">Nobody won this one. A parent can give it to someone.</p>
-          <div class="row"><select id="as${w.row}">${kidOpts}</select>
-          <input type="number" id="ap${w.row}" placeholder="Points" min="0"></div>
-          <button class="btn full mt" data-assign="${w.row}">Assign</button>`;
-      } else {
-        body = `<div style="margin:6px 0 10px"><span class="chip" style="background:${esc(kidColor(w.winner))}">${esc(w.winner)}</span> for <b>${pt(w.points)}</b>
-          <div class="how">${esc(w.how)}${w.total ? ' · ' + plural(w.total, 'bid') : ''}</div></div>`;
-        if (w.status === 'Assigned') {
-          body += `<div class="row"><button class="btn green" data-done="${w.row}">Done</button><button class="btn red" data-notdone="${w.row}">Not done</button></div>`;
-        }
-      }
-      return `<div class="card chore"><div class="meta" style="margin-bottom:4px"><h3 style="margin:0">${esc(w.chore)}</h3>
-        <span class="status ${statusClass(w.status)}">${statusLabel(w.status)}</span></div>${body}</div>`;
-    }).join('');
-  }
+  const latest = DATA.winners.filter(w => w.round === last);
+  $('resultsTitle').textContent = last >= 1 ? 'Latest auction: Round ' + last : 'Latest auction';
+  $('resultCards').innerHTML = latest.length ? latest.map(w => `<div class="card chore">
+      <div class="meta" style="margin-bottom:4px"><h3 style="margin:0">${esc(w.chore)}</h3><span class="status ${statusClass(w.status)}">${statusLabel(w.status)}</span></div>
+      ${w.status === 'No Bids' ? '' : `<div>${chip(w.winner)} for <b>${pt(w.points)}</b></div>`}
+      <div class="how">${esc(w.how)}${w.total ? ' · ' + plural(w.total, 'bid') : ''}</div></div>`).join('')
+    : '<div class="card empty">No auction has closed yet. Winners show up here after the first one.</div>';
 
-  const older = DATA.winners.filter(w => w.round < last).slice(0, 80);
+  const older = DATA.winners.filter(w => w.round < last && open.indexOf(w) === -1 && w.status !== 'No Bids').slice(0, 80);
   $('history').innerHTML = older.length
-    ? '<table><tr><th>Round</th><th>Chore</th><th>Winner</th><th>Pts</th><th>Status</th></tr>' + older.map(w =>
+    ? '<table><tr><th>Round</th><th>Chore</th><th>Who</th><th>Pts</th><th>Result</th></tr>' + older.map(w =>
       `<tr><td>${w.round}</td><td>${esc(w.chore)}</td><td>${esc(w.winner)}</td><td>${esc(w.points)}</td><td><span class="status ${statusClass(w.status)}">${statusLabel(w.status)}</span></td></tr>`).join('') + '</table>'
-    : '<div class="empty">Earlier rounds will show here.</div>';
+    : '<div class="empty">Finished chores from earlier rounds show here.</div>';
 }
-
-async function resultsClick(e) {
-  const b = e.target.closest('button');
+function choresClick(e) {
+  const b = e.target.closest('[data-ready]');
   if (!b) return;
-  if (b.dataset.done) {
-    const row = +b.dataset.done;
-    act(async () => {
-      if (!(await confirmParent('Mark done?', 'Points will be added to their balance.'))) throw new Error('CANCELLED');
-      return pcall('markChore', { row: row, status: 'Done' });
-    });
-  }
-  if (b.dataset.notdone) {
-    const row = +b.dataset.notdone;
-    act(async () => {
-      if (!(await confirmParent('Mark not done?', 'No points will be given.'))) throw new Error('CANCELLED');
-      return pcall('markChore', { row: row, status: 'Not Done' });
-    });
-  }
-  if (b.dataset.assign) {
-    const row = b.dataset.assign;
-    const kid = $('as' + row).value, pts = $('ap' + row).value;
-    act(() => pcall('assignChore', { row: +row, kid: kid, points: pts === '' ? '' : Number(pts) }));
-  }
+  act(() => api('ready', { row: +b.dataset.ready }));
 }
 
 /* ---------- Points ---------- */
 function renderPoints() {
-  $('balances').innerHTML = DATA.balances.length ? DATA.balances.map(b =>
-    `<div class="bal" style="background:${esc(b.color)}"><div class="n">${b.points}</div><div class="k">${esc(b.name)}</div></div>`).join('')
-    : '<div class="card empty">No kids yet.</div>';
-
+  $('balances').innerHTML = DATA.balances.length ? DATA.balances.map(b => {
+    const g = goalFor(b.name);
+    return `<div class="bal" style="background:${esc(b.color)}">
+      <div class="top"><span class="k">${esc(b.name)}${b.name === DATA.me ? ' (you)' : ''}</span><span class="n">${b.points}</span></div>
+      ${g.text ? `<div class="goal">${esc(g.text)}<div class="bar"><i style="width:${Math.min(100, g.pct)}%"></i></div></div>` : ''}
+    </div>`;
+  }).join('') : '<div class="card empty">No kids yet.</div>';
   const sel = $('redeemKid');
-  const prev = sel.value || KID || '';
+  const prev = sel.value || DATA.me || '';
   sel.innerHTML = DATA.kids.map(k => `<option ${k.name === prev ? 'selected' : ''}>${esc(k.name)}</option>`).join('');
-
   $('rewardList').innerHTML = DATA.rewards.length ? DATA.rewards.map((r, i) =>
-    `<div class="item"><span class="nm">${esc(r.name)}</span><span class="tag">${pt(r.cost)}</span><button class="btn small" data-rw="${i}">Buy</button></div>`).join('')
+    `<div class="item"><span class="nm">${esc(r.name)}</span><span class="tag">${pt(r.cost)}</span><button class="btn small" data-rw="${i}">Trade</button></div>`).join('')
     : '<div class="empty">No rewards yet. A parent can add them in the Parent tab.</div>';
-
   $('ledger').innerHTML = DATA.ledger.length
     ? '<table><tr><th>When</th><th>Kid</th><th>Pts</th><th>What</th></tr>' + DATA.ledger.map(l =>
       `<tr><td>${esc(l.date)}</td><td>${esc(l.kid)}</td><td class="${l.points >= 0 ? 'plus' : 'minus'}">${l.points > 0 ? '+' : ''}${l.points}</td><td>${esc(l.type)}: ${esc(l.details)}</td></tr>`).join('') + '</table>'
     : '<div class="empty">No points yet.</div>';
 }
-
 function rewardClick(e) {
   const b = e.target.closest('[data-rw]');
   if (!b) return;
-  const r = DATA.rewards[+b.dataset.rw];
-  const kid = $('redeemKid').value;
+  const r = DATA.rewards[+b.dataset.rw], kid = $('redeemKid').value;
   if (!kid) return;
   act(async () => {
-    if (!(await confirmParent('Buy this reward?', kid + ' spends ' + r.cost + (r.cost === 1 ? ' point' : ' points') + ' on ' + r.name + '.'))) throw new Error('CANCELLED');
+    if (!(await confirmParent('Trade points for this reward?', kid + ' spends ' + points(r.cost) + ' on ' + r.name + '. You give the reward.'))) throw new Error('CANCELLED');
     return pcall('redeem', { kid: kid, reward: r.name });
   });
 }
 
 /* ---------- Parent ---------- */
+let JOIN = null, joinTimer = null;
+function joinBoxHtml() {
+  if (JOIN && JOIN.expires > Date.now()) {
+    return `<div class="codebig">${esc(JOIN.code)}</div>
+      <p class="desc" style="text-align:center">For ${esc(JOIN.kid)}. Works one time. Expires in <b id="joinLeft"></b>.${JOIN.demo ? ' (Demo codes are just for show.)' : ''}</p>`;
+  }
+  return '';
+}
+function tickJoin() {
+  clearInterval(joinTimer);
+  if (!JOIN) return;
+  const update = () => {
+    const left = Math.max(0, Math.round((JOIN.expires - Date.now()) / 1000));
+    if (!left) { JOIN = null; clearInterval(joinTimer); if ($('joinBox')) $('joinBox').innerHTML = ''; return; }
+    const el = $('joinLeft'); if (el) el.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+  };
+  update();
+  joinTimer = setInterval(update, 1000);
+}
+
+function section(id, title, body) {
+  return `<details class="sec" data-sec="${id}" ${OPEN_SECTIONS.has(id) ? 'open' : ''}><summary>${title}</summary><div>${body}</div></details>`;
+}
+
 function renderParent() {
-  const box = $('parentArea');
-  const d = DATA;
+  const box = $('parentArea'), d = DATA;
   if (!TOKEN) {
+    const waiting = d.winners.filter(w => w.status === 'Ready').length;
     box.innerHTML = `<div class="card" style="max-width:520px">
       <h3 class="sec">Parent area</h3>
-      <p class="desc">Unlock to run auctions, approve chores, give points, and change settings. Your PIN is checked on the server, never stored in this page.</p>
+      ${waiting ? `<p class="good">${plural(waiting, 'chore')} waiting for your approval.</p>` : ''}
+      <p class="desc">Unlock to approve chores, run the auction, set up kids' devices, and change settings. Your PIN is checked on the server.</p>
       ${d.demo ? '<p class="tip">Demo PIN: <b>1234</b></p>' : ''}
       <div class="row"><input type="password" id="pinInline" inputmode="numeric" autocomplete="off" placeholder="Parent PIN">
       <button class="btn shrink" data-p="unlock">Unlock</button></div>
@@ -1148,97 +1658,110 @@ function renderParent() {
     return;
   }
   const kidOpts = d.kids.map(k => `<option>${esc(k.name)}</option>`).join('');
+  const ready = d.winners.filter(w => w.status === 'Ready');
+  const todo = d.winners.filter(w => w.status === 'Assigned');
+  const none = d.winners.filter(w => w.status === 'No Bids');
+  const chk = fairnessCheck(d.kids.length, d.chores, d.fairness.limit);
+
   box.innerHTML = `
+  <div class="card hl">
+    <div class="meta" style="margin:0 0 6px"><h3 class="sec" style="margin:0">Needs your OK</h3><button class="btn ghost small" data-p="lock">Lock parent area</button></div>
+    ${ready.length ? ready.map(w => `<div class="item"><span class="nm">${chip(w.winner)} ${esc(w.chore)}<small>Round ${w.round} · ${pt(w.points)} · ready since ${esc(w.statusDate)}</small></span>
+      <span class="acts"><button class="btn green small" data-p="done" data-row="${w.row}">Approve</button>
+      <button class="btn ghost small" data-p="again" data-row="${w.row}">Needs more work</button>
+      <button class="btn ghost small" data-p="notdone" data-row="${w.row}">Not done</button></span></div>`).join('')
+      : '<p class="desc" style="margin:0">Nothing is waiting. When a kid taps Ready for inspection, it shows up here.</p>'}
+  </div>
+
+  ${none.length ? `<div class="card"><h3 class="sec">No winner yet</h3>
+    ${none.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>Round ${w.round} · ${esc(w.how)}</small></span>
+      <span class="acts"><select class="sel-mini" id="as${w.row}">${kidOpts}</select>
+      <input type="number" class="mini" id="ap${w.row}" placeholder="Pts" min="0">
+      <button class="btn small" data-p="assign" data-row="${w.row}">Assign</button>
+      <button class="btn ghost small" data-p="skip" data-row="${w.row}">Skip</button></span></div>`).join('')}</div>` : ''}
+
   <div class="card">
-    <div class="meta" style="margin:0 0 6px"><h3 class="sec" style="margin:0">Auction</h3><button class="btn ghost small" data-p="lock">Lock parent area</button></div>
+    <h3 class="sec">Auction</h3>
     <p class="desc">Round ${d.round} is open. It closes on its own every ${esc(d.schedule.label)} (${esc(d.schedule.tz.replace(/_/g, ' '))} time).</p>
-    <button class="btn gold full" data-p="run">Run Auction Now</button>
-    <div class="row mt">
-      <div><label>Auction day</label><select id="pDay">${dayOpts(d.schedule.day)}</select></div>
-      <div><label>Time</label><select id="pHour">${hourOpts(d.schedule.hour)}</select></div>
-      <button class="btn shrink" data-p="sched">Save</button>
-    </div>
+    <button class="btn gold full" data-p="run">Close the auction now</button>
+    ${todo.length ? `<p class="desc mt" style="margin-bottom:0">${plural(todo.length, 'chore')} still to do. You can also mark them done here:</p>
+      ${todo.map(w => `<div class="item"><span class="nm">${chip(w.winner)} ${esc(w.chore)}<small>Round ${w.round} · ${pt(w.points)}</small></span>
+      <span class="acts"><button class="btn green small" data-p="done" data-row="${w.row}">Done</button><button class="btn ghost small" data-p="notdone" data-row="${w.row}">Not done</button></span></div>`).join('')}` : ''}
   </div>
 
-  <div class="card">
-    <h3 class="sec">Add a kid's tablet or phone</h3>
-    <ol class="steps-sm">
-      <li>On the kid's device, go to <span class="site">${esc(SITE)}</span></li>
-      <li>Tap <b>Enter a join code</b></li>
-      <li>Type the code below</li>
-    </ol>
+  ${section('devices', "Set up kids' devices", `
+    <p class="desc">Each kid's device bids only as that kid. Pick the kid, get a code, and type it on their device at <span class="site">${esc(SITE)}</span> using <b>Enter a join code</b>.</p>
+    <div class="row"><select id="jcKid">${kidOpts}</select><button class="btn gold shrink" data-p="joinCode">Get a join code</button></div>
     <div id="joinBox">${joinBoxHtml()}</div>
-    <p class="desc mt" style="margin-bottom:6px">Adding your own phone instead? Send yourself the link.</p>
-    <button class="btn ghost small" data-p="share">Share the family link</button>
-  </div>
+    <p class="desc mt">Or set up the device you are holding: <button class="link" data-p="thisDevice">Use this device for a kid</button></p>
+    <label>Devices that can bid</label>
+    ${d.devices.length ? d.devices.map(x => `<div class="item"><span class="nm">${chip(x.kid)}<small>Added ${esc(x.added)} · last used ${esc(x.lastSeen)}</small></span>
+      <button class="btn ghost small" data-p="rmDevice" data-key="${esc(x.key)}">Remove</button></div>`).join('') : '<p class="desc">No devices yet.</p>'}
+    <p class="desc mt" style="margin-bottom:0">Want to send the link to your own phone? <button class="link" data-p="share">Share the family link</button></p>`)}
 
-  <div class="card">
-    <h3 class="sec">Fairness rules</h3>
-    <label>Most chores one kid can win each round</label>
-    <select id="pCap">${capOpts(d.fairness.cap)}</select>
-    ${toggleHtml('pRepeat', d.fairness.noRepeat, RULE_REPEAT[0], RULE_REPEAT[1])}
-    ${toggleHtml('pAuto', d.fairness.autoAssign, RULE_AUTO[0], RULE_AUTO[1])}
-    <p class="desc">Each chore also has a lowest and highest pay, set below. The lowest pay is your minimum reward.</p>
-    <button class="btn full" data-p="fair">Save fairness rules</button>
-  </div>
-
-  <div class="card">
-    <h3 class="sec">Give or take points</h3>
+  ${section('points', 'Give or take points', `
     <div class="row">
       <div><label>Kid</label><select id="adjKid">${kidOpts}</select></div>
       <div><label>Points (use - to take away)</label><input type="number" id="adjPts" placeholder="5"></div>
     </div>
     <label>Reason (kids can see this)</label>
     <input type="text" id="adjReason" maxlength="80" placeholder="Helped without being asked">
-    <button class="btn full mt" data-p="adjust">Save points</button>
-  </div>
+    <button class="btn full mt" data-p="adjust">Save points</button>`)}
 
-  <div class="card">
-    <h3 class="sec">Kids</h3>
-    ${d.kids.map((k, i) => `<div class="item"><span class="nm"><span class="dot" style="background:${esc(k.color)}"></span>${esc(k.name)}</span>
-      <button class="btn ghost small" data-p="delKid" data-i="${i}">Remove</button></div>`).join('')}
+  ${section('rules', 'Fairness rules and schedule', `
+    <label>Work limit per kid each round</label>
+    <select id="pLimit">${limitOpts(d.fairness.limit)}</select>
+    <div class="${chk.cls}" id="pCheck">${esc(chk.text)}</div>
+    ${toggleHtml('pRepeat', d.fairness.noRepeat, RULE_REPEAT[0], RULE_REPEAT[1])}
+    <label>Chores nobody wins</label>
+    ${unclaimedHtml('pUnc', d.fairness.unclaimed)}
+    <div class="row mt">
+      <div><label>Auction day</label><select id="pDay">${dayOpts(d.schedule.day)}</select></div>
+      <div><label>Time</label><select id="pHour">${hourOpts(d.schedule.hour)}</select></div>
+    </div>
+    <button class="btn full mt" data-p="saveRules">Save rules and schedule</button>`)}
+
+  ${section('kids', 'Kids', `
+    ${d.kids.map((k, i) => `<div class="item"><span class="nm">${chip(k.name)}</span><button class="btn ghost small" data-p="delKid" data-i="${i}">Remove</button></div>`).join('')}
     <div class="row mt" style="align-items:center">
       <input type="color" id="nkColor" value="${COLORS[d.kids.length % COLORS.length]}" aria-label="Color">
       <input type="text" id="nkName" maxlength="24" placeholder="New kid's name">
       <button class="btn shrink" data-p="addKid">Add</button>
-    </div>
-  </div>
+    </div>`)}
 
-  <div class="card">
-    <h3 class="sec">Chores and pay</h3>
-    ${d.chores.map((c, i) => `<div class="item"><span class="nm">${esc(c.name)}${c.desc ? `<small>${esc(c.desc)}</small>` : ''}</span>
-      <span class="pay">Pays <input type="number" class="mini" id="cmin${i}" value="${c.min}" min="1" max="100"> to
-      <input type="number" class="mini" id="cmax${i}" value="${c.max}" min="1" max="100"></span>
-      <button class="btn small" data-p="saveChore" data-i="${i}">Save</button>
-      <button class="btn ghost small" data-p="delChore" data-i="${i}">Remove</button></div>`).join('') || '<p class="desc">No chores yet.</p>'}
+  ${section('chores', 'Chores, pay, and who can do them', `
+    ${d.chores.map((c, i) => `<div class="item" style="display:block">
+      <div class="nm" style="margin-bottom:6px">${esc(c.name)}${c.desc ? `<small>${esc(c.desc)}</small>` : ''}</div>
+      <div class="row" style="align-items:center">
+        <span class="pay">Pays <input type="number" class="mini" id="cmin${i}" value="${c.min}" min="1" max="100"> to <input type="number" class="mini" id="cmax${i}" value="${c.max}" min="1" max="100"></span>
+        <select class="sel-mini shrink" id="csize${i}">${[1, 2, 3].map(n => `<option value="${n}" ${c.size === n ? 'selected' : ''}>${SIZE_SHORT[n]}</option>`).join('')}</select>
+      </div>
+      <div class="kidchecks mt">Who can do it:
+        ${d.kids.map(k => `<label><input type="checkbox" class="cwho${i}" value="${esc(k.name)}" ${canDo(c, k.name) ? 'checked' : ''}>${esc(k.name)}</label>`).join('')}</div>
+      <div class="acts mt"><button class="btn small" data-p="saveChore" data-i="${i}">Save</button><button class="btn ghost small" data-p="delChore" data-i="${i}">Remove</button></div>
+    </div>`).join('') || '<p class="desc">No chores yet.</p>'}
     <label>Add a chore</label>
     <input type="text" id="ncName" maxlength="40" placeholder="Chore name">
     <input type="text" id="ncDesc" maxlength="80" placeholder="Short description (optional)" class="mt">
     <div class="row mt" style="align-items:center">
-      <span class="pay">Pays <input type="number" class="mini" id="ncMin" value="2" min="1" max="100"> to
-      <input type="number" class="mini" id="ncMax" value="6" min="1" max="100"> pts</span>
+      <span class="pay">Pays <input type="number" class="mini" id="ncMin" value="2" min="1" max="100"> to <input type="number" class="mini" id="ncMax" value="6" min="1" max="100"></span>
+      <select class="sel-mini shrink" id="ncSize"><option value="1">Small</option><option value="2">Medium</option><option value="3">Big</option></select>
       <button class="btn shrink" data-p="addChore">Add chore</button>
-    </div>
-  </div>
+    </div>`)}
 
-  <div class="card">
-    <h3 class="sec">Rewards</h3>
+  ${section('rewards', 'Rewards', `
     ${d.rewards.map((r, i) => `<div class="item"><span class="nm">${esc(r.name)}</span>
       <span class="pay">Costs <input type="number" class="mini" id="rc${i}" value="${r.cost}" min="1" max="1000"> pts</span>
-      <button class="btn small" data-p="saveReward" data-i="${i}">Save</button>
-      <button class="btn ghost small" data-p="delReward" data-i="${i}">Remove</button></div>`).join('') || '<p class="desc">No rewards yet.</p>'}
+      <span class="acts"><button class="btn small" data-p="saveReward" data-i="${i}">Save</button><button class="btn ghost small" data-p="delReward" data-i="${i}">Remove</button></span></div>`).join('') || '<p class="desc">No rewards yet.</p>'}
     <div class="row mt" style="align-items:center">
       <input type="text" id="nrName" maxlength="40" placeholder="New reward">
       <span class="pay shrink">Costs <input type="number" class="mini" id="nrCost" value="10" min="1" max="1000"> pts</span>
       <button class="btn shrink" data-p="addReward">Add</button>
-    </div>
-  </div>
+    </div>`)}
 
-
-  <div class="card">
-    <h3 class="sec">Family settings</h3>
+  ${section('family', 'Family settings', `
     <label>Family name</label><input type="text" id="fName" maxlength="40" value="${esc(d.family)}">
-    <label>Parent email for weekly results (optional)</label><input type="email" id="fEmail" maxlength="120" value="${esc(d.email)}">
+    <label>Parent email (weekly results and lost-link emails)</label><input type="email" id="fEmail" maxlength="120" value="${esc(d.email)}">
     <button class="btn full mt" data-p="saveFam">Save</button>
     <label class="mt">Change the parent PIN</label>
     <div class="row">
@@ -1247,97 +1770,89 @@ function renderParent() {
       <input type="password" id="pinNew2" inputmode="numeric" placeholder="New PIN again" autocomplete="new-password">
     </div>
     <button class="btn ghost full mt" data-p="pin">Change PIN</button>
-  </div>
-
-  <div class="card danger">
-    <h3 class="sec">Delete this family</h3>
-    <p class="desc">Permanently deletes your kids, chores, bids, and points from our server. This cannot be undone.</p>
-    <button class="btn red" data-p="delete">Delete everything</button>
-  </div>`;
+    <div class="card danger mt" style="margin-bottom:0">
+      <h3 class="sec">${d.demo ? 'Start the demo over' : 'Delete this family'}</h3>
+      <p class="desc">${d.demo ? 'Puts the demo family back the way it started.' : 'Permanently deletes your kids, chores, bids, and points. This cannot be undone.'}</p>
+      <button class="btn red" data-p="delete">${d.demo ? 'Start over' : 'Delete everything'}</button>
+    </div>`)}`;
   tickJoin();
-}
-
-/* ---------- Join codes (parent side) ---------- */
-let JOIN = null, joinTimer = null;
-function joinBoxHtml() {
-  if (JOIN && JOIN.expires > Date.now()) {
-    return `<div class="codebig">${esc(JOIN.code)}</div>
-      <p class="desc" style="text-align:center">Works one time. Expires in <b id="joinLeft"></b>.</p>
-      <button class="btn ghost full" data-p="joinCode">Get a different code</button>`;
-  }
-  return `<button class="btn gold full" data-p="joinCode">Get a join code</button>`;
-}
-function tickJoin() {
-  clearInterval(joinTimer);
-  if (!JOIN) return;
-  const update = () => {
-    const left = Math.max(0, Math.round((JOIN.expires - Date.now()) / 1000));
-    const el = $('joinLeft');
-    if (!left) { JOIN = null; clearInterval(joinTimer); if ($('joinBox')) $('joinBox').innerHTML = joinBoxHtml(); return; }
-    if (el) el.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
-  };
-  update();
-  joinTimer = setInterval(update, 1000);
 }
 
 async function inlineUnlock() {
   const pin = $('pinInline') ? $('pinInline').value : '';
   if (!pin) return toast('Type the PIN first.', true);
-  try {
-    const r = await api('login', { pin: pin });
-    TOKEN = r.token;
-    ss('ca_tok_' + FID, TOKEN);
-    toast('Parent area unlocked.');
-    await load();
-  } catch (e) { toast(errMsg(e), true); }
+  try { setToken((await api('login', { pin: pin })).token); toast('Parent area unlocked.'); await load(); }
+  catch (e) { toast(errMsg(e), true); }
 }
 
 async function parentClick(e) {
   const b = e.target.closest('[data-p]');
   if (!b) return;
-  const d = DATA, i = Number(b.dataset.i), v = id => $(id).value;
+  const d = DATA, i = Number(b.dataset.i), row = Number(b.dataset.row), v = id => $(id).value;
   switch (b.dataset.p) {
     case 'unlock': return inlineUnlock();
     case 'lock':
       try { await api('logout'); } catch (err) { /* ignore */ }
-      TOKEN = null; ss('ca_tok_' + FID, null); renderParent(); toast('Parent area locked.');
-      return;
+      setToken(null); renderParent(); toast('Parent area locked.'); return;
+    case 'done': return act(() => pcall('markChore', { row: row, status: 'Done' }));
+    case 'again': return act(() => pcall('markChore', { row: row, status: 'Again' }));
+    case 'notdone':
+      return act(async () => {
+        if (!(await ask('Mark not done?', 'No points will be given for this chore.', 'confirm'))) throw new Error('CANCELLED');
+        return pcall('markChore', { row: row, status: 'Not Done' });
+      });
+    case 'skip': return act(() => pcall('markChore', { row: row, status: 'Skip' }));
+    case 'assign': return act(() => pcall('assignChore', { row: row, kid: v('as' + row), points: v('ap' + row) === '' ? '' : Number(v('ap' + row)) }));
     case 'run':
-      act(async () => {
-        if (!(await ask('Run the auction now?', 'This closes Round ' + d.round + ' and picks a winner for every chore.', 'confirm'))) throw new Error('CANCELLED');
+      return act(async () => {
+        if (!(await ask('Close the auction now?', 'This closes Round ' + d.round + ' and picks a winner for every chore. Unfinished chores from earlier rounds stay open.', 'confirm'))) throw new Error('CANCELLED');
         await pcall('runAuction');
         CUR_TAB = 'chores';
-        return 'Auction done! Here are the winners.';
+        return 'Auction closed! Here are the winners.';
       });
-      return;
-    case 'sched': return act(() => pcall('saveSchedule', { day: v('pDay'), hour: Number(v('pHour')) }));
-    case 'fair': return act(() => pcall('saveFairness', { cap: Number(v('pCap')), noRepeat: $('pRepeat').checked, autoAssign: $('pAuto').checked }));
-    case 'adjust': return act(() => pcall('adjust', { kid: v('adjKid'), points: v('adjPts') === '' ? '' : Number(v('adjPts')), reason: v('adjReason') }));
-    case 'addKid': return act(() => pcall('saveKid', { name: v('nkName'), color: v('nkColor') }));
-    case 'delKid':
-      return act(async () => {
-        if (!(await ask('Remove ' + d.kids[i].name + '?', 'They will disappear from the app. Their history and points are kept, and adding the same name again brings them back.', 'confirm'))) throw new Error('CANCELLED');
-        return pcall('remove', { type: 'kid', name: d.kids[i].name });
-      });
-    case 'saveChore': return act(() => pcall('saveChore', { name: d.chores[i].name, min: Number(v('cmin' + i)), max: Number(v('cmax' + i)) }));
-    case 'delChore':
-      return act(async () => {
-        if (!(await ask('Remove ' + d.chores[i].name + '?', 'It will no longer be up for auction. Bids already placed on it this round will lose.', 'confirm'))) throw new Error('CANCELLED');
-        return pcall('remove', { type: 'chore', name: d.chores[i].name });
-      });
-    case 'addChore': return act(() => pcall('saveChore', { name: v('ncName'), desc: v('ncDesc'), min: Number(v('ncMin')), max: Number(v('ncMax')) }));
-    case 'saveReward': return act(() => pcall('saveReward', { name: d.rewards[i].name, cost: Number(v('rc' + i)) }));
-    case 'delReward': return act(() => pcall('remove', { type: 'reward', name: d.rewards[i].name }));
-    case 'addReward': return act(() => pcall('saveReward', { name: v('nrName'), cost: Number(v('nrCost')) }));
-    case 'share': return shareLink(familyLink());
     case 'joinCode':
       try {
-        const r = await pcall('joinCode');
-        JOIN = { code: r.code, expires: Date.now() + r.seconds * 1000 };
+        const r = await pcall('joinCode', { kid: v('jcKid') });
+        JOIN = { code: r.code, kid: r.kid, demo: !!r.demo, expires: Date.now() + r.seconds * 1000 };
         $('joinBox').innerHTML = joinBoxHtml();
         tickJoin();
       } catch (err) { if (errMsg(err) !== 'CANCELLED') toast(errMsg(err), true); }
       return;
+    case 'thisDevice': return switchKid();
+    case 'rmDevice':
+      return act(async () => {
+        if (!(await ask('Remove this device?', 'It will no longer be able to bid. You can set it up again later.', 'confirm'))) throw new Error('CANCELLED');
+        return pcall('removeDevice', { key: b.dataset.key });
+      });
+    case 'share': return shareLink(familyLink());
+    case 'adjust': return act(() => pcall('adjust', { kid: v('adjKid'), points: v('adjPts') === '' ? '' : Number(v('adjPts')), reason: v('adjReason') }));
+    case 'saveRules':
+      return act(async () => {
+        const unc = (document.querySelector('input[name=pUnc]:checked') || {}).value || 'auto';
+        await pcall('saveFairness', { limit: Number(v('pLimit')), noRepeat: $('pRepeat').checked, unclaimed: unc });
+        await pcall('saveSchedule', { day: v('pDay'), hour: Number(v('pHour')) });
+        return 'Rules and schedule saved.';
+      });
+    case 'addKid': return act(() => pcall('saveKid', { name: v('nkName'), color: v('nkColor') }));
+    case 'delKid':
+      return act(async () => {
+        if (!(await ask('Remove ' + d.kids[i].name + '?', 'They disappear from the app and their devices stop working. Their history and points are kept, and adding the same name again brings them back.', 'confirm'))) throw new Error('CANCELLED');
+        return pcall('remove', { type: 'kid', name: d.kids[i].name });
+      });
+    case 'saveChore': {
+      const who = Array.from(document.querySelectorAll('.cwho' + i)).filter(x => x.checked).map(x => x.value);
+      if (!who.length) return toast('Pick at least one kid who can do this chore.', true);
+      return act(() => pcall('saveChore', { name: d.chores[i].name, min: Number(v('cmin' + i)), max: Number(v('cmax' + i)), size: Number(v('csize' + i)), who: who }));
+    }
+    case 'delChore':
+      return act(async () => {
+        if (!(await ask('Remove ' + d.chores[i].name + '?', 'It will no longer be up for auction. Bids already placed on it this round will not count.', 'confirm'))) throw new Error('CANCELLED');
+        return pcall('remove', { type: 'chore', name: d.chores[i].name });
+      });
+    case 'addChore': return act(() => pcall('saveChore', { name: v('ncName'), desc: v('ncDesc'), min: Number(v('ncMin')), max: Number(v('ncMax')), size: Number(v('ncSize')) }));
+    case 'saveReward': return act(() => pcall('saveReward', { name: d.rewards[i].name, cost: Number(v('rc' + i)) }));
+    case 'delReward': return act(() => pcall('remove', { type: 'reward', name: d.rewards[i].name }));
+    case 'addReward': return act(() => pcall('saveReward', { name: v('nrName'), cost: Number(v('nrCost')) }));
     case 'saveFam': return act(() => pcall('saveFamily', { name: v('fName'), email: v('fEmail'), appLink: APP_LINK }));
     case 'pin': {
       if (!/^\d{4,8}$/.test(v('pinNew'))) return toast('The new PIN must be 4 to 8 numbers.', true);
@@ -1345,28 +1860,34 @@ async function parentClick(e) {
       return act(() => pcall('changePin', { oldPin: v('pinOld'), newPin: v('pinNew') }));
     }
     case 'delete': {
+      if (d.demo) { Demo.reset(); setToken(null); CUR_TAB = 'bid'; toast('The demo was reset.'); return load(); }
       const pin = await ask('Delete this family?', 'This permanently deletes all kids, chores, bids, and points. It cannot be undone. Enter the parent PIN to confirm.', 'pin');
       if (!pin) return;
-      try {
-        await pcall('deleteFamily', { pin: pin });
-        forget(FID);
-        location.href = APP_LINK;
-      } catch (err) { if (errMsg(err) !== 'CANCELLED') toast(errMsg(err), true); }
+      try { await pcall('deleteFamily', { pin: pin }); forget(FID); location.href = APP_LINK; }
+      catch (err) { if (errMsg(err) !== 'CANCELLED') toast(errMsg(err), true); }
       return;
     }
   }
 }
 
+function parentChange(e) {
+  if (e.target.id === 'pLimit' && DATA) {
+    const chk = fairnessCheck(DATA.kids.length, DATA.chores, Number(e.target.value));
+    const el = $('pCheck'); el.className = chk.cls; el.textContent = chk.text;
+  }
+}
+
 /* ============================== START ============================== */
-$('btnDemo').onclick = tryDemo;
+$('btnDemo').onclick = openDemo;
 $('btnSetup').onclick = startWizard;
 $('btnJoin').onclick = showJoin;
+$('btnRealFamily').onclick = startWizard;
+$('btnDemoReset').onclick = () => { Demo.reset(); setToken(null); CUR_TAB = 'bid'; toast('The demo was reset.'); load(); };
+$('recGo').onclick = recover;
 $('joinGo').onclick = joinGo;
 $('joinBack').onclick = () => renderLanding();
 $('joinInput').addEventListener('input', e => { e.target.value = formatCode(e.target.value); });
 $('joinInput').addEventListener('keydown', e => { if (e.key === 'Enter') joinGo(); });
-document.querySelectorAll('.js-site').forEach(el => { el.textContent = SITE; });
-$('btnRealFamily').onclick = startWizard;
 $('wizNext').onclick = wizNext;
 $('wizBack').onclick = wizBack;
 $('wizBody').addEventListener('input', wizInput);
@@ -1374,28 +1895,36 @@ $('wizBody').addEventListener('change', wizInput);
 $('wizBody').addEventListener('click', wizClick);
 $('tab-bid').addEventListener('click', bidClick);
 $('tab-bid').addEventListener('change', e => { const m = /^bid(\d+)$/.exec(e.target.id || ''); if (m) clampBid(+m[1], e.target.value); });
-$('resultCards').addEventListener('click', resultsClick);
+$('tab-chores').addEventListener('click', choresClick);
 $('rewardList').addEventListener('click', rewardClick);
 $('parentArea').addEventListener('click', parentClick);
+$('parentArea').addEventListener('change', parentChange);
+$('parentArea').addEventListener('toggle', e => { const s = e.target.dataset && e.target.dataset.sec; if (s) { if (e.target.open) OPEN_SECTIONS.add(s); else OPEN_SECTIONS.delete(s); } }, true);
 $('parentArea').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'pinInline') inlineUnlock(); });
 document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => { showTab(b.dataset.tab); if (DATA) load(); }));
+document.querySelectorAll('.js-site').forEach(el => { el.textContent = SITE; });
+document.querySelectorAll('.js-support').forEach(el => { el.textContent = SUPPORT_EMAIL; });
+$('supportLink').textContent = SUPPORT_EMAIL;
+$('supportLink').href = 'mailto:' + SUPPORT_EMAIL + '?subject=' + encodeURIComponent('The Chore Auction');
+$('priceNote').textContent = PRICE_NOTE;
+
+// Direct links: .../#demo, .../#setup, .../#join
+function routeHash() {
+  const go = (location.hash || '').replace('#', '').toLowerCase();
+  if (go === 'demo') { openDemo(); return true; }
+  const to = { setup: startWizard, join: showJoin }[go];
+  if (!to) return false;
+  history.replaceState(null, '', location.pathname + location.search);
+  to();
+  return true;
+}
+window.addEventListener('hashchange', () => { if (!FID || isDemo()) routeHash(); });
 
 (function start() {
   const fid = cleanId(new URLSearchParams(location.search).get('f'));
   if (fid) openFamily(fid);
   else if (!routeHash()) renderLanding();
 })();
-
-// Direct links: .../#demo, .../#setup, .../#join
-function routeHash() {
-  const go = (location.hash || '').replace('#', '').toLowerCase();
-  const to = { demo: tryDemo, setup: startWizard, join: showJoin }[go];
-  if (!to) return false;
-  history.replaceState(null, '', location.pathname + location.search);
-  to();
-  return true;
-}
-window.addEventListener('hashchange', () => { if (!FID) routeHash(); });
 </script>
 </body>
 </html>
