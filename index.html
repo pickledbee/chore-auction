@@ -1382,7 +1382,11 @@ document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('cl
 
 (function start() {
   const fid = cleanId(new URLSearchParams(location.search).get('f'));
+  const go = (location.hash || '').replace('#', '').toLowerCase();
   if (fid) openFamily(fid);
+  else if (go === 'demo') { history.replaceState(null, '', APP_LINK); tryDemo(); }
+  else if (go === 'setup') { history.replaceState(null, '', APP_LINK); startWizard(); }
+  else if (go === 'join') { history.replaceState(null, '', APP_LINK); showJoin(); }
   else renderLanding();
 })();
 </script>
