@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-MudaeHl97m7MMevwtQ+pyfPL8xTOKNEdAG8iyBApx/E='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-ldm571mNlJpz5tZAjgiYhlz6DZNO3Yjmz1Qmv9uyRRk='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -236,6 +236,57 @@
     header.app h1{font-size:21px}
     .bal .n{font-size:34px}
   }
+  /* ---------- version 5 additions ---------- */
+  .ways{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+  .way{background:var(--bg);border-radius:14px;padding:14px}
+  .way b{display:block;font:600 17px 'Fredoka',sans-serif;color:var(--purple);margin-bottom:4px}
+  .way span{color:var(--muted);font-size:14px}
+  .pill.help{border:0;color:#fff;cursor:pointer;font:800 13px 'Nunito',sans-serif}
+  .overlay{position:fixed;inset:0;background:rgba(20,10,40,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .overlay.show{display:flex}
+  .choices{display:grid;gap:12px}
+  .choice{display:block;width:100%;text-align:left;border:2px solid var(--line);background:#fff;border-radius:16px;padding:16px 18px;cursor:pointer;font:inherit;color:var(--ink)}
+  .choice:hover,.choice:focus{border-color:var(--purple2);outline:none}
+  .choice b{display:block;font:600 20px 'Fredoka',sans-serif;color:var(--purple);margin-bottom:4px}
+  .choice span{color:var(--muted);font-size:15px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+  .tile{border:0;border-radius:20px;padding:26px 10px;color:#fff;font:600 24px 'Fredoka',sans-serif;cursor:pointer;min-height:120px;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+  .tile small{display:block;font:700 14px 'Nunito',sans-serif;opacity:.9;margin-top:6px}
+  .tile.parent{background:var(--ink)}
+  .whobar{background:var(--ink);color:#fff;padding:10px 0;font-weight:800}
+  .whobar .wrap{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .hello{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .hello .big{font:700 26px 'Fredoka',sans-serif}
+  .hello .pts{margin-left:auto;text-align:right}
+  .hello .pts b{display:block;font:700 34px 'Fredoka',sans-serif;line-height:1}
+  .goalbox{background:var(--goldl);border-radius:12px;padding:10px 12px;font-weight:800;margin-top:12px}
+  .goalbar{height:10px;background:#f3e3b5;border-radius:999px;margin-top:8px;overflow:hidden}
+  .goalbar i{display:block;height:100%;background:var(--gold);border-radius:999px}
+  .approve{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid var(--line)}
+  .approve:last-child{border-bottom:0}
+  .approve .what{flex:1;min-width:180px}
+  .approve .what b{font:600 19px 'Fredoka',sans-serif;display:block}
+  .approve .what small{color:var(--muted);font-weight:700}
+  .approve .btn{padding:14px 18px}
+  .bigcheck{font-size:20px}
+  .done-all{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .caught{text-align:center;padding:26px 10px}
+  .caught b{display:block;font:600 22px 'Fredoka',sans-serif;color:var(--green);margin-bottom:6px}
+  .kpbox{max-width:340px;text-align:center}
+  .kpdots{display:flex;justify-content:center;gap:14px;margin:6px 0 16px}
+  .kpdots i{width:20px;height:20px;border-radius:50%;border:3px solid var(--purple2)}
+  .kpdots i.on{background:var(--purple2)}
+  .kpdots.shake{animation:shake .35s}
+  @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+  .kpkeys{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .kpkeys button{height:64px;border:0;border-radius:16px;background:var(--bg);font:700 26px 'Fredoka',sans-serif;color:var(--ink);cursor:pointer}
+  .kpkeys button:active{background:var(--lav)}
+  .kpkeys .kpx{font:800 15px 'Nunito',sans-serif;color:var(--purple)}
+  .helpsteps{padding-left:20px;margin:8px 0}
+  .helpsteps li{margin:8px 0;color:var(--ink)}
+  .count{display:inline-block;min-width:20px;padding:1px 7px;border-radius:999px;background:var(--red);color:#fff;font-size:12px;margin-left:5px;vertical-align:1px}
+  .codepill{display:inline-block;background:var(--lav);color:var(--purple);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:800}
+  .codepill.no{background:#fff1e6;color:#7a3d00}
 </style>
 </head>
 <body>
@@ -265,8 +316,8 @@
           <div class="mini-card"><span>Lowest bid wins</span><span class="chip" style="background:#e85d75;margin:0">Maya</span></div>
           <p>When the weekly auction closes, Maya wins the chore.</p></div>
         <div class="st"><b class="n">3</b>
-          <div class="mini-card"><span>Ready for inspection</span><span class="status s-Ready">Waiting</span></div>
-          <p>Maya takes out the trash and taps Ready. A parent checks it and taps Approve.</p></div>
+          <div class="mini-card"><span>I finished it!</span><span class="status s-Ready">Check it</span></div>
+          <p>Maya takes out the trash and taps I finished it. A parent taps Approve. One tap.</p></div>
         <div class="st"><b class="n">4</b>
           <div class="mini-card"><span>Maya earns 3 points</span><span class="tag">15 pts</span></div>
           <p>She now has 15 points. 3 more and she can trade them for an hour of screen time.</p></div>
@@ -274,6 +325,15 @@
     </div>
     <div id="landMsg" class="notice hidden"></div>
     <div id="landContinue" class="continue"></div>
+    <div class="card">
+      <h3 class="sec">Works with the devices you have</h3>
+      <div class="ways">
+        <div class="way"><b>A parent's phone</b><span>Type your PIN once. After that, approving a chore is one tap.</span></div>
+        <div class="way"><b>Kids' own tablets or phones</b><span>Each one is set up for one kid, so siblings cannot bid for each other.</span></div>
+        <div class="way"><b>One family computer</b><span>No phone? No problem. Kids tap their name and type their own 4-number secret code.</span></div>
+      </div>
+      <p class="desc mt" style="margin-bottom:0">Mix and match. Many families use a parent's phone plus one shared family tablet.</p>
+    </div>
     <div class="card">
       <h3 class="sec">Built to be fair</h3>
       <div class="feat">
@@ -294,7 +354,7 @@
       <ul class="plain desc" style="padding-left:20px;margin:0">
         <li id="priceNote"></li>
         <li>Works in the web browser on any phone, tablet, or computer. Nothing to install.</li>
-        <li>A private space for your family, a weekly auction that closes on its own, and an approval list for parents.</li>
+        <li>A private space for your family, a weekly auction that closes on its own, and one-tap approvals for parents.</li>
         <li>Questions or help: <a id="supportLink" href="#"></a></li>
       </ul>
     </div>
@@ -303,10 +363,9 @@
       <ul class="plain desc" style="padding-left:20px;margin:0">
         <li>The app never asks for last names, addresses, birthdays, or photos. Your family's information (a family nickname, kids' first names, chores, and points) is kept in its own Google Sheet in the app owner's private Google Drive. It is not shared or sold. The app owner can see it in order to give support.</li>
         <li>Your family link lets a device view your family's chores and points. Treat it like a house key and only share it within your household.</li>
-        <li>Only devices a parent sets up can bid, and each one bids as one kid. Switching kids needs the parent PIN.</li>
-        <li>Join codes work once and expire after 10 minutes.</li>
-        <li>Parent actions need your PIN. It is stored scrambled and checked on the server, and it locks for 10 minutes after 5 wrong tries.</li>
-        <li>You can delete your family and all of its data at any time from the Parent tab.</li>
+        <li>Only devices a parent sets up can bid. On a family computer, each kid has their own secret code.</li>
+        <li>Parent actions need your PIN, which is stored scrambled and checked on the server. It locks after repeated wrong tries, and you get an email if that happens.</li>
+        <li>You can delete your family and all of its data at any time.</li>
       </ul>
       <p class="desc mt" style="margin-bottom:0">Full details: <a href="privacy.html">Privacy Policy</a> and <a href="terms.html">Terms and refunds</a>.</p>
     </div>
@@ -335,10 +394,10 @@
 
 <!-- ================= JOIN WITH A CODE ================= -->
 <div id="s-join" class="screen">
-  <div class="wiz-head"><div class="wrap"><h1 style="margin:0">Set up this device</h1></div></div>
+  <div class="wiz-head"><div class="wrap"><h1 style="margin:0">Set up a kid's device</h1></div></div>
   <div class="wrap" style="padding-top:20px;max-width:520px">
     <div class="card">
-      <p class="desc">Ask a parent to open the app on their phone, go to <b>Parent</b>, then <b>Set up kids' devices</b>, pick your name, and tap <b>Get a join code</b>. Type the code here.</p>
+      <p class="desc">A parent opens the app on their phone, taps <b>Settings</b>, then <b>Devices</b>, picks your name, and taps <b>Get a join code</b>. Type the code here.</p>
       <label for="joinInput">Join code</label>
       <input type="text" id="joinInput" class="codein" maxlength="7" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC-123">
       <button class="btn gold full mt" id="joinGo">Join</button>
@@ -371,19 +430,17 @@
     <div class="card" style="text-align:center">
       <div class="big-check">&#10003;</div>
       <h2 style="margin-bottom:6px">Your family is ready!</h2>
-      <p class="desc">This is your family's private link. This device will remember it. Bookmark it too, or send it to your own phone.</p>
-      <div class="linkbox"><input type="text" id="doneLink" readonly><button class="btn shrink" id="doneShare">Share</button></div>
-      <a class="btn gold full mt" id="doneOpen" href="#">Open my Chore Auction</a>
+      <p class="desc" id="doneThis"></p>
+      <a class="btn gold full" id="doneOpen" href="#">Open my Chore Auction</a>
     </div>
     <div class="card">
-      <h3 class="sec">Next: set up each kid's device</h3>
-      <p class="desc">Kids can only bid on a device a parent has set up for them. For each kid:</p>
-      <ol class="steps-sm">
-        <li>On your phone, open the app, go to <b>Parent</b>, then <b>Set up kids' devices</b>. Pick the kid and tap <b>Get a join code</b>.</li>
-        <li>On the kid's tablet or phone, go to <span class="site js-site"></span> and tap <b>Enter a join code</b>.</li>
-        <li>Type the code. That device now bids only as that kid.</li>
-      </ol>
-      <p class="desc" style="margin:0">One tablet shared by several kids? Use <b>Set up this device</b> on the Bid tab, and switch kids with your PIN.</p>
+      <h3 class="sec">Next: get your kids set up (pick one or mix)</h3>
+      <div class="ways">
+        <div class="way"><b>One family computer or tablet</b><span>On that computer, go to <span class="site js-site"></span>, tap <b>Open my family</b> (or use your family link), and choose <b>Family computer</b>. Kids sign in with the secret codes you just picked.</span></div>
+        <div class="way"><b>Each kid's own device</b><span>In the app, tap <b>Settings</b>, then <b>Devices</b>, pick a kid, and tap <b>Get a join code</b>. On the kid's device, go to <span class="site js-site"></span> and tap <b>Enter a join code</b>.</span></div>
+      </div>
+      <p class="desc mt">Your family link, for your other devices:</p>
+      <div class="linkbox"><input type="text" id="doneLink" readonly><button class="btn shrink" id="doneShare">Share</button></div>
     </div>
     <div class="card">
       <h3 class="sec">Add it to the home screen</h3>
@@ -402,91 +459,65 @@
         <div class="sub" id="family"></div>
       </div>
       <div class="pills">
-        <div class="pill" id="roundPill"></div>
         <div class="pill" id="closePill"></div>
+        <button class="pill help" id="btnHelp">How it works</button>
       </div>
     </div>
   </header>
   <div class="banner hidden" id="demoBanner">
     <div class="wrap">
-      <span>Demo family with made-up kids. Everything stays on this device. Parent PIN: 1234.</span>
-      <span class="bb"><button class="btn small ghost" id="btnDemoReset">Start over</button><button class="btn small" id="btnRealFamily">Set up my real family</button></span>
+      <span>Demo family, made-up kids, nothing is saved online. Try it as:</span>
+      <span class="bb">
+        <button class="btn small" data-demo="parent">A parent's phone</button>
+        <button class="btn small" data-demo="kid">Sam's tablet</button>
+        <button class="btn small" data-demo="shared">The family computer</button>
+        <button class="btn small ghost" id="btnDemoReset">Start over</button>
+        <button class="btn small gold" id="btnRealFamily">Set up my real family</button>
+      </span>
     </div>
   </div>
-  <nav class="tabs">
-    <div class="wrap">
-      <button data-tab="bid" class="on">Bid</button>
-      <button data-tab="board">Board</button>
-      <button data-tab="chores">Chores</button>
-      <button data-tab="points">Points</button>
-      <button data-tab="parent">Parent<span id="parentBadge"></span></button>
-    </div>
-  </nav>
-  <main class="wrap">
-    <section class="tab on" id="tab-bid">
-      <div id="whoCard"></div>
-      <div class="tip" id="fairNote"></div>
-      <div class="grid" id="choreCards"></div>
-    </section>
-
-    <section class="tab" id="tab-board">
-      <h2>Auction Board</h2>
-      <div class="card"><p class="desc" style="margin:0">Bids are secret until the auction closes. You can see who has bid, but not how much.</p></div>
-      <div class="grid" id="boardCards"></div>
-      <div class="card mt">
-        <h3 class="sec">Bids placed this round</h3>
-        <div id="boardKids"></div>
-      </div>
-    </section>
-
-    <section class="tab" id="tab-chores">
-      <div id="myChores"></div>
-      <div class="card">
-        <h3 class="sec">Everyone's chores in progress</h3>
-        <div id="openChores"></div>
-      </div>
-      <h2 id="resultsTitle">Latest auction</h2>
-      <div class="grid" id="resultCards"></div>
-      <div class="card mt">
-        <h3 class="sec">Earlier</h3>
-        <div class="tablewrap" id="history"></div>
-      </div>
-    </section>
-
-    <section class="tab" id="tab-points">
-      <h2>Points</h2>
-      <div class="grid" id="balances"></div>
-      <div class="card mt">
-        <h3 class="sec">Trade points for a reward</h3>
-        <p class="desc">A parent approves each trade and then gives the reward. The app does not control screen time on any device.</p>
-        <label for="redeemKid">Who is buying?</label>
-        <select id="redeemKid"></select>
-        <div id="rewardList" class="mt"></div>
-      </div>
-      <div class="card">
-        <h3 class="sec">Every point, earned and spent</h3>
-        <div class="tablewrap" id="ledger"></div>
-      </div>
-    </section>
-
-    <section class="tab" id="tab-parent">
-      <div id="parentArea"></div>
-    </section>
-  </main>
+  <div class="whobar hidden" id="whoBar"></div>
+  <nav class="tabs hidden" id="tabs"><div class="wrap" id="tabsIn"></div></nav>
+  <main class="wrap" id="view"></main>
 </div>
 
 <div id="toast"></div>
 
-<div id="modal">
+<!-- yes/no, PIN, and pick-one questions -->
+<div id="modal" class="overlay">
   <div class="mbox">
     <h3 id="mTitle"></h3>
     <p class="desc" id="mText"></p>
     <select id="mSelect" class="hidden" style="margin-bottom:12px"></select>
-    <input type="password" id="mInput" inputmode="numeric" autocomplete="off" placeholder="Parent PIN" style="margin-bottom:12px">
+    <input type="password" id="mInput" inputmode="numeric" autocomplete="off" placeholder="Parent PIN" maxlength="12" style="margin-bottom:12px">
     <div class="row">
       <button class="btn ghost" id="mCancel">Cancel</button>
       <button class="btn" id="mOk">OK</button>
     </div>
+  </div>
+</div>
+
+<!-- big number pad for kids' secret codes -->
+<div id="kp" class="overlay">
+  <div class="mbox kpbox">
+    <h3 id="kpTitle"></h3>
+    <p class="desc" id="kpText">Type your secret code.</p>
+    <div class="kpdots" id="kpDots"><i></i><i></i><i></i><i></i></div>
+    <div class="kpkeys" id="kpKeys">
+      <button>1</button><button>2</button><button>3</button>
+      <button>4</button><button>5</button><button>6</button>
+      <button>7</button><button>8</button><button>9</button>
+      <button class="kpx" data-k="back">&#9003;</button><button>0</button><button class="kpx" data-k="cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- "How it works" -->
+<div id="hm" class="overlay">
+  <div class="mbox" style="max-width:520px">
+    <h3 id="hmTitle">How it works</h3>
+    <div id="hmBody" class="desc"></div>
+    <button class="btn full mt" id="hmClose">Got it</button>
   </div>
 </div>
 
@@ -521,13 +552,18 @@ const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 const STEPS = ['Family', 'Kids', 'Chores', 'Rewards', 'Rules'];
 const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
+const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
 const SITE = APP_LINK.replace(/^https?:\/\//, '').replace(/\/(index\.html)?$/, '');
 const TZ = (function () { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago'; } catch (e) { return 'America/Chicago'; } })();
-let FID = null, TOKEN = null, DEVICE = null, DATA = null, W = null, CONFIG = null;
-let CUR_TAB = 'bid';
+let FID = null;        // this family
+let TOKEN = null;      // parent session (short-lived)
+let DEVICE = null;     // this device's key (kid device, parent phone, or family computer)
+let KSESS = null;      // a kid signed in on the family computer (memory only)
+let DATA = null, W = null, CONFIG = null;
+let KTAB = 'bid', PTAB = 'approve';
 const BID_VALUES = {};
 const OPEN_SECTIONS = new Set();
 
@@ -562,10 +598,12 @@ function pinProblem(p) {
   if (weakPin(p)) return 'That PIN is too easy to guess. Avoid repeats like 111111 and runs like 123456.';
   return '';
 }
+function randomCode() { return String(1000 + Math.floor(Math.random() * 9000)); }
 function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 function pt(n) { return n + (Math.abs(Number(n)) === 1 ? ' pt' : ' pts'); }
 function points(n) { return n + (Math.abs(Number(n)) === 1 ? ' point' : ' points'); }
 const isDemo = () => FID === 'demo';
+const role = () => (DATA && DATA.device ? DATA.device.role : '');
 
 let toastTimer = null;
 function toast(msg, isErr) {
@@ -605,6 +643,7 @@ function busyFail(message, retry, back) {
   $('busyBack').onclick = back;
 }
 
+/* ---------- questions: yes/no, PIN, pick one ---------- */
 function ask(title, text, mode, options) {
   return new Promise(resolve => {
     const inp = $('mInput'), sel = $('mSelect');
@@ -614,16 +653,50 @@ function ask(title, text, mode, options) {
     sel.classList.toggle('hidden', mode !== 'select');
     inp.value = '';
     if (mode === 'select') sel.innerHTML = (options || []).map(o => `<option>${esc(o)}</option>`).join('');
-    $('modal').className = 'show';
+    $('mOk').textContent = mode === 'pin' ? 'Unlock' : 'OK';
+    $('modal').className = 'overlay show';
     if (mode === 'pin') setTimeout(() => inp.focus(), 60);
     const done = ok => {
-      $('modal').className = '';
+      $('modal').className = 'overlay';
       $('mOk').onclick = $('mCancel').onclick = inp.onkeydown = null;
       resolve(ok ? (mode === 'pin' ? inp.value : mode === 'select' ? sel.value : true) : null);
     };
     $('mOk').onclick = () => done(true);
     $('mCancel').onclick = () => done(false);
     inp.onkeydown = e => { if (e.key === 'Enter') done(true); };
+  });
+}
+
+/* ---------- big number pad for kids' secret codes ---------- */
+function keypad(title, text, check) {
+  return new Promise(resolve => {
+    let code = '';
+    const dots = () => { Array.from($('kpDots').children).forEach((d, i) => d.classList.toggle('on', i < code.length)); };
+    $('kpTitle').textContent = title;
+    $('kpText').textContent = text;
+    dots();
+    $('kp').className = 'overlay show';
+    const close = v => { $('kp').className = 'overlay'; $('kpKeys').onclick = null; document.removeEventListener('keydown', onKey); resolve(v); };
+    let checking = false;
+    const press = async k => {
+      if (k === 'cancel') return close(null);
+      if (checking) return;
+      if (k === 'back') { code = code.slice(0, -1); return dots(); }
+      if (!/^\d$/.test(k) || code.length >= 4) return;
+      code += k; dots();
+      if (code.length === 4) {
+        checking = true;
+        const res = await check(code);
+        checking = false;
+        if (res) return close(res);
+        code = ''; dots();                       // clear right away so the next try starts fresh
+        $('kpDots').classList.add('shake');
+        setTimeout(() => $('kpDots').classList.remove('shake'), 400);
+      }
+    };
+    const onKey = e => { if (/^\d$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('back'); else if (e.key === 'Escape') press('cancel'); };
+    document.addEventListener('keydown', onKey);
+    $('kpKeys').onclick = e => { const b = e.target.closest('button'); if (b) press(b.dataset.k || b.textContent.trim()); };
   });
 }
 
@@ -692,17 +765,17 @@ function allocate_(chores, kids, bids, prev, opts) {
 }
 
 const Demo = (function () {
-  const KEY = 'ca_demo_v3';
-  let S = null, session = false;
+  const KEY = 'ca_demo_v5';
+  let S = null, session = false, kidIn = '';
   const day = 864e5, hr = 36e5;
 
   function seed() {
     const now = Date.now();
     const d = (daysAgo, hrs) => now - daysAgo * day + (hrs || 0) * hr;
     const s = {
-      v: 3, family: 'The Demo Family', round: 3, pin: '1234', day: 'Sunday', hour: 18,
-      limit: 7, noRepeat: true, unclaimed: 'auto', me: 'Sam', email: '', nextRow: 2,
-      kids: [{ name: 'Maya', color: '#e85d75', active: true }, { name: 'Leo', color: '#3a86ff', active: true }, { name: 'Sam', color: '#2a9d8f', active: true }],
+      v: 5, family: 'The Demo Family', round: 3, pin: '1234', day: 'Sunday', hour: 18,
+      limit: 7, noRepeat: true, unclaimed: 'auto', autoApprove: 24, role: 'parent', me: 'Sam', email: '', nextRow: 2,
+      kids: [{ name: 'Maya', color: '#e85d75', active: true, code: '1111' }, { name: 'Leo', color: '#3a86ff', active: true, code: '2222' }, { name: 'Sam', color: '#2a9d8f', active: true, code: '3333' }],
       chores: [
         ['Take out trash', 'Kitchen and bathroom trash to the curb', 1, 6, 1],
         ['Unload dishwasher', 'Put away every clean dish', 2, 8, 2],
@@ -718,7 +791,9 @@ const Demo = (function () {
       rewards: [['15 minutes screen time', 5], ['30 minutes screen time', 10], ['1 hour screen time', 18],
                 ['Pick the family movie', 15], ['Stay up 30 minutes late', 20], ['Friend sleepover', 40]].map(r => ({ name: r[0], cost: r[1], active: true })),
       winners: [], ledger: [], bids: [],
-      devices: [{ key: 'demo-this', kid: 'Sam', added: d(10), lastSeen: now }, { key: 'demo-maya', kid: 'Maya', added: d(10), lastSeen: d(1) }]
+      devices: [{ key: 'demo-this', kid: '', role: 'parent', added: d(10), lastSeen: now },
+                { key: 'demo-tab', kid: 'Maya', role: 'kid', added: d(10), lastSeen: d(1) },
+                { key: 'demo-pc', kid: '', role: 'shared', added: d(12), lastSeen: d(0, -2) }]
     };
     const w = (round, date, chore, kid, pts, total, status, sdate, how) => {
       s.winners.push({ row: s.nextRow++, round, date, chore, winner: kid, points: pts, total, status, statusDate: sdate || null, how });
@@ -744,7 +819,7 @@ const Demo = (function () {
     w(2, r2, 'Set the table', 'Leo', 1, 3, 'Done', d(3), 'Tied bid, went to the kid with less work');
     w(2, r2, 'Water the plants', 'Sam', 1, 1, 'Ready', d(0, -5), 'Lowest bid');
     w(2, r2, 'Sweep the kitchen', 'Sam', 4, 2, 'Assigned', null, 'Lowest bid');
-    w(2, r2, 'Clean out the car', 'Leo', 12, 1, 'Assigned', null, 'Lowest bid');
+    w(2, r2, 'Clean out the car', 'Leo', 12, 1, 'Ready', d(0, -1), 'Lowest bid');
     s.ledger.push({ time: d(10, 3), kid: 'Leo', points: -10, type: 'Spent', details: '30 minutes screen time' });
     s.ledger.push({ time: d(5, 2), kid: 'Maya', points: 3, type: 'Bonus', details: 'Helped carry in the groceries' });
     s.ledger.push({ time: d(4, 1), kid: 'Sam', points: -5, type: 'Spent', details: '15 minutes screen time' });
@@ -762,7 +837,7 @@ const Demo = (function () {
   function load() {
     if (S) return;
     try { const j = localStorage.getItem(KEY); if (j) S = JSON.parse(j); } catch (e) { S = null; }
-    if (!S || S.v !== 3) { S = seed(); save(); }
+    if (!S || S.v !== 5) { S = seed(); save(); }
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* demo still works without saving */ } }
   const fmt = ms => ms ? new Date(ms).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
@@ -770,18 +845,25 @@ const Demo = (function () {
   const choresOn = () => S.chores.filter(c => c.active);
   const P = n => n + (Math.abs(n) === 1 ? ' point' : ' points');
   const needKid = n => { if (kidsOn().indexOf(n) === -1) throw new Error('Pick a kid.'); return n; };
-  const mustMe = () => { if (!S.me || kidsOn().indexOf(S.me) === -1) throw new Error('NO_DEVICE'); return S.me; };
+  const currentKid = () => {
+    if (S.role === 'kid' && kidsOn().indexOf(S.me) > -1) return S.me;
+    if (S.role === 'shared' && kidIn && kidsOn().indexOf(kidIn) > -1) return kidIn;
+    return '';
+  };
+  const mustMe = () => { const k = currentKid(); if (!k) throw new Error('NO_DEVICE'); return k; };
   const bal = () => { const b = {}; S.ledger.forEach(l => { b[l.kid] = (b[l.kid] || 0) + l.points; }); return b; };
   const win = row => { const w = S.winners.find(x => x.row === Number(row)); if (!w) throw new Error('Row not found.'); return w; };
   const int = (v, lo, hi, label) => { const n = Math.round(Number(v)); if (v === '' || v == null || !isFinite(n) || n < lo || n > hi) throw new Error(label + ' must be a number from ' + lo + ' to ' + hi + '.'); return n; };
   const txt = (v, max, label) => { const s = String(v || '').trim().replace(/\s+/g, ' ').replace(/,/g, ''); if (!s) throw new Error('Please enter ' + label + '.'); return s.slice(0, max); };
-  const PARENT = ['runAuction', 'joinCode', 'bindDevice', 'removeDevice', 'markChore', 'assignChore', 'redeem', 'adjust', 'saveKid',
+  const PARENT = ['runAuction', 'joinCode', 'bindDevice', 'removeDevice', 'markChore', 'approveAll', 'setKidCode', 'assignChore', 'redeem', 'adjust', 'saveKid',
     'saveChore', 'saveReward', 'remove', 'saveSchedule', 'saveFairness', 'saveFamily', 'changePin', 'deleteFamily'];
 
   const H = {
     data() {
-      const me = S.me && kidsOn().indexOf(S.me) > -1 ? S.me : '';
-      const kids = S.kids.filter(k => k.active).map(k => ({ name: k.name, color: k.color }));
+      let tk = '';
+      if (S.role === 'parent' && !session) { session = true; tk = 'demo-session'; }
+      const me = currentKid();
+      const kids = S.kids.filter(k => k.active).map(k => Object.assign({ name: k.name, color: k.color }, session ? { hasCode: !!k.code } : {}));
       const bids = S.bids.filter(b => b.round === S.round && b.status === 'Active');
       const b = bal();
       const all = S.winners.map(w => Object.assign({}, w, { date: fmt(w.date), statusDate: fmt(w.statusDate) }));
@@ -790,7 +872,8 @@ const Demo = (function () {
       return {
         fid: 'demo', demo: true, family: S.family, round: S.round,
         schedule: { day: S.day, hour: S.hour, label: S.day + ' at ' + hl(S.hour), tz: TZ },
-        fairness: { limit: S.limit, noRepeat: S.noRepeat, unclaimed: S.unclaimed }, me,
+        fairness: { limit: S.limit, noRepeat: S.noRepeat, unclaimed: S.unclaimed, autoApprove: S.autoApprove }, me,
+        device: { role: S.role, kid: S.role === 'kid' ? S.me : '' },
         kids,
         chores: choresOn().map(c => {
           const cb = bids.filter(x => x.chore === c.name);
@@ -801,12 +884,27 @@ const Demo = (function () {
         winners: open.concat(rest),
         rewards: S.rewards.filter(r => r.active).map(r => ({ name: r.name, cost: r.cost })),
         ledger: S.ledger.slice(-50).reverse().map(l => ({ date: fmt(l.time), kid: l.kid, points: l.points, type: l.type, details: l.details })),
-        parent: session, email: session ? S.email : '',
-        devices: session ? S.devices.map(x => ({ key: x.key, kid: x.kid, added: fmt(x.added), lastSeen: fmt(x.lastSeen) + (x.key === 'demo-this' ? ' (this device)' : '') })) : []
+        parent: session, token: tk, weakPin: false, email: session ? S.email : '',
+        devices: session ? S.devices.map(x => ({ key: x.key, kid: x.kid, role: x.role, added: fmt(x.added), lastSeen: fmt(x.lastSeen), mine: x.key === 'demo-this' })) : []
       };
     },
-    login(a) { if (String(a.pin || '').trim() !== S.pin) throw new Error('Wrong PIN. In the demo, the PIN is ' + S.pin + '.'); session = true; return { token: 'demo-session' }; },
+    login(a) {
+      if (String(a.pin || '').trim() !== S.pin) throw new Error('Wrong PIN. In the demo, the PIN is ' + S.pin + '.');
+      session = true;
+      if (a.remember) { S.role = 'parent'; const d = S.devices.find(x => x.key === 'demo-this'); if (d) { d.role = 'parent'; d.kid = ''; } }
+      return { token: 'demo-session', device: a.remember ? 'demo' : '' };
+    },
+    resume() { if (S.role !== 'parent') throw new Error('NO_DEVICE'); session = true; return { token: 'demo-session' }; },
     logout() { session = false; return 'Locked.'; },
+    kidLogin(a) {
+      if (S.role !== 'shared') throw new Error('NO_DEVICE');
+      const k = S.kids.find(x => x.active && x.name === a.kid);
+      if (!k) throw new Error('Pick your name.');
+      if (String(a.code) !== k.code) throw new Error('That code is not right. Try again.');
+      kidIn = k.name;
+      return { ksess: 'demo-kid', kid: k.name };
+    },
+    kidLogout() { kidIn = ''; return 'Signed out.'; },
     bid(a) {
       const me = mustMe();
       const c = choresOn().find(x => x.name === a.chore);
@@ -855,19 +953,20 @@ const Demo = (function () {
     },
     joinCode(a) { needKid(a.kid); return { code: 'DEM-' + String(Math.floor(100 + Math.random() * 899)).replace(/[01]/g, '7'), seconds: 600, kid: a.kid, demo: true }; },
     bindDevice(a) {
-      const kid = needKid(a.kid);
-      S.me = kid;
+      const r = ['kid', 'parent', 'shared'].indexOf(a.role) > -1 ? a.role : 'kid';
+      const kid = r === 'kid' ? needKid(a.kid) : '';
+      S.role = r; if (kid) S.me = kid;
+      kidIn = '';
       const d = S.devices.find(x => x.key === 'demo-this');
-      if (d) { d.kid = kid; d.lastSeen = Date.now(); } else S.devices.push({ key: 'demo-this', kid, added: Date.now(), lastSeen: Date.now() });
-      return { device: 'demo', kid };
+      if (d) { d.kid = kid; d.role = r; d.lastSeen = Date.now(); } else S.devices.push({ key: 'demo-this', kid, role: r, added: Date.now(), lastSeen: Date.now() });
+      return { device: 'demo', kid, role: r };
     },
     removeDevice(a) {
       const i = S.devices.findIndex(x => x.key === a.key);
       if (i === -1) throw new Error('That device was already removed.');
-      const kid = S.devices[i].kid;
-      if (a.key === 'demo-this') S.me = '';
+      if (a.key === 'demo-this') S.role = '';
       S.devices.splice(i, 1);
-      return 'Device removed. It can no longer bid for ' + kid + '.';
+      return 'Device removed. It is no longer part of your Chore Auction.';
     },
     markChore(a) {
       const w = win(a.row);
@@ -881,6 +980,17 @@ const Demo = (function () {
       if (to === 'Assigned') return w.chore + ' sent back to ' + w.winner + ' for a little more work.';
       if (to === 'Skipped') return w.chore + ' skipped this round.';
       return w.chore + ' marked Not done. No points given.';
+    },
+    approveAll(a) {
+      let n = 0, p = 0;
+      (a.rows || []).forEach(row => { try { const w = win(row); H.markChore({ row, status: 'Done' }); n++; p += w.points; } catch (e) { /* skip */ } });
+      return n ? 'Approved ' + n + (n === 1 ? ' chore' : ' chores') + '. ' + P(p) + ' given.' : 'Nothing needed approving.';
+    },
+    setKidCode(a) {
+      const k = S.kids.find(x => x.active && x.name === a.kid);
+      if (!k) throw new Error('Pick a kid.');
+      if (!/^\d{4}$/.test(String(a.code))) throw new Error('A secret code is 4 numbers.');
+      k.code = String(a.code); return k.name + '\'s secret code was saved.';
     },
     assignChore(a) {
       const w = win(a.row), kid = needKid(a.kid), p = int(a.points, 0, 1000, 'Points');
@@ -904,9 +1014,10 @@ const Demo = (function () {
     },
     saveKid(a) {
       const n = txt(a.name, 24, 'kid name'), old = S.kids.find(k => k.name.toLowerCase() === n.toLowerCase());
-      if (old) { old.active = true; old.color = a.color || old.color; return old.name + ' saved.'; }
+      if (a.code != null && a.code !== '' && !/^\d{4}$/.test(String(a.code))) throw new Error('A secret code is 4 numbers.');
+      if (old) { old.active = true; old.color = a.color || old.color; if (a.code) old.code = String(a.code); return old.name + ' saved.'; }
       if (kidsOn().length >= 10) throw new Error('You can have up to 10 kids.');
-      S.kids.push({ name: n, color: a.color || '#6c4bb6', active: true }); return n + ' added.';
+      S.kids.push({ name: n, color: a.color || '#6c4bb6', active: true, code: a.code ? String(a.code) : '' }); return n + ' added.';
     },
     saveChore(a) {
       const n = txt(a.name, 40, 'chore name'), mn = int(a.min, 1, 100, 'The lowest pay'), mx = int(a.max, mn, 100, 'The highest pay');
@@ -931,14 +1042,18 @@ const Demo = (function () {
       it.active = false; return a.name + ' removed. Their history is kept.';
     },
     saveSchedule(a) { S.day = a.day; S.hour = int(a.hour, 0, 23, 'The hour'); return 'The auction now closes every ' + S.day + ' at ' + hl(S.hour) + '.'; },
-    saveFairness(a) { S.limit = int(a.limit, 0, 30, 'The work limit'); S.noRepeat = !!a.noRepeat; S.unclaimed = a.unclaimed === 'parent' ? 'parent' : 'auto'; return 'Fairness rules saved.'; },
+    saveFairness(a) {
+      S.limit = int(a.limit, 0, 30, 'The work limit'); S.noRepeat = !!a.noRepeat; S.unclaimed = a.unclaimed === 'parent' ? 'parent' : 'auto';
+      if (a.autoApprove != null) S.autoApprove = [0, 12, 24, 48].indexOf(Number(a.autoApprove)) > -1 ? Number(a.autoApprove) : 0;
+      return 'Rules saved.';
+    },
     saveFamily(a) { S.family = txt(a.name, 40, 'family nickname'); S.email = String(a.email || '').trim(); return 'Family settings saved.'; },
     changePin(a) {
       if (String(a.oldPin).trim() !== S.pin) throw new Error('Wrong PIN.');
-      if (!/^\d{4,8}$/.test(String(a.newPin))) throw new Error('The PIN must be 4 to 8 numbers.');
+      if (!/^\d{4,12}$/.test(String(a.newPin))) throw new Error('The PIN must be numbers.');
       S.pin = String(a.newPin); return 'PIN changed. (In the demo, Start over sets it back to 1234.)';
     },
-    deleteFamily() { S = seed(); session = false; return 'The demo was reset.'; }
+    deleteFamily() { S = seed(); session = false; kidIn = ''; return 'The demo was reset.'; }
   };
 
   return {
@@ -951,7 +1066,9 @@ const Demo = (function () {
       save();
       return JSON.parse(JSON.stringify(out));
     },
-    reset() { S = seed(); session = false; save(); }
+    reset() { S = seed(); session = false; kidIn = ''; save(); },
+    // "Try it as" buttons: switch what kind of device this pretends to be
+    setRole(r) { load(); session = false; kidIn = ''; S.role = r; if (r === 'kid') S.me = 'Sam'; const d = S.devices.find(x => x.key === 'demo-this'); if (d) { d.role = r; d.kid = r === 'kid' ? 'Sam' : ''; } save(); }
   };
 })();
 
@@ -968,6 +1085,7 @@ const SLOW = { createFamily: 75000, runAuction: 45000 };
 async function api(action, args) {
   args = Object.assign({}, args || {});
   if (DEVICE && !('device' in args)) args.device = DEVICE;
+  if (KSESS && !('ksess' in args)) args.ksess = KSESS;
   if (isDemo() && action !== 'config' && action !== 'join' && action !== 'recover' && action !== 'createFamily') {
     netBar(true);
     try { await new Promise(r => setTimeout(r, 150)); return Demo.call(action, args); }
@@ -999,40 +1117,40 @@ async function api(action, args) {
 }
 
 function setToken(t) { TOKEN = t; ss('ca_tok_' + FID, t); lastActive = Date.now(); }
+function setDevice(d) { DEVICE = d || null; if (!isDemo()) ls('ca_dev_' + FID, d || null); }
 
-// Lock the parent area after 10 minutes without a tap or key press
-const IDLE_LOCK_MS = 10 * 60 * 1000;
-let lastActive = Date.now();
-['click', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, () => { lastActive = Date.now(); }, { passive: true, capture: true }));
-setInterval(async () => {
-  if (!TOKEN || Date.now() - lastActive < IDLE_LOCK_MS) return;
-  try { await api('logout'); } catch (e) { /* ignore */ }
-  setToken(null);
-  if (DATA) { renderApp(); toast('The parent area locked after 10 minutes without use.'); }
-}, 20000);
+/* ---------- parent sign-in ---------- */
+// A remembered parent phone signs itself back in. Anywhere else, ask for the PIN.
+async function ensureParent(reason) {
+  if (TOKEN) return true;
+  if (role() === 'parent') {
+    try { setToken((await api('resume')).token); return true; }
+    catch (e) { if (errMsg(e) === 'NO_DEVICE') setDevice(null); }
+  }
+  return await pinLogin(reason, false);
+}
 
-async function unlock(reason) {
+async function pinLogin(reason, remember) {
   const demo = isDemo() ? ' The demo PIN is 1234.' : '';
   const pin = await ask('Parent PIN', (reason ? reason + ' ' : '') + 'Enter the parent PIN.' + demo, 'pin');
   if (!pin) return false;
-  try { setToken((await api('login', { pin: pin })).token); return true; }
-  catch (e) { toast(errMsg(e), true); return false; }
+  try {
+    const r = await api('login', { pin: pin, remember: !!remember });
+    setToken(r.token);
+    if (r.device) setDevice(r.device);
+    return true;
+  } catch (e) { toast(errMsg(e), true); return false; }
 }
 
 async function pcall(action, args) {
-  if (!TOKEN && !(await unlock())) throw new Error('CANCELLED');
+  if (!(await ensureParent())) throw new Error('CANCELLED');
   try { return await api(action, args); }
   catch (e) {
     if (errMsg(e) !== 'PARENT_LOCKED') throw e;
     setToken(null);
-    if (await unlock('Your parent session timed out.')) return await api(action, args);
+    if (await ensureParent('Your parent session ended.')) return await api(action, args);
     throw new Error('CANCELLED');
   }
-}
-
-async function confirmParent(title, text) {
-  if (TOKEN) return !!(await ask(title, text, 'confirm'));
-  return await unlock(text);
 }
 
 async function act(fn) {
@@ -1042,10 +1160,27 @@ async function act(fn) {
     await load();
   } catch (e) {
     const m = errMsg(e);
-    if (m === 'NO_DEVICE') { DEVICE = null; ls('ca_dev_' + FID, null); toast('This device is not set up for a kid. Ask a parent to set it up.', true); await load(); return; }
+    if (m === 'NO_DEVICE') { KSESS = null; toast('This device is not set up for that. Ask a parent.', true); await load(); return; }
     if (m !== 'CANCELLED') toast(m, true);
   }
 }
+
+/* ---------- idle timers ---------- */
+// Family computer: a kid is signed out after 3 minutes, a parent after 5.
+// Anywhere else that is not a remembered parent phone: parent locks after 10 minutes.
+let lastActive = Date.now();
+['click', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, () => { lastActive = Date.now(); }, { passive: true, capture: true }));
+setInterval(async () => {
+  if (!DATA || !$('s-app').classList.contains('on')) return;
+  const idle = Date.now() - lastActive;
+  if (KSESS && idle > 3 * 60e3) { await kidSignOut('Signed out after 3 minutes without use.'); return; }
+  if (TOKEN && role() !== 'parent' && idle > (role() === 'shared' ? 5 : 10) * 60e3) {
+    try { await api('logout'); } catch (e) { /* ignore */ }
+    setToken(null);
+    renderApp();
+    toast('The parent area locked after a few minutes without use.');
+  }
+}, 15000);
 
 /* ============================== LANDING ============================== */
 function renderLanding(msg) {
@@ -1055,15 +1190,15 @@ function renderLanding(msg) {
   const fam = cleanId(ls('ca_fid'));
   let html = '';
   if (fam) html += `<a class="btn" href="${esc(familyLink(fam))}">Open my family</a>`;
-  if (ls('ca_demo_v3')) html += `<a class="btn ghost" href="${esc(APP_LINK)}#demo">Continue the demo</a>`;
+  if (ls('ca_demo_v5')) html += `<a class="btn ghost" href="${esc(APP_LINK)}#demo">Continue the demo</a>`;
   $('landContinue').innerHTML = html;
-  FID = null; DATA = null;
+  FID = null; DATA = null; KSESS = null;
   if (location.hash || location.search) history.replaceState(null, '', APP_LINK);
   show('landing');
 }
 
 function openDemo() {
-  FID = 'demo'; TOKEN = null; DEVICE = null; CUR_TAB = 'bid';
+  FID = 'demo'; TOKEN = null; DEVICE = null; KSESS = null; KTAB = 'bid'; PTAB = 'approve';
   history.replaceState(null, '', APP_LINK + '#demo');
   load(true);
 }
@@ -1100,7 +1235,7 @@ async function joinGo() {
   $('joinGo').disabled = true;
   const prevFid = FID;
   try {
-    FID = null;
+    FID = null; DEVICE = null; KSESS = null;
     const r = await api('join', { code: code });
     ls('ca_fid', r.fid);
     ls('ca_dev_' + r.fid, r.device);
@@ -1122,11 +1257,11 @@ async function startWizard() {
   }
   W = {
     step: 0, license: '', name: '', pin: '', pin2: '', email: '',
-    kids: [{ name: '', color: COLORS[0] }, { name: '', color: COLORS[1] }],
+    kids: [{ name: '', color: COLORS[0], code: randomCode() }, { name: '', color: COLORS[1], code: randomCode() }],
     chores: LIB_CHORES.map(c => ({ name: c[0], desc: c[1], min: c[2], max: c[3], on: !!c[4], size: c[5] })),
     rewards: LIB_REWARDS.map(r => ({ name: r[0], cost: r[1], on: !!r[2] })),
     newChore: { name: '', min: 2, max: 6, size: 1 }, newReward: { name: '', cost: 10 },
-    day: 'Sunday', hour: 18, limit: null, noRepeat: true, unclaimed: 'auto'
+    day: 'Sunday', hour: 18, limit: null, noRepeat: true, unclaimed: 'auto', autoApprove: 24
   };
   show('wizard');
   renderWizard();
@@ -1167,10 +1302,12 @@ function wKids() {
   return `<div class="card">
     <h2>Who is bidding?</h2>
     <p class="desc">Add each kid and pick a color for their name. First names or nicknames only, no last names.</p>
+    <p class="tip">Each kid also gets a 4-number <b>secret code</b>. They type it to sign in on a shared family computer or tablet, so siblings cannot bid for each other. We picked random ones; change them to anything your kids will remember.</p>
     ${W.kids.map((k, i) => `
-      <div class="row" style="margin-bottom:8px;align-items:center">
+      <div class="row" style="margin-bottom:10px;align-items:center">
         <input type="color" data-k="kids.${i}.color" value="${esc(k.color)}" aria-label="Color">
-        <input type="text" data-k="kids.${i}.name" value="${esc(k.name)}" maxlength="24" placeholder="Kid ${i + 1} name">
+        <input type="text" data-k="kids.${i}.name" value="${esc(k.name)}" maxlength="24" placeholder="Kid ${i + 1} first name">
+        <input type="text" class="mini" style="width:92px!important" data-k="kids.${i}.code" value="${esc(k.code)}" inputmode="numeric" maxlength="4" aria-label="Secret code" placeholder="Code">
         ${W.kids.length > 1 ? `<button class="btn ghost small shrink" data-w="delKid" data-i="${i}">Remove</button>` : ''}
       </div>`).join('')}
     ${W.kids.length < 10 ? `<button class="btn ghost mt" data-w="addKid">Add another kid</button>` : ''}
@@ -1286,7 +1423,17 @@ function wRules() {
     <label>Chores nobody wins</label>
     ${unclaimedHtml('wUnc', W.unclaimed, 'unclaimed')}
     <p class="tip mt">Ties go to the kid with less work.</p>
+  </div>
+  <div class="card">
+    <h2>Approving finished chores</h2>
+    <p class="desc">When a kid taps "I finished it," you check it and tap Approve. If you are busy, the app can approve it for you after a while, unless you tap Redo first.</p>
+    <label>Approve automatically after</label>
+    <select data-k="autoApprove" data-num="1">${autoOpts(W.autoApprove)}</select>
   </div>`;
+}
+function autoOpts(sel) {
+  return [[0, 'Never, I will always approve myself'], [12, '12 hours'], [24, '24 hours (recommended)'], [48, '48 hours']]
+    .map(o => `<option value="${o[0]}" ${Number(sel) === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('');
 }
 
 function setPath(path, val) {
@@ -1308,7 +1455,7 @@ function wizClick(e) {
   const b = e.target.closest('[data-w]');
   if (!b) return;
   const i = Number(b.dataset.i), what = b.dataset.w;
-  if (what === 'addKid') W.kids.push({ name: '', color: COLORS[W.kids.length % COLORS.length] });
+  if (what === 'addKid') W.kids.push({ name: '', color: COLORS[W.kids.length % COLORS.length], code: randomCode() });
   if (what === 'delKid') W.kids.splice(i, 1);
   if (what === 'addChore') {
     const n = W.newChore, name = String(n.name || '').trim();
@@ -1342,6 +1489,8 @@ function wizCheck() {
     if (!names.length) return 'Add at least one kid.';
     const lower = names.map(n => n.toLowerCase());
     if (new Set(lower).size !== lower.length) return 'Each kid needs a different name.';
+    const badCode = W.kids.find(k => k.name.trim() && !/^\d{4}$/.test(String(k.code || '')));
+    if (badCode) return badCode.name.trim() + '\'s secret code needs to be 4 numbers.';
   }
   if (W.step === 2) {
     const on = W.chores.filter(c => c.on);
@@ -1362,19 +1511,23 @@ async function wizNext() {
   if (W.step < STEPS.length - 1) { W.step++; renderWizard(); window.scrollTo(0, 0); return; }
   const payload = {
     license: W.license.trim(), name: W.name.trim(), pin: W.pin, email: W.email.trim(), tz: TZ, appLink: APP_LINK,
-    kids: W.kids.filter(k => k.name.trim()).map(k => ({ name: k.name.trim(), color: k.color })),
+    kids: W.kids.filter(k => k.name.trim()).map(k => ({ name: k.name.trim(), color: k.color, code: String(k.code || '') })),
     chores: W.chores.filter(c => c.on).map(c => ({ name: c.name, desc: c.desc, min: c.min, max: c.max, size: c.size })),
     rewards: W.rewards.filter(r => r.on).map(r => ({ name: r.name, cost: r.cost })),
-    day: W.day, hour: W.hour, limit: W.limit || 0, noRepeat: W.noRepeat, unclaimed: W.unclaimed
+    day: W.day, hour: W.hour, limit: W.limit || 0, noRepeat: W.noRepeat, unclaimed: W.unclaimed, autoApprove: W.autoApprove
   };
   const go = async () => {
     busy('Setting up your family...', ['Creating your family\'s private space...', 'Adding kids, chores, and rewards...', 'Almost ready...', 'Still working. Slow connections can take up to a minute...']);
     try {
-      FID = null;
+      FID = null; DEVICE = null; KSESS = null; TOKEN = null;
       const r = await api('createFamily', payload);
+      // This device is almost always the parent's phone: remember it now, so the PIN is never asked for here again.
+      FID = r.fid;
+      let remembered = false;
+      try { const l = await api('login', { pin: payload.pin, remember: true }); setToken(l.token); setDevice(l.device); remembered = true; } catch (e) { /* they can choose later */ }
       W = null;
       ls('ca_fid', r.fid);
-      renderDone(r.fid);
+      renderDone(r.fid, remembered);
     } catch (e) {
       busyFail(errMsg(e) + ' If you try again, check the Parent page afterwards so you do not end up with two families.', go, () => { show('wizard'); });
     }
@@ -1386,8 +1539,11 @@ function wizBack() {
   W.step--; renderWizard(); window.scrollTo(0, 0);
 }
 
-function renderDone(fid) {
+function renderDone(fid, remembered) {
   const link = familyLink(fid);
+  $('doneThis').textContent = remembered
+    ? 'This device is now your parent phone, so you will not need your PIN here again. To approve chores, just open the app and tap Approve.'
+    : 'Open the app on your phone and choose "A parent\'s phone" to approve chores with one tap.';
   $('doneLink').value = link;
   $('doneOpen').href = link;
   $('doneShare').onclick = () => shareLink(link);
@@ -1410,9 +1566,10 @@ async function copyText(text) {
   }
 }
 
+
 /* ============================== FAMILY APP ============================== */
 async function openFamily(fid) {
-  FID = fid;
+  FID = fid; KSESS = null;
   if (location.hash !== '#f=' + fid) history.replaceState(null, '', APP_LINK + '#f=' + fid);
   TOKEN = cleanId(ss('ca_tok_' + fid)) || null;
   DEVICE = cleanId(ls('ca_dev_' + fid)) || null;
@@ -1437,37 +1594,96 @@ async function load(first) {
     return;
   }
   DATA = d;
-  if (TOKEN && !DATA.parent) setToken(null);
+  if (DATA.token) setToken(DATA.token);                 // remembered parent phone: signed in automatically
+  else if (TOKEN && !DATA.parent) setToken(null);
+  if (KSESS && !DATA.me) KSESS = null;
   if (!isDemo()) {
-    if (DEVICE && !DATA.me) { DEVICE = null; ls('ca_dev_' + FID, null); }
+    if (DEVICE && !DATA.device.role) setDevice(null);
     ls('ca_fid', FID);
   }
   renderApp();
   if (first) show('app');
 }
 
+// Which screen this device shows right now
+function mode() {
+  const r = role();
+  if (r === 'parent') return 'parent';
+  if (r === 'kid') return DATA.me ? 'kid' : 'setup';
+  if (r === 'shared') return DATA.me ? 'kid' : (DATA.parent ? 'parent' : 'who');
+  return DATA.parent ? 'parent' : 'setup';
+}
+
 function kidColor(name) { const k = DATA.kids.find(x => x.name === name); return k ? k.color : '#8a8a8a'; }
 function chip(name) { return `<span class="chip" style="background:${esc(kidColor(name))}">${esc(name)}</span>`; }
 function canDo(c, kid) { return !c.who || !c.who.length || c.who.indexOf(kid) > -1; }
-const openRows = () => DATA.winners.filter(w => w.status === 'Assigned' || w.status === 'Ready');
+const readyRows = () => DATA.winners.filter(w => w.status === 'Ready');
+const todoRows = () => DATA.winners.filter(w => w.status === 'Assigned');
+const noWinnerRows = () => DATA.winners.filter(w => w.status === 'No Bids');
 
 function renderApp() {
+  const m = mode();
   document.title = DATA.family + ' - The Chore Auction';
   $('family').textContent = DATA.family;
-  $('roundPill').textContent = 'Round ' + DATA.round;
-  $('closePill').textContent = 'Closes ' + DATA.schedule.label;
+  $('closePill').textContent = 'Auction closes ' + DATA.schedule.label;
   $('demoBanner').classList.toggle('hidden', !DATA.demo);
-  const waiting = DATA.winners.filter(w => w.status === 'Ready').length;
-  $('parentBadge').innerHTML = waiting ? `<span class="badge">${waiting}</span>` : '';
-  renderBid(); renderBoard(); renderChores(); renderPoints(); renderParent();
-  showTab(CUR_TAB);
-}
-function showTab(name) {
-  CUR_TAB = name;
-  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
-  document.querySelectorAll('section.tab').forEach(s => s.classList.toggle('on', s.id === 'tab-' + name));
+  document.querySelectorAll('[data-demo]').forEach(b => b.classList.toggle('gold', DATA.demo && b.dataset.demo === role()));
+
+  // the dark bar that says who is using a shared screen
+  const bar = $('whoBar');
+  let barHtml = '';
+  if (role() === 'shared' && m === 'kid') barHtml = `<span>${esc(DATA.me)} is using the family computer</span><button class="btn small white" data-a="kidOut">I'm done, sign out</button>`;
+  else if (m === 'parent' && role() !== 'parent') barHtml = `<span>A parent is using ${role() === 'shared' ? 'the family computer' : 'this device'}</span><button class="btn small white" data-a="lock">Lock</button>`;
+  bar.innerHTML = barHtml ? `<div class="wrap">${barHtml}</div>` : '';
+  bar.classList.toggle('hidden', !barHtml);
+
+  // tabs
+  let tabs = [];
+  if (m === 'kid') {
+    const todo = todoRows().filter(w => w.winner === DATA.me).length;
+    tabs = [['bid', 'Bid on chores'], ['mine', 'My chores' + (todo ? ` <span class="count">${todo}</span>` : '')], ['points', 'My points']];
+  } else if (m === 'parent') {
+    const n = readyRows().length;
+    tabs = [['approve', 'Approve' + (n ? ` <span class="count">${n}</span>` : '')], ['week', 'This week'], ['points', 'Points'], ['settings', 'Settings']];
+  }
+  const cur = m === 'kid' ? KTAB : PTAB;
+  $('tabsIn').innerHTML = tabs.map(t => `<button data-tab="${t[0]}" class="${t[0] === cur ? 'on' : ''}">${t[1]}</button>`).join('');
+  $('tabs').classList.toggle('hidden', !tabs.length);
+
+  $('view').innerHTML = m === 'setup' ? viewSetup() : m === 'who' ? viewWho() : m === 'kid' ? viewKid() : viewParent();
+  if (m === 'parent' && PTAB === 'settings') tickJoin();
 }
 
+/* ---------- first time on a device: how will it be used? ---------- */
+function viewSetup() {
+  return `<div class="card" style="max-width:640px;margin:0 auto 14px">
+    <h2>Welcome to ${esc(DATA.family)}!</h2>
+    <p class="desc">How will this device be used? You only answer this once.</p>
+    <div class="choices">
+      <button class="choice" data-a="asParent"><b>A parent's phone</b><span>Approve chores and run the auction. Type your PIN once, and this phone remembers you.</span></button>
+      <button class="choice" data-a="asShared"><b>Our family computer or tablet</b><span>Everyone shares it. Kids tap their name and type their own secret code. A parent sets it up once with the PIN.</span></button>
+      <button class="choice" data-a="asKid"><b>One kid's own device</b><span>Only that kid bids here. A parent picks the kid with the PIN, or the kid types a join code.</span></button>
+    </div>
+  </div>`;
+}
+
+/* ---------- family computer: who's using this? ---------- */
+function viewWho() {
+  return `<div class="card">
+    <h2>Who's using this?</h2>
+    <p class="desc">Tap your name, then type your secret code.</p>
+    <div class="tiles">
+      ${DATA.kids.map(k => `<button class="tile" style="background:${esc(k.color)}" data-a="whoKid" data-kid="${esc(k.name)}">${esc(k.name)}<small>${pt((DATA.balances.find(b => b.name === k.name) || {}).points || 0)}</small></button>`).join('')}
+      <button class="tile parent" data-a="whoParent">Parent<small>PIN needed</small></button>
+    </div>
+    ${DATA.demo ? '<p class="tip mt">Demo secret codes: Maya 1111, Leo 2222, Sam 3333. Parent PIN: 1234.</p>' : ''}
+  </div>
+  <div class="card">
+    <p class="desc" style="margin:0">This week's auction closes <b>${esc(DATA.schedule.label)}</b>. ${plural(DATA.chores.length, 'chore')} are up for bids.</p>
+  </div>`;
+}
+
+/* ============================== KID VIEW ============================== */
 function goalFor(kid) {
   const b = DATA.balances.find(x => x.name === kid);
   const pts = b ? b.points : 0;
@@ -1475,80 +1691,85 @@ function goalFor(kid) {
   const next = rw.find(r => r.cost > pts);
   const can = rw.filter(r => r.cost <= pts).pop();
   if (!rw.length) return { pts, text: '', pct: 0 };
-  if (next) return { pts, text: `${next.cost - pts} more for ${next.name}` + (can ? ` (or trade now for ${can.name})` : ''), pct: Math.round(pts / next.cost * 100) };
-  return { pts, text: `Enough for ${can.name}`, pct: 100 };
+  if (next) return { pts, text: `${next.cost - pts} more for ${next.name}` + (can ? `. You can already get ${can.name}!` : ''), pct: Math.round(pts / next.cost * 100) };
+  return { pts, text: `You have enough for ${can.name}!`, pct: 100 };
 }
 
-function fairText() {
-  const f = DATA.fairness;
-  const parts = ['Lowest bid wins.'];
-  if (f.limit) parts.push('Each kid can win up to ' + plural(f.limit, 'work point') + ' per round (small job 1, medium 2, big 3).');
-  parts.push('Ties go to whoever has less work.');
-  if (f.noRepeat) parts.push('Chores rotate.');
-  parts.push(f.unclaimed === 'auto' ? 'Chores nobody bids on go to the kid with the least work, at the lowest pay.' : 'A parent assigns chores nobody wins.');
-  return parts.join(' ');
+function viewKid() {
+  const me = DATA.me, g = goalFor(me);
+  const hello = `<div class="card hl">
+    <div class="hello">${chip(me)}<span class="big">Hi ${esc(me)}!</span><div class="pts"><b>${g.pts}</b>points</div></div>
+    ${g.text ? `<div class="goalbox">${esc(g.text)}<div class="goalbar"><i style="width:${Math.min(100, g.pct)}%"></i></div></div>` : ''}
+    ${role() === 'kid' ? `<p class="desc mt" style="margin-bottom:0">Not ${esc(me)}? <button class="link" data-a="switchKid">Switch kid</button> (a parent needs to approve).</p>` : ''}
+  </div>`;
+  if (KTAB === 'mine') return hello + kidMine();
+  if (KTAB === 'points') return hello + kidPoints();
+  return hello + kidBid();
 }
 
-/* ---------- Bid ---------- */
-function renderBid() {
-  const me = DATA.me;
-  if (me) {
-    const g = goalFor(me);
-    $('whoCard').innerHTML = `<div class="card">
-      <div class="who">${chip(me)}<span class="big">You are bidding as ${esc(me)}</span></div>
-      ${g.text ? `<div class="goalline">You have ${points(g.pts)}. ${esc(g.text)}.</div>` : ''}
-      <p class="desc mt" style="margin-bottom:0">Not ${esc(me)}? <button class="link" data-x="switch">Switch kid</button> (a parent needs to approve).</p>
-    </div>`;
-  } else {
-    $('whoCard').innerHTML = `<div class="card hl">
-      <h3 class="sec">This device is not set up for a kid yet</h3>
-      <p class="desc">Anyone with your family link can look around. To bid, a parent sets this device up for one kid, so siblings cannot bid for each other.</p>
-      <button class="btn gold" data-x="switch">Set up this device for a kid</button>
-      <p class="desc mt" style="margin-bottom:0">On a kid's own tablet, a parent can also use <b>Parent</b> then <b>Set up kids' devices</b> to get a join code.</p>
-    </div>`;
-  }
-  $('fairNote').textContent = fairText();
-
-  const list = DATA.chores.filter(c => !me || canDo(c, me));
-  const cc = $('choreCards');
-  if (!list.length) { cc.innerHTML = '<div class="card empty">No chores up for auction right now.</div>'; return; }
-  cc.innerHTML = list.map(c => {
+function kidBid() {
+  const me = DATA.me, f = DATA.fairness;
+  const list = DATA.chores.filter(c => canDo(c, me));
+  const rules = `<p class="tip">Pick the <b>fewest points</b> you would do each job for, then tap <b>Place my bid</b>. The lowest bid wins when the auction closes <b>${esc(DATA.schedule.label)}</b>. You can change a bid until then.${f.limit ? ' To keep it fair, each kid can only win so much work.' : ''}</p>`;
+  if (!list.length) return rules + '<div class="card empty">No chores up for auction right now.</div>';
+  return rules + `<div class="grid">${list.map(c => {
     const i = DATA.chores.indexOf(c);
-    const mine = me && c.mine != null ? c.mine : null;
+    const mine = c.mine;
     const v = BID_VALUES[c.name] != null ? BID_VALUES[c.name] : (mine != null ? mine : Math.round((c.min + c.max) / 2));
-    const only = c.who && c.who.length ? `<span class="tag size">Only ${esc(c.who.join(', '))}</span>` : '';
+    const others = c.bidders.filter(k => k !== me).length;
     return `<div class="card chore">
       <h3>${esc(c.name)}</h3>
       ${c.desc ? `<p class="desc">${esc(c.desc)}</p>` : ''}
-      <div class="meta"><span class="tags"><span class="tag">Pays ${c.min} to ${c.max}</span><span class="tag size">${SIZES[c.size] || ''}</span>${only}</span><span>${plural(c.bidders.length, 'bid')}</span></div>
-      ${mine != null ? `<div class="mine"><span>Your bid: <b>${pt(mine)}</b></span><button class="link red" data-wd="${i}">Take back</button></div>` : ''}
-      ${me ? `<div class="stepper">
-        <button data-dn="${i}" aria-label="Less">-</button>
+      <div class="meta"><span class="tags"><span class="tag">Pays ${c.min} to ${c.max}</span><span class="tag size">${SIZES[c.size] || ''}</span></span><span>${others ? plural(others, 'other bid') : 'No other bids yet'}</span></div>
+      ${mine != null ? `<div class="mine"><span>Your bid: <b>${pt(mine)}</b></span><button class="link red" data-a="withdraw" data-i="${i}">Take back</button></div>` : ''}
+      <div class="stepper">
+        <button data-a="dn" data-i="${i}" aria-label="Less">-</button>
         <input type="number" id="bid${i}" value="${v}" min="${c.min}" max="${c.max}" aria-label="Bid">
-        <button data-up="${i}" aria-label="More">+</button>
+        <button data-a="up" data-i="${i}" aria-label="More">+</button>
       </div>
-      <button class="btn gold full" data-bid="${i}">${mine != null ? 'Change my bid' : 'Place my bid'}</button>`
-      : `<button class="btn ghost full" data-x="switch">Set up this device to bid</button>`}
+      <button class="btn gold full" data-a="bid" data-i="${i}">${mine != null ? 'Change my bid' : 'Place my bid'}</button>
     </div>`;
-  }).join('');
+  }).join('')}</div>`;
 }
 
-async function switchKid() {
-  const kids = DATA.kids.map(k => k.name);
-  if (!kids.length) return toast('Add a kid first in the Parent tab.', true);
-  if (!TOKEN && !(await unlock('A parent needs to approve which kid uses this device.'))) return;
-  const kid = await ask('Who uses this device?', 'This device will bid only as this kid. Switching later needs the parent PIN again.', 'select', kids);
-  if (!kid) return;
-  try {
-    const r = await pcall('bindDevice', { kid: kid, device: DEVICE || '' });
-    if (!isDemo()) { DEVICE = r.device; ls('ca_dev_' + FID, r.device); }
-    try { await api('logout'); } catch (e) { /* ignore */ }
-    setToken(null);
-    Object.keys(BID_VALUES).forEach(k => delete BID_VALUES[k]);
-    CUR_TAB = 'bid';
-    toast('This device now bids as ' + r.kid + '. The parent area was locked.');
-    await load();
-  } catch (e) { if (errMsg(e) !== 'CANCELLED') toast(errMsg(e), true); }
+function kidMine() {
+  const me = DATA.me;
+  const todo = todoRows().filter(w => w.winner === me);
+  const waiting = readyRows().filter(w => w.winner === me);
+  const done = DATA.winners.filter(w => w.winner === me && w.status === 'Done').slice(0, 5);
+  return `<div class="card">
+      <h3 class="sec">To do</h3>
+      ${todo.length ? todo.map(w => `<div class="approve"><div class="what"><b>${esc(w.chore)}</b><small>Worth ${pt(w.points)}</small></div>
+        <button class="btn green" data-a="ready" data-row="${w.row}">I finished it!</button></div>`).join('')
+        : '<p class="desc" style="margin:0">Nothing to do right now. Bid on chores to earn points!</p>'}
+    </div>
+    ${waiting.length ? `<div class="card"><h3 class="sec">Waiting for a parent to check</h3>
+      ${waiting.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>Worth ${pt(w.points)}</small></span><span class="status s-Ready">Waiting</span></div>`).join('')}</div>` : ''}
+    ${done.length ? `<div class="card"><h3 class="sec">Done and paid</h3>
+      ${done.map(w => `<div class="item"><span class="nm">${esc(w.chore)}</span><span class="tag">+${pt(w.points)}</span></div>`).join('')}</div>` : ''}`;
+}
+
+function kidPoints() {
+  const me = DATA.me, b = (DATA.balances.find(x => x.name === me) || {}).points || 0;
+  const mine = DATA.ledger.filter(l => l.kid === me).slice(0, 15);
+  return `<div class="card">
+      <h3 class="sec">Rewards</h3>
+      <p class="desc">To trade your points for a reward, ask a parent.</p>
+      ${DATA.rewards.slice().sort((x, y) => x.cost - y.cost).map(r => `<div class="item"><span class="nm">${esc(r.name)}<small>${pt(r.cost)}</small></span>
+        ${b >= r.cost ? '<span class="status s-Done">You can get this!</span>' : `<span class="tag">${r.cost - b} more</span>`}</div>`).join('') || '<p class="desc">No rewards yet.</p>'}
+    </div>
+    <div class="card"><h3 class="sec">My points history</h3>
+      ${mine.length ? mine.map(l => `<div class="item"><span class="nm">${esc(l.details)}<small>${esc(l.date)}</small></span><b class="${l.points >= 0 ? 'plus' : 'minus'}">${l.points > 0 ? '+' : ''}${l.points}</b></div>`).join('') : '<p class="desc" style="margin:0">No points yet.</p>'}
+    </div>`;
+}
+
+async function kidSignOut(msg) {
+  const k = KSESS;
+  KSESS = null;
+  try { if (k) await api('kidLogout', { ksess: k }); } catch (e) { /* ignore */ }
+  KTAB = 'bid';
+  toast(msg || 'Signed out. See you next time!');
+  await load();
 }
 
 function clampBid(i, v) {
@@ -1558,108 +1779,97 @@ function clampBid(i, v) {
   BID_VALUES[c.name] = v;
   return v;
 }
-function bidClick(e) {
-  const t = e.target.closest('button');
-  if (!t) return;
-  if (t.dataset.x === 'switch') return switchKid();
-  if (t.dataset.dn) clampBid(+t.dataset.dn, Number($('bid' + t.dataset.dn).value) - 1);
-  if (t.dataset.up) clampBid(+t.dataset.up, Number($('bid' + t.dataset.up).value) + 1);
-  if (t.dataset.bid) {
-    const i = +t.dataset.bid, v = clampBid(i, $('bid' + i).value), name = DATA.chores[i].name;
-    delete BID_VALUES[name];
-    act(() => api('bid', { chore: name, points: v }));
-  }
-  if (t.dataset.wd) act(() => api('withdraw', { chore: DATA.chores[+t.dataset.wd].name }));
+
+/* ============================== PARENT VIEW ============================== */
+function viewParent() {
+  const d = DATA;
+  let warn = '';
+  if (d.weakPin) warn += `<div class="warn">Your parent PIN is short. Choose a new one with 6 to 12 numbers in Settings, then Family.</div>`;
+  if (!d.demo && !d.email) warn += `<div class="warn">Add a parent email in Settings, then Family, so you hear about security notices and can recover your link.</div>`;
+  const body = PTAB === 'week' ? parentWeek() : PTAB === 'points' ? parentPoints() : PTAB === 'settings' ? parentSettings() : parentApprove();
+  return warn + body;
 }
 
-/* ---------- Board ---------- */
-function renderBoard() {
-  $('boardCards').innerHTML = DATA.chores.length ? DATA.chores.map(c => `
-    <div class="card chore"><h3>${esc(c.name)}</h3>
-      <div class="meta"><span class="tags"><span class="tag">Pays ${c.min} to ${c.max}</span><span class="tag size">${SIZES[c.size] || ''}</span></span><span>Lowest bid: secret</span></div>
-      ${c.bidders.length ? c.bidders.map(chip).join('') : '<p class="desc" style="margin:0">No bids yet.</p>'}
-    </div>`).join('') : '<div class="card empty">No chores up for auction.</div>';
+function parentApprove() {
+  const d = DATA, ready = readyRows(), none = noWinnerRows(), todo = todoRows();
+  const kidOpts = d.kids.map(k => `<option>${esc(k.name)}</option>`).join('');
+  return `<div class="card hl">
+    <div class="done-all"><h3 class="sec" style="margin:0">Finished chores to check</h3>
+      ${ready.length > 1 ? `<button class="btn green" data-a="approveAll">Approve all ${ready.length}</button>` : ''}</div>
+    ${ready.length ? ready.map(w => `<div class="approve">${chip(w.winner)}
+        <div class="what"><b>${esc(w.chore)}</b><small>${pt(w.points)} · finished ${esc(w.statusDate)}</small></div>
+        <button class="btn green bigcheck" data-a="approve" data-row="${w.row}">&#10003; Approve</button>
+        <button class="btn ghost" data-a="redo" data-row="${w.row}">Redo</button></div>`).join('')
+      : `<div class="caught"><b>All caught up!</b><span class="desc">When a kid taps "I finished it," it shows up here. One tap to approve.</span></div>`}
+    ${d.fairness.autoApprove ? `<p class="tip mt" style="margin-bottom:0">Not checked within ${d.fairness.autoApprove} hours? It is approved for you automatically. Change this in Settings, then Rules.</p>` : ''}
+  </div>
+  ${none.length ? `<div class="card"><h3 class="sec">Chores with no winner</h3>
+    <p class="desc">Nobody won these. Pick who does it and the points, or skip it this week.</p>
+    ${none.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>Round ${w.round}</small></span>
+      <span class="acts"><select class="sel-mini" id="as${w.row}">${kidOpts}</select>
+      <input type="number" class="mini" id="ap${w.row}" placeholder="Pts" min="0">
+      <button class="btn small" data-a="assign" data-row="${w.row}">Assign</button>
+      <button class="btn ghost small" data-a="skip" data-row="${w.row}">Skip</button></span></div>`).join('')}</div>` : ''}
+  <div class="card"><p class="desc" style="margin:0">${todo.length ? `${plural(todo.length, 'chore')} still being worked on. ` : ''}See bids and progress in <button class="link" data-tab-go="week">This week</button>.</p></div>`;
+}
+
+function parentWeek() {
+  const d = DATA, todo = todoRows();
   const counts = {};
-  DATA.kids.forEach(k => counts[k.name] = 0);
-  DATA.chores.forEach(c => c.bidders.forEach(k => counts[k] = (counts[k] || 0) + 1));
-  $('boardKids').innerHTML = DATA.kids.map(k =>
-    `<div class="board-kid">${chip(k.name)}<b>${counts[k.name]} of ${DATA.chores.filter(c => canDo(c, k.name)).length} chores</b></div>`).join('') || '<div class="empty">No kids yet.</div>';
+  d.kids.forEach(k => counts[k.name] = 0);
+  d.chores.forEach(c => c.bidders.forEach(k => counts[k] = (counts[k] || 0) + 1));
+  const last = d.round - 1;
+  const latest = d.winners.filter(w => w.round === last);
+  return `<div class="card">
+    <h3 class="sec">This week's auction (round ${d.round})</h3>
+    <p class="desc">Kids are bidding now. It closes on its own <b>${esc(d.schedule.label)}</b>. Bid amounts stay secret until then.</p>
+    <label>Bids so far</label>
+    ${d.kids.map(k => `<div class="board-kid">${chip(k.name)}<b>${counts[k.name]} of ${d.chores.filter(c => canDo(c, k.name)).length} chores</b></div>`).join('')}
+    <button class="btn gold full mt" data-a="run">Close the auction now</button>
+  </div>
+  <div class="card"><h3 class="sec">Being worked on</h3>
+    ${todo.length ? todo.map(w => `<div class="item"><span class="nm">${chip(w.winner)} ${esc(w.chore)}<small>Round ${w.round} · ${pt(w.points)}</small></span>
+      <span class="acts"><button class="btn green small" data-a="approve" data-row="${w.row}">Done</button><button class="btn ghost small" data-a="notdone" data-row="${w.row}">Not done</button></span></div>`).join('')
+      : '<p class="desc" style="margin:0">Nothing in progress right now.</p>'}
+  </div>
+  <div class="card"><h3 class="sec">${last >= 1 ? 'Last auction (round ' + last + ')' : 'Last auction'}</h3>
+    ${latest.length ? latest.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>${esc(w.how)}</small></span>
+      ${w.status === 'No Bids' ? '<span class="status s-NoBids">No winner</span>' : `<span>${chip(w.winner)} ${pt(w.points)}</span>`}</div>`).join('')
+      : '<p class="desc" style="margin:0">No auction has closed yet.</p>'}
+  </div>`;
 }
 
-/* ---------- Chores ---------- */
-function statusClass(s) { return 's-' + String(s).replace(/\s/g, ''); }
-function statusLabel(s) { return { 'No Bids': 'No winner', 'Ready': 'Waiting for parent', 'Assigned': 'To do' }[s] || s; }
-
-function renderChores() {
-  const me = DATA.me;
-  const open = openRows();
-  if (me) {
-    const mine = open.filter(w => w.winner === me);
-    $('myChores').innerHTML = `<div class="card hl"><h3 class="sec">My chores (${esc(me)})</h3>
-      ${mine.length ? mine.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>Round ${w.round} · ${pt(w.points)}</small></span>
-        ${w.status === 'Assigned' ? `<button class="btn green small" data-ready="${w.row}">Ready for inspection</button>` : `<span class="status s-Ready">Waiting for parent approval</span>`}</div>`).join('')
-      : '<p class="desc" style="margin:0">Nothing to do right now. Bid on chores to earn points!</p>'}</div>`;
-  } else $('myChores').innerHTML = '';
-
-  const byKid = {};
-  open.forEach(w => { (byKid[w.winner] = byKid[w.winner] || []).push(w); });
-  $('openChores').innerHTML = Object.keys(byKid).length ? Object.keys(byKid).map(k => `<div style="margin-bottom:8px">${chip(k)}
-      ${byKid[k].map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>Round ${w.round} · ${pt(w.points)}</small></span><span class="status ${statusClass(w.status)}">${statusLabel(w.status)}</span></div>`).join('')}</div>`).join('')
-    : '<p class="desc" style="margin:0">No chores in progress.</p>';
-
-  const last = DATA.round - 1;
-  const latest = DATA.winners.filter(w => w.round === last);
-  $('resultsTitle').textContent = last >= 1 ? 'Latest auction: Round ' + last : 'Latest auction';
-  $('resultCards').innerHTML = latest.length ? latest.map(w => `<div class="card chore">
-      <div class="meta" style="margin-bottom:4px"><h3 style="margin:0">${esc(w.chore)}</h3><span class="status ${statusClass(w.status)}">${statusLabel(w.status)}</span></div>
-      ${w.status === 'No Bids' ? '' : `<div>${chip(w.winner)} for <b>${pt(w.points)}</b></div>`}
-      <div class="how">${esc(w.how)}${w.total ? ' · ' + plural(w.total, 'bid') : ''}</div></div>`).join('')
-    : '<div class="card empty">No auction has closed yet. Winners show up here after the first one.</div>';
-
-  const older = DATA.winners.filter(w => w.round < last && open.indexOf(w) === -1 && w.status !== 'No Bids').slice(0, 80);
-  $('history').innerHTML = older.length
-    ? '<table><tr><th>Round</th><th>Chore</th><th>Who</th><th>Pts</th><th>Result</th></tr>' + older.map(w =>
-      `<tr><td>${w.round}</td><td>${esc(w.chore)}</td><td>${esc(w.winner)}</td><td>${esc(w.points)}</td><td><span class="status ${statusClass(w.status)}">${statusLabel(w.status)}</span></td></tr>`).join('') + '</table>'
-    : '<div class="empty">Finished chores from earlier rounds show here.</div>';
-}
-function choresClick(e) {
-  const b = e.target.closest('[data-ready]');
-  if (!b) return;
-  act(() => api('ready', { row: +b.dataset.ready }));
+function parentPoints() {
+  const d = DATA;
+  const kidOpts = d.kids.map(k => `<option>${esc(k.name)}</option>`).join('');
+  return `<div class="grid">${d.balances.map(b => {
+      const g = goalFor(b.name);
+      return `<div class="bal" style="background:${esc(b.color)}"><div class="top"><span class="k">${esc(b.name)}</span><span class="n">${b.points}</span></div>
+        ${g.text ? `<div class="goal">${esc(g.text)}<div class="bar"><i style="width:${Math.min(100, g.pct)}%"></i></div></div>` : ''}</div>`;
+    }).join('')}</div>
+  <div class="card mt">
+    <h3 class="sec">Trade points for a reward</h3>
+    <p class="desc">Pick the kid, tap the reward, then give it to them. The app does not control screen time on any device.</p>
+    <select id="redeemKid">${kidOpts}</select>
+    <div class="mt">${d.rewards.map((r, i) => `<div class="item"><span class="nm">${esc(r.name)}</span><span class="tag">${pt(r.cost)}</span><button class="btn small" data-a="redeem" data-i="${i}">Trade</button></div>`).join('') || '<p class="desc">No rewards yet. Add them in Settings.</p>'}</div>
+  </div>
+  <div class="card">
+    <h3 class="sec">Give or take points</h3>
+    <div class="row">
+      <div><label>Kid</label><select id="adjKid">${kidOpts}</select></div>
+      <div><label>Points (use - to take away)</label><input type="number" id="adjPts" placeholder="5"></div>
+    </div>
+    <label>Reason (kids can see this)</label>
+    <input type="text" id="adjReason" maxlength="80" placeholder="Helped without being asked">
+    <button class="btn full mt" data-a="adjust">Save points</button>
+  </div>
+  <div class="card"><h3 class="sec">Every point, earned and spent</h3>
+    <div class="tablewrap">${d.ledger.length ? '<table><tr><th>When</th><th>Kid</th><th>Pts</th><th>What</th></tr>' + d.ledger.map(l =>
+      `<tr><td>${esc(l.date)}</td><td>${esc(l.kid)}</td><td class="${l.points >= 0 ? 'plus' : 'minus'}">${l.points > 0 ? '+' : ''}${l.points}</td><td>${esc(l.type)}: ${esc(l.details)}</td></tr>`).join('') + '</table>' : '<p class="desc">No points yet.</p>'}</div>
+  </div>`;
 }
 
-/* ---------- Points ---------- */
-function renderPoints() {
-  $('balances').innerHTML = DATA.balances.length ? DATA.balances.map(b => {
-    const g = goalFor(b.name);
-    return `<div class="bal" style="background:${esc(b.color)}">
-      <div class="top"><span class="k">${esc(b.name)}${b.name === DATA.me ? ' (you)' : ''}</span><span class="n">${b.points}</span></div>
-      ${g.text ? `<div class="goal">${esc(g.text)}<div class="bar"><i style="width:${Math.min(100, g.pct)}%"></i></div></div>` : ''}
-    </div>`;
-  }).join('') : '<div class="card empty">No kids yet.</div>';
-  const sel = $('redeemKid');
-  const prev = sel.value || DATA.me || '';
-  sel.innerHTML = DATA.kids.map(k => `<option ${k.name === prev ? 'selected' : ''}>${esc(k.name)}</option>`).join('');
-  $('rewardList').innerHTML = DATA.rewards.length ? DATA.rewards.map((r, i) =>
-    `<div class="item"><span class="nm">${esc(r.name)}</span><span class="tag">${pt(r.cost)}</span><button class="btn small" data-rw="${i}">Trade</button></div>`).join('')
-    : '<div class="empty">No rewards yet. A parent can add them in the Parent tab.</div>';
-  $('ledger').innerHTML = DATA.ledger.length
-    ? '<table><tr><th>When</th><th>Kid</th><th>Pts</th><th>What</th></tr>' + DATA.ledger.map(l =>
-      `<tr><td>${esc(l.date)}</td><td>${esc(l.kid)}</td><td class="${l.points >= 0 ? 'plus' : 'minus'}">${l.points > 0 ? '+' : ''}${l.points}</td><td>${esc(l.type)}: ${esc(l.details)}</td></tr>`).join('') + '</table>'
-    : '<div class="empty">No points yet.</div>';
-}
-function rewardClick(e) {
-  const b = e.target.closest('[data-rw]');
-  if (!b) return;
-  const r = DATA.rewards[+b.dataset.rw], kid = $('redeemKid').value;
-  if (!kid) return;
-  act(async () => {
-    if (!(await confirmParent('Trade points for this reward?', kid + ' spends ' + points(r.cost) + ' on ' + r.name + '. You give the reward.'))) throw new Error('CANCELLED');
-    return pcall('redeem', { kid: kid, reward: r.name });
-  });
-}
-
-/* ---------- Parent ---------- */
+/* ---------- parent settings ---------- */
 let JOIN = null, joinTimer = null;
 function joinBoxHtml() {
   if (JOIN && JOIN.expires > Date.now()) {
@@ -1679,97 +1889,39 @@ function tickJoin() {
   update();
   joinTimer = setInterval(update, 1000);
 }
-
 function section(id, title, body) {
   return `<details class="sec" data-sec="${id}" ${OPEN_SECTIONS.has(id) ? 'open' : ''}><summary>${title}</summary><div>${body}</div></details>`;
 }
+function deviceLabel(x) { return x.role === 'kid' ? chip(x.kid) + ' own device' : `<b>${esc(ROLE_NAMES[x.role] || 'Device')}</b>`; }
 
-function renderParent() {
-  const box = $('parentArea'), d = DATA;
-  if (!TOKEN) {
-    const waiting = d.winners.filter(w => w.status === 'Ready').length;
-    box.innerHTML = `<div class="card" style="max-width:520px">
-      <h3 class="sec">Parent area</h3>
-      ${waiting ? `<p class="good">${plural(waiting, 'chore')} waiting for your approval.</p>` : ''}
-      <p class="desc">Unlock to approve chores, run the auction, set up kids' devices, and change settings. Your PIN is checked on the server.</p>
-      ${d.demo ? '<p class="tip">Demo PIN: <b>1234</b></p>' : ''}
-      <div class="row"><input type="password" id="pinInline" inputmode="numeric" autocomplete="off" placeholder="Parent PIN">
-      <button class="btn shrink" data-p="unlock">Unlock</button></div>
-    </div>`;
-    return;
-  }
+function parentSettings() {
+  const d = DATA;
   const kidOpts = d.kids.map(k => `<option>${esc(k.name)}</option>`).join('');
-  const ready = d.winners.filter(w => w.status === 'Ready');
-  const todo = d.winners.filter(w => w.status === 'Assigned');
-  const none = d.winners.filter(w => w.status === 'No Bids');
   const chk = fairnessCheck(d.kids.length, d.chores, d.fairness.limit);
+  const thisDevice = role() === 'parent' ? `This is a <b>parent's phone</b>. It stays signed in, so you never need the PIN here.`
+    : role() === 'shared' ? `This is your <b>family computer</b>. Lock it when you are done so kids cannot use the parent area.`
+    : `This device is not set up yet. <button class="link" data-a="asParent">Make this my parent phone</button>`;
+  return `<div class="card"><p class="desc" style="margin:0">${thisDevice}</p></div>
 
-  box.innerHTML = `
-  ${d.weakPin ? `<div class="warn">Your parent PIN is short. Choose a new one with 6 to 12 numbers in Family settings below.</div>` : ''}
-  ${!d.demo && !d.email ? `<div class="warn">Add a parent email in Family settings so you hear about wrong-PIN lockouts and new devices, and can recover your link.</div>` : ''}
-  <div class="card hl">
-    <div class="meta" style="margin:0 0 6px"><h3 class="sec" style="margin:0">Needs your OK</h3><button class="btn ghost small" data-p="lock">Lock parent area</button></div>
-    ${ready.length ? ready.map(w => `<div class="item"><span class="nm">${chip(w.winner)} ${esc(w.chore)}<small>Round ${w.round} · ${pt(w.points)} · ready since ${esc(w.statusDate)}</small></span>
-      <span class="acts"><button class="btn green small" data-p="done" data-row="${w.row}">Approve</button>
-      <button class="btn ghost small" data-p="again" data-row="${w.row}">Needs more work</button>
-      <button class="btn ghost small" data-p="notdone" data-row="${w.row}">Not done</button></span></div>`).join('')
-      : '<p class="desc" style="margin:0">Nothing is waiting. When a kid taps Ready for inspection, it shows up here.</p>'}
-  </div>
-
-  ${none.length ? `<div class="card"><h3 class="sec">No winner yet</h3>
-    ${none.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>Round ${w.round} · ${esc(w.how)}</small></span>
-      <span class="acts"><select class="sel-mini" id="as${w.row}">${kidOpts}</select>
-      <input type="number" class="mini" id="ap${w.row}" placeholder="Pts" min="0">
-      <button class="btn small" data-p="assign" data-row="${w.row}">Assign</button>
-      <button class="btn ghost small" data-p="skip" data-row="${w.row}">Skip</button></span></div>`).join('')}</div>` : ''}
-
-  <div class="card">
-    <h3 class="sec">Auction</h3>
-    <p class="desc">Round ${d.round} is open. It closes on its own every ${esc(d.schedule.label)} (${esc(d.schedule.tz.replace(/_/g, ' '))} time).</p>
-    <button class="btn gold full" data-p="run">Close the auction now</button>
-    ${todo.length ? `<p class="desc mt" style="margin-bottom:0">${plural(todo.length, 'chore')} still to do. You can also mark them done here:</p>
-      ${todo.map(w => `<div class="item"><span class="nm">${chip(w.winner)} ${esc(w.chore)}<small>Round ${w.round} · ${pt(w.points)}</small></span>
-      <span class="acts"><button class="btn green small" data-p="done" data-row="${w.row}">Done</button><button class="btn ghost small" data-p="notdone" data-row="${w.row}">Not done</button></span></div>`).join('')}` : ''}
-  </div>
-
-  ${section('devices', "Set up kids' devices", `
-    <p class="desc">Each kid's device bids only as that kid. Pick the kid, get a code, and type it on their device at <span class="site">${esc(SITE)}</span> using <b>Enter a join code</b>.</p>
-    <div class="row"><select id="jcKid">${kidOpts}</select><button class="btn gold shrink" data-p="joinCode">Get a join code</button></div>
+  ${section('devices', 'Devices', `
+    <p class="desc"><b>A kid's own device:</b> pick the kid, tap Get a join code, then on their device go to <span class="site">${esc(SITE)}</span> and tap Enter a join code.</p>
+    <div class="row"><select id="jcKid">${kidOpts}</select><button class="btn gold shrink" data-a="joinCode">Get a join code</button></div>
     <div id="joinBox">${joinBoxHtml()}</div>
-    <p class="desc mt">Or set up the device you are holding: <button class="link" data-p="thisDevice">Use this device for a kid</button></p>
-    <label>Devices that can bid</label>
-    ${d.devices.length ? d.devices.map(x => `<div class="item"><span class="nm">${chip(x.kid)}<small>Added ${esc(x.added)} · last used ${esc(x.lastSeen)}</small></span>
-      <button class="btn ghost small" data-p="rmDevice" data-key="${esc(x.key)}">Remove</button></div>`).join('') : '<p class="desc">No devices yet.</p>'}
-    <p class="desc mt" style="margin-bottom:0">Want to send the link to your own phone? <button class="link" data-p="share">Share the family link</button></p>`)}
+    <p class="desc mt"><b>A family computer or another parent's phone:</b> open your family link on it and pick what it is. <button class="link" data-a="share">Share the family link</button></p>
+    <label>Devices in your family</label>
+    ${d.devices.length ? d.devices.map(x => `<div class="item"><span class="nm">${deviceLabel(x)}${x.mine ? ' (this one)' : ''}<small>Added ${esc(x.added)} · last used ${esc(x.lastSeen)}</small></span>
+      <button class="btn ghost small" data-a="rmDevice" data-key="${esc(x.key)}">Remove</button></div>`).join('') : '<p class="desc">No devices yet.</p>'}`)}
 
-  ${section('points', 'Give or take points', `
-    <div class="row">
-      <div><label>Kid</label><select id="adjKid">${kidOpts}</select></div>
-      <div><label>Points (use - to take away)</label><input type="number" id="adjPts" placeholder="5"></div>
-    </div>
-    <label>Reason (kids can see this)</label>
-    <input type="text" id="adjReason" maxlength="80" placeholder="Helped without being asked">
-    <button class="btn full mt" data-p="adjust">Save points</button>`)}
-
-  ${section('rules', 'Fairness rules and schedule', `
-    <label>Work limit per kid each round</label>
-    <select id="pLimit">${limitOpts(d.fairness.limit)}</select>
-    <div class="${chk.cls}" id="pCheck">${esc(chk.text)}</div>
-    ${toggleHtml('pRepeat', d.fairness.noRepeat, RULE_REPEAT[0], RULE_REPEAT[1])}
-    <label>Chores nobody wins</label>
-    ${unclaimedHtml('pUnc', d.fairness.unclaimed)}
-    <div class="row mt">
-      <div><label>Auction day</label><select id="pDay">${dayOpts(d.schedule.day)}</select></div>
-      <div><label>Time</label><select id="pHour">${hourOpts(d.schedule.hour)}</select></div>
-    </div>
-    <button class="btn full mt" data-p="saveRules">Save rules and schedule</button>`)}
-
-  ${section('kids', 'Kids', `
-    ${d.kids.map((k, i) => `<div class="item"><span class="nm">${chip(k.name)}</span><button class="btn ghost small" data-p="delKid" data-i="${i}">Remove</button></div>`).join('')}
-    <div class="row mt" style="align-items:center">
+  ${section('kids', 'Kids and secret codes', `
+    <p class="desc">Kids type their secret code to sign in on the family computer. Only you can see or change them here.</p>
+    ${d.kids.map((k, i) => `<div class="item"><span class="nm">${chip(k.name)} <span class="codepill ${k.hasCode ? '' : 'no'}">${k.hasCode ? 'Secret code set' : 'No secret code yet'}</span></span>
+      <span class="acts"><button class="btn small" data-a="setCode" data-i="${i}">${k.hasCode ? 'Change code' : 'Set code'}</button><button class="btn ghost small" data-a="delKid" data-i="${i}">Remove</button></span></div>`).join('')}
+    <label>Add a kid</label>
+    <div class="row" style="align-items:center">
       <input type="color" id="nkColor" value="${COLORS[d.kids.length % COLORS.length]}" aria-label="Color">
-      <input type="text" id="nkName" maxlength="24" placeholder="New kid's name">
-      <button class="btn shrink" data-p="addKid">Add</button>
+      <input type="text" id="nkName" maxlength="24" placeholder="First name">
+      <input type="text" id="nkCode" class="mini" style="width:92px!important" maxlength="4" inputmode="numeric" placeholder="Code" value="${randomCode()}">
+      <button class="btn shrink" data-a="addKid">Add</button>
     </div>`)}
 
   ${section('chores', 'Chores, pay, and who can do them', `
@@ -1781,7 +1933,7 @@ function renderParent() {
       </div>
       <div class="kidchecks mt">Who can do it:
         ${d.kids.map(k => `<label><input type="checkbox" class="cwho${i}" value="${esc(k.name)}" ${canDo(c, k.name) ? 'checked' : ''}>${esc(k.name)}</label>`).join('')}</div>
-      <div class="acts mt"><button class="btn small" data-p="saveChore" data-i="${i}">Save</button><button class="btn ghost small" data-p="delChore" data-i="${i}">Remove</button></div>
+      <div class="acts mt"><button class="btn small" data-a="saveChore" data-i="${i}">Save</button><button class="btn ghost small" data-a="delChore" data-i="${i}">Remove</button></div>
     </div>`).join('') || '<p class="desc">No chores yet.</p>'}
     <label>Add a chore</label>
     <input type="text" id="ncName" maxlength="40" placeholder="Chore name">
@@ -1789,56 +1941,161 @@ function renderParent() {
     <div class="row mt" style="align-items:center">
       <span class="pay">Pays <input type="number" class="mini" id="ncMin" value="2" min="1" max="100"> to <input type="number" class="mini" id="ncMax" value="6" min="1" max="100"></span>
       <select class="sel-mini shrink" id="ncSize"><option value="1">Small</option><option value="2">Medium</option><option value="3">Big</option></select>
-      <button class="btn shrink" data-p="addChore">Add chore</button>
+      <button class="btn shrink" data-a="addChore">Add chore</button>
     </div>`)}
 
   ${section('rewards', 'Rewards', `
     ${d.rewards.map((r, i) => `<div class="item"><span class="nm">${esc(r.name)}</span>
       <span class="pay">Costs <input type="number" class="mini" id="rc${i}" value="${r.cost}" min="1" max="1000"> pts</span>
-      <span class="acts"><button class="btn small" data-p="saveReward" data-i="${i}">Save</button><button class="btn ghost small" data-p="delReward" data-i="${i}">Remove</button></span></div>`).join('') || '<p class="desc">No rewards yet.</p>'}
+      <span class="acts"><button class="btn small" data-a="saveReward" data-i="${i}">Save</button><button class="btn ghost small" data-a="delReward" data-i="${i}">Remove</button></span></div>`).join('') || '<p class="desc">No rewards yet.</p>'}
     <div class="row mt" style="align-items:center">
       <input type="text" id="nrName" maxlength="40" placeholder="New reward">
       <span class="pay shrink">Costs <input type="number" class="mini" id="nrCost" value="10" min="1" max="1000"> pts</span>
-      <button class="btn shrink" data-p="addReward">Add</button>
+      <button class="btn shrink" data-a="addReward">Add</button>
     </div>`)}
 
-  ${section('family', 'Family settings', `
+  ${section('rules', 'Rules and schedule', `
+    <div class="row">
+      <div><label>Auction closes on</label><select id="pDay">${dayOpts(d.schedule.day)}</select></div>
+      <div><label>At</label><select id="pHour">${hourOpts(d.schedule.hour)}</select></div>
+    </div>
+    <label>Approve finished chores automatically after</label>
+    <select id="pAuto">${autoOpts(d.fairness.autoApprove)}</select>
+    <label>Work limit per kid each round</label>
+    <select id="pLimit">${limitOpts(d.fairness.limit)}</select>
+    <div class="${chk.cls}" id="pCheck">${esc(chk.text)}</div>
+    ${toggleHtml('pRepeat', d.fairness.noRepeat, RULE_REPEAT[0], RULE_REPEAT[1])}
+    <label>Chores nobody wins</label>
+    ${unclaimedHtml('pUnc', d.fairness.unclaimed)}
+    <button class="btn full mt" data-a="saveRules">Save rules and schedule</button>`)}
+
+  ${section('family', 'Family', `
     <label>Family nickname (no last names)</label><input type="text" id="fName" maxlength="40" value="${esc(d.family)}">
-    <label>Parent email (weekly results and lost-link emails)</label><input type="email" id="fEmail" maxlength="120" value="${esc(d.email)}">
-    <button class="btn full mt" data-p="saveFam">Save</button>
+    <label>Parent email (weekly results, security notices, lost-link emails)</label><input type="email" id="fEmail" maxlength="120" value="${esc(d.email)}">
+    <button class="btn full mt" data-a="saveFam">Save</button>
     <label class="mt">Change the parent PIN</label>
     <div class="row">
       <input type="password" id="pinOld" inputmode="numeric" placeholder="Current PIN" autocomplete="off" maxlength="12">
       <input type="password" id="pinNew" inputmode="numeric" placeholder="New PIN (6-12 numbers)" autocomplete="new-password" maxlength="12">
       <input type="password" id="pinNew2" inputmode="numeric" placeholder="New PIN again" autocomplete="new-password" maxlength="12">
     </div>
-    <button class="btn ghost full mt" data-p="pin">Change PIN</button>
+    <button class="btn ghost full mt" data-a="pin">Change PIN</button>
     <div class="card danger mt" style="margin-bottom:0">
       <h3 class="sec">${d.demo ? 'Start the demo over' : 'Delete this family'}</h3>
       <p class="desc">${d.demo ? 'Puts the demo family back the way it started.' : 'Permanently deletes your kids, chores, bids, and points. This cannot be undone.'}</p>
-      <button class="btn red" data-p="delete">${d.demo ? 'Start over' : 'Delete everything'}</button>
+      <button class="btn red" data-a="delete">${d.demo ? 'Start over' : 'Delete everything'}</button>
     </div>`)}`;
-  tickJoin();
 }
 
-async function inlineUnlock() {
-  const pin = $('pinInline') ? $('pinInline').value : '';
-  if (!pin) return toast('Type the PIN first.', true);
-  try { setToken((await api('login', { pin: pin })).token); toast('Parent area unlocked.'); await load(); }
-  catch (e) { toast(errMsg(e), true); }
+/* ============================== HELP ============================== */
+function showHelp() {
+  const m = DATA ? mode() : 'setup', when = DATA ? DATA.schedule.label : 'once a week';
+  const H = {
+    setup: ['Getting started', `<p>Each device is set up once, as one of these:</p><ol class="helpsteps">
+      <li><b>A parent's phone.</b> Type your PIN once. After that it opens straight to your approvals.</li>
+      <li><b>A family computer or tablet</b> that everyone shares. Kids tap their name and type their 4-number secret code.</li>
+      <li><b>A kid's own device.</b> It only ever bids as that kid.</li></ol><p>You can mix them. Most families use a parent's phone and one shared tablet.</p>`],
+    who: ['Using the family computer', `<ol class="helpsteps"><li><b>Kids:</b> tap your name and type your secret code.</li>
+      <li>Bid on chores, or tap <b>I finished it!</b> on a chore you did.</li>
+      <li>Tap <b>I'm done, sign out</b> when you are finished. It also signs you out by itself after 3 minutes.</li>
+      <li><b>Parents:</b> tap Parent and type your PIN. Tap Lock when you are done.</li></ol>`],
+    kid: ['How the Chore Auction works', `<ol class="helpsteps"><li><b>Bid on chores:</b> pick the fewest points you would do each job for and tap Place my bid.</li>
+      <li>The auction closes <b>${esc(when)}</b>. The lowest bid wins each chore.</li>
+      <li><b>My chores:</b> do your job, then tap <b>I finished it!</b></li>
+      <li>A parent checks it and approves it. The points go in your bank.</li>
+      <li><b>My points:</b> see how close you are to a reward. Ask a parent to trade your points.</li></ol>`],
+    parent: ['How it works for parents', `<ol class="helpsteps"><li>Kids bid on chores during the week.</li>
+      <li>The auction closes by itself <b>${esc(when)}</b>, or tap Close the auction now in <b>This week</b>.</li>
+      <li>When a kid finishes a chore, it shows up in <b>Approve</b>. Tap Approve (or Approve all). That is it.${DATA && DATA.fairness.autoApprove ? ' If you forget, it is approved for you after ' + DATA.fairness.autoApprove + ' hours.' : ''}</li>
+      <li><b>Points:</b> trade points for rewards, and give bonus points.</li>
+      <li><b>Settings:</b> devices, kids' secret codes, chores, rewards, and rules.</li></ol>`]
+  }[m];
+  $('hmTitle').textContent = H[0];
+  $('hmBody').innerHTML = H[1];
+  $('hm').className = 'overlay show';
 }
 
-async function parentClick(e) {
-  const b = e.target.closest('[data-p]');
+/* ============================== WHAT EACH BUTTON DOES ============================== */
+async function chooseKid(text) {
+  const kids = DATA.kids.map(k => k.name);
+  if (!kids.length) { toast('Add a kid first in Settings.', true); return null; }
+  return await ask('Which kid uses this device?', text, 'select', kids);
+}
+async function lockParent(msg) {
+  try { await api('logout'); } catch (e) { /* ignore */ }
+  setToken(null);
+  if (msg) toast(msg);
+}
+
+async function viewClick(e) {
+  const tg = e.target.closest('[data-tab-go]');
+  if (tg) { PTAB = tg.dataset.tabGo; renderApp(); window.scrollTo(0, 0); return; }
+  const b = e.target.closest('[data-a]');
   if (!b) return;
   const d = DATA, i = Number(b.dataset.i), row = Number(b.dataset.row), v = id => $(id).value;
-  switch (b.dataset.p) {
-    case 'unlock': return inlineUnlock();
-    case 'lock':
-      try { await api('logout'); } catch (err) { /* ignore */ }
-      setToken(null); renderParent(); toast('Parent area locked.'); return;
-    case 'done': return act(() => pcall('markChore', { row: row, status: 'Done' }));
-    case 'again': return act(() => pcall('markChore', { row: row, status: 'Again' }));
+  switch (b.dataset.a) {
+    /* ----- first-time device setup ----- */
+    case 'asParent':
+      if (await pinLogin('Make this your parent phone.', true)) { PTAB = 'approve'; toast('This is now your parent phone. You will not need your PIN here again.'); await load(); }
+      return;
+    case 'asShared':
+      if (!(await ensureParent('A parent sets up the family computer once.'))) return;
+      return act(async () => {
+        const r = await pcall('bindDevice', { role: 'shared', device: DEVICE || '' });
+        setDevice(r.device); await lockParent();
+        return 'This is now your family computer. Kids tap their name and type their secret code.';
+      });
+    case 'asKid': {
+      const how = await ask('Set up a kid\'s own device', 'Is a parent here to type the PIN, or does the kid have a join code?', 'select', ['A parent is here', 'I have a join code']);
+      if (!how) return;
+      if (how === 'I have a join code') return showJoin();
+      if (!(await ensureParent('A parent needs to approve which kid uses this device.'))) return;
+      const kid = await chooseKid('This device will only ever bid as this kid.');
+      if (!kid) return;
+      return act(async () => {
+        const r = await pcall('bindDevice', { role: 'kid', kid: kid, device: DEVICE || '' });
+        setDevice(r.device); await lockParent(); KTAB = 'bid';
+        return 'This device now belongs to ' + kid + '.';
+      });
+    }
+    case 'switchKid': {
+      if (!(await ensureParent('A parent needs to approve switching kids.'))) return;
+      const kid = await chooseKid('This device will bid only as this kid.');
+      if (!kid) return;
+      return act(async () => {
+        const r = await pcall('bindDevice', { role: 'kid', kid: kid, device: DEVICE || '' });
+        setDevice(r.device); await lockParent(); KTAB = 'bid';
+        Object.keys(BID_VALUES).forEach(k => delete BID_VALUES[k]);
+        return 'This device now bids as ' + kid + '.';
+      });
+    }
+
+    /* ----- family computer ----- */
+    case 'whoKid': {
+      const kid = b.dataset.kid;
+      const r = await keypad('Hi ' + kid + '!', 'Type your secret code.', async code => {
+        try { return await api('kidLogin', { kid: kid, code: code }); } catch (err) { toast(errMsg(err), true); return null; }
+      });
+      if (r) { KSESS = r.ksess; KTAB = 'bid'; Object.keys(BID_VALUES).forEach(k => delete BID_VALUES[k]); await load(); }
+      return;
+    }
+    case 'whoParent':
+      if (await pinLogin('', false)) { PTAB = 'approve'; await load(); }
+      return;
+    case 'kidOut': return kidSignOut();
+    case 'lock': await lockParent('Parent area locked.'); return load();
+
+    /* ----- kids ----- */
+    case 'dn': return clampBid(i, Number($('bid' + i).value) - 1);
+    case 'up': return clampBid(i, Number($('bid' + i).value) + 1);
+    case 'bid': { const val = clampBid(i, $('bid' + i).value), name = d.chores[i].name; delete BID_VALUES[name]; return act(() => api('bid', { chore: name, points: val })); }
+    case 'withdraw': return act(() => api('withdraw', { chore: d.chores[i].name }));
+    case 'ready': return act(() => api('ready', { row: row }));
+
+    /* ----- parents: approvals ----- */
+    case 'approve': return act(() => pcall('markChore', { row: row, status: 'Done' }));
+    case 'approveAll': return act(() => pcall('approveAll', { rows: readyRows().map(w => w.row) }));
+    case 'redo': return act(() => pcall('markChore', { row: row, status: 'Again' }));
     case 'notdone':
       return act(async () => {
         if (!(await ask('Mark not done?', 'No points will be given for this chore.', 'confirm'))) throw new Error('CANCELLED');
@@ -1848,11 +2105,22 @@ async function parentClick(e) {
     case 'assign': return act(() => pcall('assignChore', { row: row, kid: v('as' + row), points: v('ap' + row) === '' ? '' : Number(v('ap' + row)) }));
     case 'run':
       return act(async () => {
-        if (!(await ask('Close the auction now?', 'This closes Round ' + d.round + ' and picks a winner for every chore. Unfinished chores from earlier rounds stay open.', 'confirm'))) throw new Error('CANCELLED');
+        if (!(await ask('Close the auction now?', 'This closes round ' + d.round + ' and picks a winner for every chore. Unfinished chores from earlier stay open.', 'confirm'))) throw new Error('CANCELLED');
         await pcall('runAuction');
-        CUR_TAB = 'chores';
-        return 'Auction closed! Here are the winners.';
+        return 'Auction closed! Winners can see their chores now.';
       });
+
+    /* ----- parents: points ----- */
+    case 'redeem': {
+      const r = d.rewards[i], kid = v('redeemKid');
+      return act(async () => {
+        if (!(await ask('Trade ' + points(r.cost) + '?', kid + ' gets ' + r.name + '. Remember to give it to them.', 'confirm'))) throw new Error('CANCELLED');
+        return pcall('redeem', { kid: kid, reward: r.name });
+      });
+    }
+    case 'adjust': return act(() => pcall('adjust', { kid: v('adjKid'), points: v('adjPts') === '' ? '' : Number(v('adjPts')), reason: v('adjReason') }));
+
+    /* ----- parents: settings ----- */
     case 'joinCode':
       try {
         const r = await pcall('joinCode', { kid: v('jcKid') });
@@ -1861,25 +2129,29 @@ async function parentClick(e) {
         tickJoin();
       } catch (err) { if (errMsg(err) !== 'CANCELLED') toast(errMsg(err), true); }
       return;
-    case 'thisDevice': return switchKid();
+    case 'share': return shareLink(familyLink());
     case 'rmDevice':
       return act(async () => {
-        if (!(await ask('Remove this device?', 'It will no longer be able to bid. You can set it up again later.', 'confirm'))) throw new Error('CANCELLED');
-        return pcall('removeDevice', { key: b.dataset.key });
+        const mine = (d.devices.find(x => x.key === b.dataset.key) || {}).mine;
+        if (!(await ask('Remove this device?', mine ? 'This is the device you are using. It will go back to asking how it is used.' : 'It will no longer be part of your Chore Auction. You can set it up again later.', 'confirm'))) throw new Error('CANCELLED');
+        const m = await pcall('removeDevice', { key: b.dataset.key });
+        if (mine) { setDevice(null); await lockParent(); }
+        return m;
       });
-    case 'share': return shareLink(familyLink());
-    case 'adjust': return act(() => pcall('adjust', { kid: v('adjKid'), points: v('adjPts') === '' ? '' : Number(v('adjPts')), reason: v('adjReason') }));
-    case 'saveRules':
-      return act(async () => {
-        const unc = (document.querySelector('input[name=pUnc]:checked') || {}).value || 'auto';
-        await pcall('saveFairness', { limit: Number(v('pLimit')), noRepeat: $('pRepeat').checked, unclaimed: unc });
-        await pcall('saveSchedule', { day: v('pDay'), hour: Number(v('pHour')) });
-        return 'Rules and schedule saved.';
-      });
-    case 'addKid': return act(() => pcall('saveKid', { name: v('nkName'), color: v('nkColor') }));
+    case 'setCode': {
+      const kid = d.kids[i].name;
+      const code = await keypad('New secret code for ' + kid, 'Type 4 numbers ' + kid + ' will remember.', async c => c);
+      if (!code) return;
+      return act(() => pcall('setKidCode', { kid: kid, code: code }));
+    }
+    case 'addKid': {
+      const code = v('nkCode');
+      if (code && !/^\d{4}$/.test(code)) return toast('A secret code is 4 numbers.', true);
+      return act(() => pcall('saveKid', { name: v('nkName'), color: v('nkColor'), code: code }));
+    }
     case 'delKid':
       return act(async () => {
-        if (!(await ask('Remove ' + d.kids[i].name + '?', 'They disappear from the app and their devices stop working. Their history and points are kept, and adding the same name again brings them back.', 'confirm'))) throw new Error('CANCELLED');
+        if (!(await ask('Remove ' + d.kids[i].name + '?', 'They disappear from the app and their device stops working. Their history and points are kept, and adding the same name again brings them back.', 'confirm'))) throw new Error('CANCELLED');
         return pcall('remove', { type: 'kid', name: d.kids[i].name });
       });
     case 'saveChore': {
@@ -1896,6 +2168,13 @@ async function parentClick(e) {
     case 'saveReward': return act(() => pcall('saveReward', { name: d.rewards[i].name, cost: Number(v('rc' + i)) }));
     case 'delReward': return act(() => pcall('remove', { type: 'reward', name: d.rewards[i].name }));
     case 'addReward': return act(() => pcall('saveReward', { name: v('nrName'), cost: Number(v('nrCost')) }));
+    case 'saveRules':
+      return act(async () => {
+        const unc = (document.querySelector('input[name=pUnc]:checked') || {}).value || 'auto';
+        await pcall('saveFairness', { limit: Number(v('pLimit')), noRepeat: $('pRepeat').checked, unclaimed: unc, autoApprove: Number(v('pAuto')) });
+        await pcall('saveSchedule', { day: v('pDay'), hour: Number(v('pHour')) });
+        return 'Rules and schedule saved.';
+      });
     case 'saveFam': return act(() => pcall('saveFamily', { name: v('fName'), email: v('fEmail'), appLink: APP_LINK }));
     case 'pin': {
       const pp = isDemo() ? '' : pinProblem(v('pinNew'));
@@ -1904,7 +2183,7 @@ async function parentClick(e) {
       return act(() => pcall('changePin', { oldPin: v('pinOld'), newPin: v('pinNew') }));
     }
     case 'delete': {
-      if (d.demo) { Demo.reset(); setToken(null); CUR_TAB = 'bid'; toast('The demo was reset.'); return load(); }
+      if (d.demo) { Demo.reset(); setToken(null); KSESS = null; KTAB = 'bid'; PTAB = 'approve'; toast('The demo was reset.'); return load(); }
       const pin = await ask('Delete this family?', 'This permanently deletes all kids, chores, bids, and points. It cannot be undone. Enter the parent PIN to confirm.', 'pin');
       if (!pin) return;
       try { await pcall('deleteFamily', { pin: pin }); forget(FID); setToken(null); renderLanding('Your family was deleted.'); }
@@ -1914,7 +2193,9 @@ async function parentClick(e) {
   }
 }
 
-function parentChange(e) {
+function viewChange(e) {
+  const m = /^bid(\d+)$/.exec(e.target.id || '');
+  if (m) clampBid(+m[1], e.target.value);
   if (e.target.id === 'pLimit' && DATA) {
     const chk = fairnessCheck(DATA.kids.length, DATA.chores, Number(e.target.value));
     const el = $('pCheck'); el.className = chk.cls; el.textContent = chk.text;
@@ -1926,10 +2207,16 @@ $('btnDemo').onclick = openDemo;
 $('btnSetup').onclick = startWizard;
 $('btnJoin').onclick = showJoin;
 $('btnRealFamily').onclick = startWizard;
-$('btnDemoReset').onclick = () => { Demo.reset(); setToken(null); CUR_TAB = 'bid'; toast('The demo was reset.'); load(); };
+$('btnDemoReset').onclick = () => { Demo.reset(); setToken(null); KSESS = null; KTAB = 'bid'; PTAB = 'approve'; toast('The demo was reset.'); load(); };
+document.querySelectorAll('[data-demo]').forEach(b => b.addEventListener('click', () => {
+  Demo.setRole(b.dataset.demo); setToken(null); KSESS = null; KTAB = 'bid'; PTAB = 'approve';
+  load().then(() => toast({ parent: 'Now you are seeing a parent\'s phone.', kid: 'Now you are seeing Sam\'s own tablet.', shared: 'Now you are seeing the family computer. Kids tap their name and type a code.' }[b.dataset.demo]));
+}));
+$('btnHelp').onclick = showHelp;
+$('hmClose').onclick = () => { $('hm').className = 'overlay'; };
 $('recGo').onclick = recover;
 $('joinGo').onclick = joinGo;
-$('joinBack').onclick = () => renderLanding();
+$('joinBack').onclick = () => (DATA ? show('app') : renderLanding());
 $('joinInput').addEventListener('input', e => { e.target.value = formatCode(e.target.value); });
 $('joinInput').addEventListener('keydown', e => { if (e.key === 'Enter') joinGo(); });
 $('wizNext').onclick = wizNext;
@@ -1937,15 +2224,17 @@ $('wizBack').onclick = wizBack;
 $('wizBody').addEventListener('input', wizInput);
 $('wizBody').addEventListener('change', wizInput);
 $('wizBody').addEventListener('click', wizClick);
-$('tab-bid').addEventListener('click', bidClick);
-$('tab-bid').addEventListener('change', e => { const m = /^bid(\d+)$/.exec(e.target.id || ''); if (m) clampBid(+m[1], e.target.value); });
-$('tab-chores').addEventListener('click', choresClick);
-$('rewardList').addEventListener('click', rewardClick);
-$('parentArea').addEventListener('click', parentClick);
-$('parentArea').addEventListener('change', parentChange);
-$('parentArea').addEventListener('toggle', e => { const s = e.target.dataset && e.target.dataset.sec; if (s) { if (e.target.open) OPEN_SECTIONS.add(s); else OPEN_SECTIONS.delete(s); } }, true);
-$('parentArea').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'pinInline') inlineUnlock(); });
-document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => { showTab(b.dataset.tab); if (DATA) load(); }));
+$('view').addEventListener('click', viewClick);
+$('whoBar').addEventListener('click', viewClick);
+$('view').addEventListener('change', viewChange);
+$('view').addEventListener('toggle', e => { const s = e.target.dataset && e.target.dataset.sec; if (s) { if (e.target.open) OPEN_SECTIONS.add(s); else OPEN_SECTIONS.delete(s); } }, true);
+$('tabsIn').addEventListener('click', e => {
+  const b = e.target.closest('[data-tab]');
+  if (!b || !DATA) return;
+  if (mode() === 'kid') KTAB = b.dataset.tab; else PTAB = b.dataset.tab;
+  renderApp(); window.scrollTo(0, 0);
+  load();
+});
 document.querySelectorAll('.js-site').forEach(el => { el.textContent = SITE; });
 document.querySelectorAll('.js-support').forEach(el => { el.textContent = SUPPORT_EMAIL; });
 $('supportLink').textContent = SUPPORT_EMAIL;
@@ -1956,7 +2245,7 @@ $('priceNote').textContent = PRICE_NOTE;
 function routeHash() {
   const raw = (location.hash || '').replace('#', '');
   const m = /^f=([A-Za-z0-9]{20,80})$/.exec(raw);
-  if (m) { if (m[1] !== FID) openFamily(m[1]); return true; }
+  if (m) { if (m[1] !== FID || !$('s-app').classList.contains('on')) openFamily(m[1]); return true; }
   const go = raw.toLowerCase();
   if (go === 'demo') { openDemo(); return true; }
   const to = { setup: startWizard, join: showJoin }[go];
