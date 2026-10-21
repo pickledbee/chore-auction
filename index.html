@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-b0USmGNuJKUVT3Idg359IHJt/EasoNmNRP7CoV3OpJ4='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-TasG6WQR/svdLxsbl3Nee2mcA1T/qwUX8gAkPKMWm/4='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -290,6 +290,17 @@
   .mine.sent{background:var(--greenl);color:#11622f;font-weight:800}
   .mine.notyet{background:#fff1e6;color:#7a3d00;font-weight:800}
   .unsent{color:#b45309;font-weight:800;font-size:14px;margin:0 0 8px;text-align:center}
+  .tag.often{background:#e6f4ea;color:#11622f}
+  .price{display:flex;align-items:center;gap:8px;margin:6px 0 10px;flex-wrap:wrap}
+  .price b{font:700 40px 'Fredoka',sans-serif;color:var(--purple);line-height:1}
+  .price span{font-weight:800;color:var(--muted);font-size:13px;line-height:1.1}
+  .price em{font-style:normal;font-weight:800;font-size:13px;background:var(--goldl);color:#7a5200;border-radius:999px;padding:4px 10px;margin-left:auto}
+  .price em.top{background:#ffe3e3;color:#b42318}
+  .why{color:#7a3d00;background:#fff1e6;border-radius:10px;padding:8px 10px;font-weight:800;font-size:14px;margin:0 0 10px}
+  .chore.off{opacity:.8}
+  .chore.off h3{color:var(--muted)}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  .approve .what .link{display:block;margin-top:4px;font-size:13px}
 </style>
 </head>
 <body>
@@ -300,7 +311,7 @@
   <div class="hero">
     <div class="wrap">
       <h1>The Chore <span>Auction</span></h1>
-      <p>Kids bid for chores. The lowest bid wins the job and earns those points when a parent checks the work. Less negotiating, clearer expectations, and kids who chose their own jobs.</p>
+      <p>Every chore shows what it pays. Kids pick the jobs they want, any time, and earn the points when a parent checks the work. Chores nobody picks pay a little more every day, so even the yucky jobs get done.</p>
       <div class="btns">
         <button class="btn gold" id="btnDemo">Try the demo</button>
         <button class="btn line" id="btnSetup">Set up my family</button>
@@ -313,17 +324,17 @@
       <h3 class="sec">See it in action</h3>
       <div class="story">
         <div class="st"><b class="n">1</b>
-          <div class="mini-card"><span>Take out trash</span><span class="tag">Maya bids 3</span></div>
-          <p>Maya would take out the trash for 3 points. Leo asks for 5.</p></div>
+          <div class="mini-card"><span>Take out trash</span><span class="tag">Pays 2 now</span></div>
+          <p>Nobody has taken out the trash since Monday, so it has gone up from 1 point to 2.</p></div>
         <div class="st"><b class="n">2</b>
-          <div class="mini-card"><span>Lowest bid wins</span><span class="chip" style="background:#e85d75;margin:0">Maya</span></div>
-          <p>When the weekly auction closes, Maya wins the chore.</p></div>
+          <div class="mini-card"><span>I'll do it!</span><span class="chip" style="background:#e85d75;margin:0">Maya</span></div>
+          <p>Maya taps I'll do it. The chore is hers right away, for 2 points.</p></div>
         <div class="st"><b class="n">3</b>
           <div class="mini-card"><span>I finished it!</span><span class="status s-Ready">Check it</span></div>
           <p>Maya takes out the trash and taps I finished it. A parent taps Approve. One tap.</p></div>
         <div class="st"><b class="n">4</b>
-          <div class="mini-card"><span>Maya earns 3 points</span><span class="tag">15 pts</span></div>
-          <p>She now has 15 points. 3 more and she can trade them for an hour of screen time.</p></div>
+          <div class="mini-card"><span>Maya earns 2 points</span><span class="tag">16 pts</span></div>
+          <p>She now has 16 points. 2 more and she can trade them for an hour of screen time.</p></div>
       </div>
     </div>
     <div id="landMsg" class="notice hidden"></div>
@@ -332,7 +343,7 @@
       <h3 class="sec">Works with the devices you have</h3>
       <div class="ways">
         <div class="way"><b>A parent's phone</b><span>Type your PIN once. After that, approving a chore is one tap.</span></div>
-        <div class="way"><b>Kids' own tablets or phones</b><span>Each one is set up for one kid, so siblings cannot bid for each other.</span></div>
+        <div class="way"><b>Kids' own tablets or phones</b><span>Each one is set up for one kid, so siblings cannot pick chores for each other.</span></div>
         <div class="way"><b>One family computer</b><span>No phone? No problem. Kids tap their name and type their own 4-number secret code.</span></div>
       </div>
       <p class="desc mt" style="margin-bottom:0">Mix and match. Many families use a parent's phone plus one shared family tablet.</p>
@@ -340,10 +351,10 @@
     <div class="card">
       <h3 class="sec">Built to be fair</h3>
       <div class="feat">
-        <div>A work limit counts the size of each job, so no one wins everything by bidding 1 and no one gets stuck with all the big jobs.</div>
-        <div>Every chore has a lowest pay that you set, so no chore is done for nothing.</div>
-        <div>Skipping the auction never pays more. Leftover chores go to the kid with the least work, at the lowest pay.</div>
-        <div>Chores rotate, so the same kid is not stuck with the same job every week.</div>
+        <div>Always open. No waiting for a weekly round: a chore is yours the moment you pick it.</div>
+        <div>Chores nobody picks go up in points every day, up to the top pay you set. Waiting can pay more, but a sibling might grab it first.</div>
+        <div>A work limit counts the size of each job, so one kid cannot grab every chore at once.</div>
+        <div>Kids take turns: whoever did a chore last time lets someone else have first try.</div>
         <div>You can limit a chore to the kids who are old enough for it.</div>
         <div>Every point earned or spent is listed, so kids can see how it adds up.</div>
       </div>
@@ -357,7 +368,7 @@
       <ul class="plain desc" style="padding-left:20px;margin:0">
         <li id="priceNote"></li>
         <li>Works in the web browser on any phone, tablet, or computer. Nothing to install.</li>
-        <li>A private space for your family, a weekly auction that closes on its own, and one-tap approvals for parents.</li>
+        <li>A private space for your family, an always-open chore board, and one-tap approvals for parents.</li>
         <li>Questions or help: <a id="supportLink" href="#"></a></li>
       </ul>
     </div>
@@ -366,8 +377,9 @@
       <ul class="plain desc" style="padding-left:20px;margin:0">
         <li>The app never asks for last names, addresses, birthdays, or photos. Your family's information (a family nickname, kids' first names, chores, and points) is kept in its own Google Sheet in the app owner's private Google Drive. It is not shared or sold. The app owner can see it in order to give support.</li>
         <li>Your family link lets a device view your family's chores and points. Treat it like a house key and only share it within your household.</li>
-        <li>Only devices a parent sets up can bid. On a family computer, each kid has their own secret code.</li>
-        <li>Parent actions need your PIN, which is stored scrambled and checked on the server. It locks after repeated wrong tries, and you get an email if that happens.</li>
+        <li>Only devices a parent sets up can pick chores. On a family computer, each kid has their own secret code.</li>
+        <li>Parent actions need your PIN, which is stored scrambled and checked on the server. It locks after repeated wrong tries, and you get an email if that happens. Forgot it? We email you a one-time code to choose a new one.</li>
+        <li>We only email you when it matters: things you ask for, and a few security notices. Never weekly emails.</li>
         <li>You can delete your family and all of its data at any time.</li>
       </ul>
       <p class="desc mt" style="margin-bottom:0">Full details: <a href="privacy.html">Privacy Policy</a> and <a href="terms.html">Terms and refunds</a>.</p>
@@ -376,7 +388,7 @@
       <h3 class="sec">Lost your family link?</h3>
       <p class="desc">Enter the parent email you used during setup and we will email the link to you.</p>
       <div class="row"><input type="email" id="recEmail" placeholder="you@example.com" maxlength="120"><button class="btn shrink" id="recGo">Email me my link</button></div>
-      <p class="desc mt" style="margin-bottom:0">Forgot your PIN? Email <span class="js-support"></span> from your parent email address. After checking it is you, we will reset it.</p>
+      <p class="desc mt" style="margin-bottom:0">Forgot your PIN? Open your family link and tap <b>Forgot PIN?</b> where it asks for the PIN. We will email you a code to choose a new one.</p>
     </div>
   </div>
   <footer class="small">The Chore Auction · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms and refunds</a></footer>
@@ -493,6 +505,7 @@
     <p class="desc" id="mText"></p>
     <select id="mSelect" class="hidden" style="margin-bottom:12px"></select>
     <input type="password" id="mInput" inputmode="numeric" autocomplete="off" placeholder="Parent PIN" maxlength="12" style="margin-bottom:12px">
+<button class="link hidden" id="mForgot" style="display:block;margin:-4px 0 12px">Forgot PIN?</button>
     <div class="row">
       <button class="btn ghost" id="mCancel">Cancel</button>
       <button class="btn" id="mOk">OK</button>
@@ -512,6 +525,7 @@
       <button>7</button><button>8</button><button>9</button>
       <button class="kpx" data-k="back">&#9003;</button><button>0</button><button class="kpx" data-k="cancel">Cancel</button>
     </div>
+    <button class="link hidden mt" id="kpForgot">I forgot my code</button>
   </div>
 </div>
 
@@ -526,24 +540,24 @@
 
 <script>
 /* ============================== SETUP DATA ============================== */
-// [name, description, lowest pay, highest pay, picked by default, size 1-3]
+// [name, description, starts at, can grow to, picked by default, size 1-3, comes back every (days)]
 const LIB_CHORES = [
-  ['Take out trash', 'Kitchen and bathroom trash to the curb', 1, 6, 1, 1],
-  ['Unload dishwasher', 'Put away every clean dish', 2, 8, 1, 2],
-  ['Feed the pets', 'Morning and evening, all week', 1, 6, 1, 2],
-  ['Vacuum living room', 'Move small things, vacuum under the couch', 4, 12, 1, 3],
-  ['Wipe bathroom sink', 'Sink, faucet, and mirror', 2, 6, 1, 1],
-  ['Fold laundry', 'Fold and deliver one full basket', 3, 8, 1, 2],
-  ['Set the table', 'Plates, cups, forks, napkins', 1, 4, 0, 1],
-  ['Clear the table', 'Dishes to the sink, wipe the table', 1, 4, 0, 1],
-  ['Load dishwasher', 'Rinse and load after dinner', 2, 6, 0, 2],
-  ['Water the plants', 'Inside plants, twice a week', 1, 4, 0, 1],
-  ['Sweep the kitchen', 'Under the table too', 2, 8, 0, 2],
-  ['Walk the dog', 'A real walk, at least 15 minutes', 2, 8, 0, 2],
-  ['Clean a bathroom', 'Toilet, sink, mirror, and floor', 6, 15, 0, 3],
-  ['Clean out the car', 'Trash out, mats shaken, seats wiped', 5, 15, 0, 3],
-  ['Make school lunches', 'Lunches packed for everyone', 3, 8, 0, 2],
-  ['Rake leaves or shovel snow', 'Front walk and driveway', 6, 20, 0, 3]
+  ['Take out trash', 'Kitchen and bathroom trash to the curb', 1, 6, 1, 1, 3],
+  ['Unload dishwasher', 'Put away every clean dish', 2, 6, 1, 2, 1],
+  ['Feed the pets', 'Food and fresh water', 1, 4, 1, 1, 1],
+  ['Vacuum living room', 'Move small things, vacuum under the couch', 4, 12, 1, 3, 7],
+  ['Wipe bathroom sink', 'Sink, faucet, and mirror', 2, 6, 1, 1, 3],
+  ['Fold laundry', 'Fold and deliver one full basket', 3, 8, 1, 2, 2],
+  ['Set the table', 'Plates, cups, forks, napkins', 1, 3, 0, 1, 1],
+  ['Clear the table', 'Dishes to the sink, wipe the table', 1, 3, 0, 1, 1],
+  ['Load dishwasher', 'Rinse and load after dinner', 2, 5, 0, 2, 1],
+  ['Water the plants', 'All the inside plants', 1, 4, 0, 1, 3],
+  ['Sweep the kitchen', 'Under the table too', 2, 6, 0, 2, 3],
+  ['Walk the dog', 'A real walk, at least 15 minutes', 2, 6, 0, 2, 1],
+  ['Clean a bathroom', 'Toilet, sink, mirror, and floor', 6, 15, 0, 3, 7],
+  ['Clean out the car', 'Trash out, mats shaken, seats wiped', 5, 15, 0, 3, 7],
+  ['Make school lunches', 'Lunches packed for everyone', 3, 6, 0, 2, 1],
+  ['Rake leaves or shovel snow', 'Front walk and driveway', 6, 20, 0, 3, 7]
 ];
 const LIB_REWARDS = [
   ['15 minutes screen time', 5, 1], ['30 minutes screen time', 10, 1], ['1 hour screen time', 18, 1],
@@ -551,12 +565,12 @@ const LIB_REWARDS = [
   ['Skip one chore', 25, 0], ['Friend sleepover', 40, 0]
 ];
 const COLORS = ['#e85d75', '#3a86ff', '#2a9d8f', '#f08a24', '#8e5cd9', '#c99400', '#d6336c', '#495057', '#1c9fc4', '#5f8f3e'];
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const STEPS = ['Family', 'Kids', 'Chores', 'Rewards', 'Rules'];
 const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
+const OFTEN_NAMES = { 1: 'Every day', 2: 'Every 2 days', 3: 'Every 3 days', 7: 'Once a week' };
 const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
-const APP_VERSION = '5.1';
+const APP_VERSION = '6.0';
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
@@ -567,8 +581,7 @@ let TOKEN = null;      // parent session (short-lived)
 let DEVICE = null;     // this device's key (kid device, parent phone, or family computer)
 let KSESS = null;      // a kid signed in on the family computer (memory only)
 let DATA = null, W = null, CONFIG = null;
-let KTAB = 'bid', PTAB = 'approve';
-const BID_VALUES = {};
+let KTAB = 'pick', PTAB = 'approve';
 const OPEN_SECTIONS = new Set();
 
 /* ============================== HELPERS ============================== */
@@ -647,40 +660,48 @@ function busyFail(message, retry, back) {
   $('busyBack').onclick = back;
 }
 
-/* ---------- questions: yes/no, PIN, pick one ---------- */
+/* ---------- questions: yes/no, PIN, new PIN, emailed code, pick one ---------- */
+const FORGOT = '__forgot__';
 function ask(title, text, mode, options) {
   return new Promise(resolve => {
-    const inp = $('mInput'), sel = $('mSelect');
+    const inp = $('mInput'), sel = $('mSelect'), typed = mode === 'pin' || mode === 'newpin' || mode === 'code';
     $('mTitle').textContent = title;
     $('mText').textContent = text || '';
-    inp.classList.toggle('hidden', mode !== 'pin');
+    inp.classList.toggle('hidden', !typed);
     sel.classList.toggle('hidden', mode !== 'select');
+    $('mForgot').classList.toggle('hidden', mode !== 'pin');
     inp.value = '';
+    inp.type = mode === 'code' ? 'text' : 'password';
+    inp.placeholder = mode === 'code' ? '6-number code' : mode === 'newpin' ? 'New PIN' : 'Parent PIN';
     if (mode === 'select') sel.innerHTML = (options || []).map(o => `<option>${esc(o)}</option>`).join('');
     $('mOk').textContent = mode === 'pin' ? 'Unlock' : 'OK';
     $('modal').className = 'overlay show';
-    if (mode === 'pin') setTimeout(() => inp.focus(), 60);
-    const done = ok => {
+    if (typed) setTimeout(() => inp.focus(), 60);
+    const done = val => {
       $('modal').className = 'overlay';
-      $('mOk').onclick = $('mCancel').onclick = inp.onkeydown = null;
-      resolve(ok ? (mode === 'pin' ? inp.value : mode === 'select' ? sel.value : true) : null);
+      $('mOk').onclick = $('mCancel').onclick = $('mForgot').onclick = inp.onkeydown = null;
+      resolve(val);
     };
-    $('mOk').onclick = () => done(true);
-    $('mCancel').onclick = () => done(false);
-    inp.onkeydown = e => { if (e.key === 'Enter') done(true); };
+    const okVal = () => (typed ? inp.value.trim() : mode === 'select' ? sel.value : true);
+    $('mOk').onclick = () => done(okVal());
+    $('mCancel').onclick = () => done(null);
+    $('mForgot').onclick = () => done(FORGOT);
+    inp.onkeydown = e => { if (e.key === 'Enter') done(okVal()); };
   });
 }
 
 /* ---------- big number pad for kids' secret codes ---------- */
-function keypad(title, text, check) {
+function keypad(title, text, check, onForgot) {
   return new Promise(resolve => {
     let code = '';
+    $('kpForgot').classList.toggle('hidden', !onForgot);
+    $('kpForgot').onclick = onForgot ? () => { close(null); onForgot(); } : null;
     const dots = () => { Array.from($('kpDots').children).forEach((d, i) => d.classList.toggle('on', i < code.length)); };
     $('kpTitle').textContent = title;
     $('kpText').textContent = text;
     dots();
     $('kp').className = 'overlay show';
-    const close = v => { $('kp').className = 'overlay'; $('kpKeys').onclick = null; document.removeEventListener('keydown', onKey); resolve(v); };
+    const close = v => { $('kp').className = 'overlay'; $('kpKeys').onclick = null; $('kpForgot').onclick = null; document.removeEventListener('keydown', onKey); resolve(v); };
     let checking = false;
     const press = async k => {
       if (k === 'cancel') return close(null);
@@ -705,143 +726,108 @@ function keypad(title, text, check) {
 }
 
 /* ============================== IN-BROWSER DEMO ==============================
-   The demo family lives only in this browser. It uses the same auction rules
-   as the real backend (allocate_ below is an exact copy), but nothing is sent
-   to the server and no files are created.                                   */
+   The demo family lives only in this browser. It uses the same chore board
+   rules as the real backend (board_ below is an exact copy), but nothing is
+   sent to the server and no files are created.                              */
 
-// Exact copy of allocate_ from Code.gs
-function allocate_(chores, kids, bids, prev, opts) {
-  const size = {}, can = {};
-  chores.forEach(function (ch) {
-    size[ch.name] = ch.size || 1;
-    can[ch.name] = ch.who && ch.who.length ? ch.who : kids;
-  });
+// Exact copy of board_ from Code.gs
+function board_(chores, claims, opts) {
+  const kids = opts.kids || [];
+  const size = {};
+  chores.forEach(function (ch) { size[ch.name] = ch.size || 1; });
   const load = {};
   kids.forEach(function (k) { load[k] = 0; });
-  const pl = function (k) { return prev.prevLoad[k] || 0; };
-  const fits = function (k, chore) { return !opts.limit || load[k] + size[chore] <= opts.limit; };
-  const valid = bids.filter(function (b) {
-    return size[b.chore] && load[b.kid] !== undefined && can[b.chore].indexOf(b.kid) > -1;
-  });
-  const assigned = {};
-
-  (opts.noRepeat ? [false, true] : [true]).forEach(function (allowRepeat) {
-    for (;;) {
-      const cand = valid.filter(function (b) {
-        return !assigned[b.chore] && fits(b.kid, b.chore) && (allowRepeat || prev.lastWinner[b.chore] !== b.kid);
-      });
-      if (!cand.length) break;
-      cand.sort(function (a, b) {
-        return a.pts - b.pts || load[a.kid] - load[b.kid] || pl(a.kid) - pl(b.kid) || a.time - b.time;
-      });
-      const w = cand[0];
-      assigned[w.chore] = w;
-      load[w.kid] += size[w.chore];
+  claims.forEach(function (cl) { load[cl.kid] = (load[cl.kid] || 0) + (size[cl.chore] || 1); });
+  const pay = function (ch, days) {
+    if (!opts.grow || ch.max <= ch.min || days <= 0) return ch.min;
+    return Math.min(ch.max, ch.min + Math.round((ch.max - ch.min) * Math.min(days, 4) / 4));
+  };
+  const list = chores.map(function (ch) {
+    const can = ch.who && ch.who.length ? ch.who : kids;
+    const out = { name: ch.name, state: 'open', price: ch.min, next: ch.min, by: '', openAt: 0, why: '' };
+    const taken = claims.filter(function (cl) { return cl.chore === ch.name; })[0];
+    if (taken) { out.state = 'taken'; out.by = taken.kid; return out; }
+    const since = Number(ch.openSince) || 0;
+    if (since > opts.now) { out.state = 'later'; out.openAt = since; return out; }
+    const days = Math.floor((opts.now - since) / 864e5);
+    out.price = pay(ch, days);
+    out.next = pay(ch, days + 1);
+    const me = opts.me;
+    if (me) {
+      if (can.indexOf(me) === -1) out.why = 'This chore is not on your list.';
+      else if (opts.limit && (load[me] || 0) + (ch.size || 1) > opts.limit) out.why = 'You have enough chores right now. Finish one first.';
+      else if (opts.noRepeat && ch.lastBy === me && days < 1 && can.some(function (k) { return k !== me; })) out.why = 'You did this one last time. Someone else gets first try until tomorrow.';
     }
+    return out;
   });
-
-  const order = opts.order || kids;
-  return chores.map(function (ch) {
-    const cb = valid.filter(function (b) { return b.chore === ch.name; });
-    const a = assigned[ch.name];
-    if (a) {
-      const low = Math.min.apply(null, cb.map(function (b) { return b.pts; }));
-      let how = 'Lowest bid';
-      if (a.pts > low) how = 'Next lowest bid (fairness rule)';
-      else if (cb.filter(function (b) { return b.pts === low; }).length > 1) how = 'Tied bid, went to the kid with less work';
-      return { chore: ch.name, kid: a.kid, pts: a.pts, total: cb.length, status: 'Assigned', how: how, row: a.row };
-    }
-    if (opts.unclaimed === 'auto') {
-      const last = prev.lastWinner[ch.name];
-      const pick = order.filter(function (k) { return can[ch.name].indexOf(k) > -1 && fits(k, ch.name); })
-        .sort(function (x, y) { return load[x] - load[y] || pl(x) - pl(y) || (last === x ? 1 : 0) - (last === y ? 1 : 0); })[0];
-      if (pick) {
-        load[pick] += size[ch.name];
-        return { chore: ch.name, kid: pick, pts: ch.min, total: cb.length, status: 'Assigned',
-                 how: 'Nobody won it, so it went to the kid with the least work, at the lowest pay' };
-      }
-      return { chore: ch.name, kid: '(no winner)', pts: '', total: cb.length, status: 'No Bids',
-               how: 'It would put everyone over the work limit. A parent can assign it.' };
-    }
-    return { chore: ch.name, kid: '(no winner)', pts: '', total: cb.length, status: 'No Bids',
-             how: cb.length ? 'Everyone who bid was at their work limit. A parent can assign it.' : 'No bids. A parent can assign it.' };
-  });
+  return { chores: list, load: load };
 }
 
 const Demo = (function () {
-  const KEY = 'ca_demo_v5';
+  const KEY = 'ca_demo_v6';
   let S = null, session = false, kidIn = '';
   const day = 864e5, hr = 36e5;
 
   function seed() {
     const now = Date.now();
-    const d = (daysAgo, hrs) => now - daysAgo * day + (hrs || 0) * hr;
+    const ago = (days, hrs) => now - days * day - (hrs || 0) * hr;
     const s = {
-      v: 5, family: 'The Demo Family', round: 3, pin: '1234', day: 'Sunday', hour: 18,
-      limit: 7, noRepeat: true, unclaimed: 'auto', autoApprove: 24, role: 'parent', me: 'Sam', email: '', nextRow: 2,
+      v: 6, family: 'The Demo Family', pin: '1234',
+      limit: 5, noRepeat: true, grow: true, autoApprove: 24, role: 'parent', me: 'Sam', email: '', nextRow: 2,
       kids: [{ name: 'Maya', color: '#e85d75', active: true, code: '1111' }, { name: 'Leo', color: '#3a86ff', active: true, code: '2222' }, { name: 'Sam', color: '#2a9d8f', active: true, code: '3333' }],
+      // [name, description, starts at, grows to, size, comes back every, open since, last done by, who]
       chores: [
-        ['Take out trash', 'Kitchen and bathroom trash to the curb', 1, 6, 1],
-        ['Unload dishwasher', 'Put away every clean dish', 2, 8, 2],
-        ['Feed the pets', 'Morning and evening, all week', 1, 6, 2],
-        ['Vacuum living room', 'Move small things, vacuum under the couch', 4, 12, 3],
-        ['Wipe bathroom sink', 'Sink, faucet, and mirror', 2, 6, 1],
-        ['Fold laundry', 'Fold and deliver one full basket', 3, 8, 2],
-        ['Set the table', 'Plates, cups, forks, napkins', 1, 4, 1],
-        ['Water the plants', 'Inside plants, twice this week', 1, 4, 1],
-        ['Sweep the kitchen', 'Under the table too', 2, 8, 2],
-        ['Clean out the car', 'Trash out, mats shaken, seats wiped', 5, 15, 3, ['Maya', 'Leo']]
-      ].map(c => ({ name: c[0], desc: c[1], min: c[2], max: c[3], size: c[4], who: c[5] || [], active: true })),
+        ['Take out trash', 'Kitchen and bathroom trash to the curb', 1, 6, 1, 3, ago(2, 3), 'Leo'],
+        ['Unload dishwasher', 'Put away every clean dish', 2, 6, 2, 1, ago(0, 9), 'Leo'],
+        ['Feed the pets', 'Food and fresh water', 1, 4, 1, 1, now + 10 * hr, 'Sam'],
+        ['Vacuum living room', 'Move small things, vacuum under the couch', 4, 12, 3, 7, ago(3, 2), 'Leo'],
+        ['Wipe bathroom sink', 'Sink, faucet, and mirror', 2, 6, 1, 3, ago(0, 5), 'Maya'],
+        ['Fold laundry', 'Fold and deliver one full basket', 3, 8, 2, 2, ago(1, 2), 'Sam'],
+        ['Set the table', 'Plates, cups, forks, napkins', 1, 3, 1, 1, ago(1, 1), 'Maya'],
+        ['Water the plants', 'All the inside plants', 1, 4, 1, 3, ago(0, 20), 'Leo'],
+        ['Sweep the kitchen', 'Under the table too', 2, 6, 2, 3, ago(4, 1), 'Maya'],
+        ['Clean out the car', 'Trash out, mats shaken, seats wiped', 5, 15, 3, 7, ago(2, 1), 'Maya', ['Maya', 'Leo']]
+      ].map(c => ({ name: c[0], desc: c[1], min: c[2], max: c[3], size: c[4], often: c[5], openSince: c[6], lastBy: c[7], who: c[8] || [], active: true })),
       rewards: [['15 minutes screen time', 5], ['30 minutes screen time', 10], ['1 hour screen time', 18],
                 ['Pick the family movie', 15], ['Stay up 30 minutes late', 20], ['Friend sleepover', 40]].map(r => ({ name: r[0], cost: r[1], active: true })),
-      winners: [], ledger: [], bids: [],
-      devices: [{ key: 'demo-this', kid: '', role: 'parent', added: d(10), lastSeen: now },
-                { key: 'demo-tab', kid: 'Maya', role: 'kid', added: d(10), lastSeen: d(1) },
-                { key: 'demo-pc', kid: '', role: 'shared', added: d(12), lastSeen: d(0, -2) }]
+      winners: [], ledger: [],
+      devices: [{ key: 'demo-this', kid: '', role: 'parent', added: ago(10), lastSeen: now },
+                { key: 'demo-tab', kid: 'Maya', role: 'kid', added: ago(10), lastSeen: ago(1) },
+                { key: 'demo-pc', kid: '', role: 'shared', added: ago(12), lastSeen: ago(0, 2) }]
     };
-    const w = (round, date, chore, kid, pts, total, status, sdate, how) => {
-      s.winners.push({ row: s.nextRow++, round, date, chore, winner: kid, points: pts, total, status, statusDate: sdate || null, how });
-      if (status === 'Done') s.ledger.push({ time: sdate, kid, points: pts, type: 'Earned', details: 'Round ' + round + ': ' + chore });
+    const w = (date, chore, kid, pts, status, sdate, how) => {
+      s.winners.push({ row: s.nextRow++, date, chore, winner: kid, points: pts, status, statusDate: sdate || null, how: how || 'Picked it' });
+      if (status === 'Done') s.ledger.push({ time: sdate, kid, points: pts, type: 'Earned', details: chore });
     };
-    const r1 = d(14), r2 = d(7);
-    w(1, r1, 'Take out trash', 'Leo', 3, 3, 'Done', d(12), 'Lowest bid');
-    w(1, r1, 'Unload dishwasher', 'Maya', 5, 2, 'Done', d(12), 'Lowest bid');
-    w(1, r1, 'Feed the pets', 'Sam', 2, 2, 'Done', d(9), 'Lowest bid');
-    w(1, r1, 'Vacuum living room', 'Leo', 9, 1, 'Done', d(11), 'Lowest bid');
-    w(1, r1, 'Wipe bathroom sink', 'Maya', 3, 2, 'Not Done', d(8), 'Lowest bid');
-    w(1, r1, 'Fold laundry', 'Sam', 5, 2, 'Done', d(10), 'Tied bid, went to the kid with less work');
-    w(1, r1, 'Set the table', 'Sam', 1, 3, 'Done', d(9), 'Lowest bid');
-    w(1, r1, 'Water the plants', 'Maya', 2, 1, 'Done', d(10), 'Lowest bid');
-    w(1, r1, 'Sweep the kitchen', 'Leo', 4, 2, 'Done', d(11), 'Next lowest bid (fairness rule)');
-    w(1, r1, 'Clean out the car', 'Maya', 5, 0, 'Done', d(9), 'Nobody won it, so it went to the kid with the least work, at the lowest pay');
-    w(2, r2, 'Take out trash', 'Maya', 3, 3, 'Done', d(5), 'Lowest bid');
-    w(2, r2, 'Unload dishwasher', 'Leo', 5, 2, 'Done', d(5), 'Lowest bid');
-    w(2, r2, 'Feed the pets', 'Maya', 2, 2, 'Done', d(2), 'Next lowest bid (fairness rule)');
-    w(2, r2, 'Vacuum living room', 'Sam', 8, 2, 'Assigned', null, 'Lowest bid');
-    w(2, r2, 'Wipe bathroom sink', 'Leo', 3, 1, 'Done', d(4), 'Lowest bid');
-    w(2, r2, 'Fold laundry', 'Maya', 6, 2, 'Ready', d(0, -3), 'Lowest bid');
-    w(2, r2, 'Set the table', 'Leo', 1, 3, 'Done', d(3), 'Tied bid, went to the kid with less work');
-    w(2, r2, 'Water the plants', 'Sam', 1, 1, 'Ready', d(0, -5), 'Lowest bid');
-    w(2, r2, 'Sweep the kitchen', 'Sam', 4, 2, 'Assigned', null, 'Lowest bid');
-    w(2, r2, 'Clean out the car', 'Leo', 12, 1, 'Ready', d(0, -1), 'Lowest bid');
-    s.ledger.push({ time: d(10, 3), kid: 'Leo', points: -10, type: 'Spent', details: '30 minutes screen time' });
-    s.ledger.push({ time: d(5, 2), kid: 'Maya', points: 3, type: 'Bonus', details: 'Helped carry in the groceries' });
-    s.ledger.push({ time: d(4, 1), kid: 'Sam', points: -5, type: 'Spent', details: '15 minutes screen time' });
+    w(ago(9), 'Take out trash', 'Maya', 2, 'Done', ago(8, 20));
+    w(ago(8), 'Vacuum living room', 'Leo', 7, 'Done', ago(7, 22));
+    w(ago(8), 'Fold laundry', 'Maya', 5, 'Done', ago(7, 18));
+    w(ago(7), 'Clean out the car', 'Maya', 10, 'Done', ago(6, 23));
+    w(ago(6), 'Sweep the kitchen', 'Leo', 4, 'Done', ago(5, 21));
+    w(ago(6), 'Wipe bathroom sink', 'Sam', 3, 'Done', ago(5, 22));
+    w(ago(5), 'Take out trash', 'Leo', 3, 'Done', ago(4, 22));
+    w(ago(4), 'Sweep the kitchen', 'Maya', 4, 'Done', ago(3, 23));
+    w(ago(3), 'Fold laundry', 'Sam', 3, 'Done', ago(2, 22));
+    w(ago(3), 'Wipe bathroom sink', 'Maya', 2, 'Done', ago(2, 21));
+    w(ago(2), 'Set the table', 'Maya', 1, 'Done', ago(1, 23));
+    w(ago(1), 'Feed the pets', 'Sam', 1, 'Done', ago(0, 14));
+    w(ago(1), 'Unload dishwasher', 'Leo', 2, 'Done', ago(0, 9));
+    w(ago(1), 'Water the plants', 'Leo', 1, 'Done', ago(0, 20));
+    w(ago(0, 30), 'Vacuum living room', 'Sam', 6, 'Assigned', ago(0, 30));
+    w(ago(0, 26), 'Fold laundry', 'Maya', 4, 'Ready', ago(0, 3));
+    w(ago(0, 8), 'Water the plants', 'Sam', 1, 'Ready', ago(0, 5));
+    w(ago(1, 1), 'Clean out the car', 'Leo', 11, 'Ready', ago(0, 1));
+    w(ago(0, 4), 'Unload dishwasher', 'Maya', 2, 'Assigned', ago(0, 4), 'Given by a parent');
+    s.ledger.push({ time: ago(6, 3), kid: 'Leo', points: -10, type: 'Spent', details: '30 minutes screen time' });
+    s.ledger.push({ time: ago(4, 2), kid: 'Maya', points: 3, type: 'Bonus', details: 'Helped carry in the groceries' });
+    s.ledger.push({ time: ago(2, 1), kid: 'Sam', points: -5, type: 'Spent', details: '15 minutes screen time' });
     s.ledger.sort((a, b) => a.time - b.time);
-    const b = (hrsAgo, kid, chore, pts) => s.bids.push({ time: now - hrsAgo * hr, round: 3, kid, chore, pts, status: 'Active' });
-    // Sam bids 1 point on lots of chores, to show the work limit at work
-    b(40, 'Sam', 'Take out trash', 1); b(39, 'Sam', 'Feed the pets', 1); b(38, 'Sam', 'Set the table', 1);
-    b(37, 'Sam', 'Water the plants', 1); b(36, 'Sam', 'Unload dishwasher', 2); b(35, 'Sam', 'Wipe bathroom sink', 2);
-    b(30, 'Maya', 'Take out trash', 3); b(29, 'Maya', 'Unload dishwasher', 4); b(28, 'Maya', 'Feed the pets', 2);
-    b(27, 'Maya', 'Sweep the kitchen', 4); b(26, 'Maya', 'Fold laundry', 5);
-    b(20, 'Leo', 'Take out trash', 2); b(19, 'Leo', 'Vacuum living room', 7); b(18, 'Leo', 'Clean out the car', 10);
-    b(17, 'Leo', 'Set the table', 2); b(15, 'Leo', 'Water the plants', 2);
     return s;
   }
   function load() {
     if (S) return;
     try { const j = localStorage.getItem(KEY); if (j) S = JSON.parse(j); } catch (e) { S = null; }
-    if (!S || S.v !== 5) { S = seed(); save(); }
+    if (!S || S.v !== 6) { S = seed(); save(); }
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* demo still works without saving */ } }
   const fmt = ms => ms ? new Date(ms).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
@@ -859,36 +845,44 @@ const Demo = (function () {
   const win = row => { const w = S.winners.find(x => x.row === Number(row)); if (!w) throw new Error('Row not found.'); return w; };
   const int = (v, lo, hi, label) => { const n = Math.round(Number(v)); if (v === '' || v == null || !isFinite(n) || n < lo || n > hi) throw new Error(label + ' must be a number from ' + lo + ' to ' + hi + '.'); return n; };
   const txt = (v, max, label) => { const s = String(v || '').trim().replace(/\s+/g, ' ').replace(/,/g, ''); if (!s) throw new Error('Please enter ' + label + '.'); return s.slice(0, max); };
-  const PARENT = ['runAuction', 'joinCode', 'bindDevice', 'removeDevice', 'markChore', 'approveAll', 'setKidCode', 'assignChore', 'redeem', 'adjust', 'saveKid',
-    'saveChore', 'saveReward', 'remove', 'saveSchedule', 'saveFairness', 'saveFamily', 'changePin', 'deleteFamily'];
+  const isOpen = w => w.status === 'Assigned' || w.status === 'Ready';
+  const board = me => board_(choresOn(), S.winners.filter(isOpen).map(w => ({ chore: w.chore, kid: w.winner })),
+    { now: Date.now(), kids: kidsOn(), grow: S.grow, limit: S.limit, noRepeat: S.noRepeat, me: me || '' });
+  const midnightIn = days => { const d = new Date(Date.now() + days * day); d.setHours(0, 0, 0, 0); return d.getTime(); };
+  const choreDone = (name, kid) => { const c = S.chores.find(x => x.name === name); if (c) { c.openSince = midnightIn(c.often); c.lastBy = kid; } };
+  const PARENT = ['joinCode', 'bindDevice', 'removeDevice', 'markChore', 'approveAll', 'setKidCode', 'emailKidCodes', 'assignChore', 'putBack', 'redeem', 'adjust', 'saveKid',
+    'saveChore', 'saveReward', 'remove', 'saveFairness', 'saveFamily', 'changePin', 'deleteFamily'];
+  const NO_MAIL = 'In the demo, no emails are sent. ';
 
   const H = {
     data() {
       let tk = '';
       if (S.role === 'parent' && !session) { session = true; tk = 'demo-session'; }
+      // automatic approval, same as the real app
+      if (S.autoApprove) S.winners.filter(w => w.status === 'Ready' && w.statusDate < Date.now() - S.autoApprove * hr).forEach(w => {
+        w.status = 'Done'; w.statusDate = Date.now();
+        S.ledger.push({ time: Date.now(), kid: w.winner, points: w.points, type: 'Earned', details: w.chore + ' (approved automatically)' });
+        choreDone(w.chore, w.winner);
+      });
       const me = currentKid();
-      const kids = S.kids.filter(k => k.active).map(k => Object.assign({ name: k.name, color: k.color }, session ? { hasCode: !!k.code } : {}));
-      const bids = S.bids.filter(b => b.round === S.round && b.status === 'Active');
-      const b = bal();
-      const all = S.winners.map(w => Object.assign({}, w, { date: fmt(w.date), statusDate: fmt(w.statusDate) }));
-      const open = all.filter(w => w.status === 'Assigned' || w.status === 'Ready' || w.status === 'No Bids');
-      const rest = all.filter(w => open.indexOf(w) === -1).reverse().slice(0, 150);
+      const kids = S.kids.filter(k => k.active).map(k => Object.assign({ name: k.name, color: k.color }, session ? { hasCode: !!k.code, code: k.code } : {}));
+      const b = bal(), bd = board(me);
+      const sorted = S.winners.slice().sort((x, y) => (y.statusDate || y.date) - (x.statusDate || x.date) || y.row - x.row);
+      const all = sorted.map(w => Object.assign({}, w, { date: fmt(w.date), statusDate: fmt(w.statusDate) }));
+      const open = all.filter(isOpen).reverse();
+      const rest = all.filter(w => !isOpen(w)).slice(0, 150);
       return {
-        fid: 'demo', demo: true, family: S.family, round: S.round,
-        schedule: { day: S.day, hour: S.hour, label: S.day + ' at ' + hl(S.hour), tz: TZ },
-        fairness: { limit: S.limit, noRepeat: S.noRepeat, unclaimed: S.unclaimed, autoApprove: S.autoApprove }, me,
+        fid: 'demo', demo: true, now: Date.now(), family: S.family,
+        fairness: { limit: S.limit, noRepeat: S.noRepeat, grow: S.grow, autoApprove: S.autoApprove }, load: bd.load, me,
         device: { role: S.role, kid: S.role === 'kid' ? S.me : '' },
         kids,
-        chores: choresOn().map(c => {
-          const cb = bids.filter(x => x.chore === c.name);
-          const mine = me ? cb.find(x => x.kid === me) : null;
-          return { name: c.name, desc: c.desc, min: c.min, max: c.max, size: c.size, who: c.who.slice(), bidders: cb.map(x => x.kid), mine: mine ? mine.pts : null };
-        }),
+        chores: choresOn().map((c, i) => Object.assign({ name: c.name, desc: c.desc, min: c.min, max: c.max, size: c.size, who: c.who.slice(), often: c.often },
+          { state: bd.chores[i].state, price: bd.chores[i].price, next: bd.chores[i].next, by: bd.chores[i].by, openAt: bd.chores[i].openAt, why: bd.chores[i].why })),
         balances: kids.map(k => ({ name: k.name, color: k.color, points: b[k.name] || 0 })),
         winners: open.concat(rest),
         rewards: S.rewards.filter(r => r.active).map(r => ({ name: r.name, cost: r.cost })),
         ledger: S.ledger.slice(-50).reverse().map(l => ({ date: fmt(l.time), kid: l.kid, points: l.points, type: l.type, details: l.details })),
-        parent: session, token: tk, weakPin: false, email: session ? S.email : '',
+        parent: session, token: tk, weakPin: false, email: session ? S.email : '', hasEmail: true,
         devices: session ? S.devices.map(x => ({ key: x.key, kid: x.kid, role: x.role, added: fmt(x.added), lastSeen: fmt(x.lastSeen), mine: x.key === 'demo-this' })) : []
       };
     },
@@ -900,6 +894,12 @@ const Demo = (function () {
     },
     resume() { if (S.role !== 'parent') throw new Error('NO_DEVICE'); session = true; return { token: 'demo-session' }; },
     logout() { session = false; return 'Locked.'; },
+    forgotPin() { throw new Error(NO_MAIL + 'The demo PIN is ' + S.pin + '.'); },
+    forgotKidCode(a) {
+      const k = S.kids.find(x => x.active && x.name === a.kid);
+      if (!k) throw new Error('Pick your name.');
+      return NO_MAIL + 'A real family\'s parent gets an email. ' + k.name + '\'s code is ' + k.code + '.';
+    },
     kidLogin(a) {
       if (S.role !== 'shared') throw new Error('NO_DEVICE');
       const k = S.kids.find(x => x.active && x.name === a.kid);
@@ -909,24 +909,25 @@ const Demo = (function () {
       return { ksess: 'demo-kid', kid: k.name };
     },
     kidLogout() { kidIn = ''; return 'Signed out.'; },
-    bid(a) {
+    claim(a) {
       const me = mustMe();
       const c = choresOn().find(x => x.name === a.chore);
-      if (!c) throw new Error('That chore is not up for auction.');
+      if (!c) throw new Error('That chore is not on the board anymore.');
       if (c.who.length && c.who.indexOf(me) === -1) throw new Error(c.name + ' is not on ' + me + '\'s list.');
-      const p = Math.round(Number(a.points));
-      if (!isFinite(p) || p < c.min || p > c.max) throw new Error('Bids for ' + c.name + ' must be from ' + c.min + ' to ' + P(c.max) + '.');
-      const ex = S.bids.find(b => b.round === S.round && b.status === 'Active' && b.kid === me && b.chore === c.name);
-      if (ex) { ex.pts = p; ex.time = Date.now(); return 'Changed your bid on ' + c.name + ' to ' + P(p) + '.'; }
-      S.bids.push({ time: Date.now(), round: S.round, kid: me, chore: c.name, pts: p, status: 'Active' });
-      return 'Bid placed: ' + P(p) + ' for ' + c.name + '.';
+      const b = board(me).chores[choresOn().indexOf(c)];
+      if (b.state === 'taken') throw new Error(b.by === me ? 'You already have ' + c.name + '.' : b.by + ' just picked ' + c.name + '.');
+      if (b.state === 'later') throw new Error(c.name + ' is not back on the board yet.');
+      if (b.why) throw new Error(b.why);
+      if (a.points != null && a.points !== '' && Number(a.points) !== b.price) throw new Error(c.name + ' now pays ' + P(b.price) + '. Take another look and tap again if you want it.');
+      S.winners.push({ row: S.nextRow++, date: Date.now(), chore: c.name, winner: me, points: b.price, status: 'Assigned', statusDate: Date.now(), how: 'Picked it' });
+      return 'It\'s yours! ' + c.name + ' pays ' + P(b.price) + '. When you finish, tap I finished it.';
     },
-    withdraw(a) {
-      const me = mustMe();
-      const ex = S.bids.find(b => b.round === S.round && b.status === 'Active' && b.kid === me && b.chore === a.chore);
-      if (!ex) throw new Error('There is no bid to take back.');
-      ex.status = 'Withdrawn';
-      return 'Took back your bid on ' + a.chore + '.';
+    giveBack(a) {
+      const me = mustMe(), w = win(a.row);
+      if (w.winner !== me) throw new Error('That chore belongs to someone else.');
+      if (w.status !== 'Assigned') throw new Error('That chore is already ' + w.status.toLowerCase() + '.');
+      w.status = 'Given Back'; w.statusDate = Date.now();
+      return w.chore + ' is back on the board for someone else.';
     },
     ready(a) {
       const me = mustMe(), w = win(a.row);
@@ -934,26 +935,6 @@ const Demo = (function () {
       if (w.status !== 'Assigned') throw new Error('That chore is already ' + w.status.toLowerCase() + '.');
       w.status = 'Ready'; w.statusDate = Date.now();
       return 'Nice work! ' + w.chore + ' is waiting for a parent to check it.';
-    },
-    runAuction() {
-      const kids = kidsOn(), chores = choresOn();
-      if (!chores.length) throw new Error('There are no chores to auction.');
-      const sizeOf = {}; chores.forEach(c => { sizeOf[c.name] = c.size; });
-      const roundBids = S.bids.filter(b => b.round === S.round && b.status === 'Active');
-      const bids = roundBids.map((b, i) => ({ row: i + 1, kid: b.kid, chore: b.chore, pts: b.pts, time: b.time, ref: b }));
-      const lastWinner = {}, prevLoad = {};
-      S.winners.filter(w => w.round === S.round - 1 && w.status !== 'No Bids' && w.status !== 'Skipped').forEach(w => {
-        lastWinner[w.chore] = w.winner; prevLoad[w.winner] = (prevLoad[w.winner] || 0) + (sizeOf[w.chore] || 1);
-      });
-      const order = kids.slice().sort(() => Math.random() - 0.5);
-      const res = allocate_(chores.map(c => ({ name: c.name, min: c.min, max: c.max, size: c.size, who: c.who })), kids, bids,
-        { lastWinner, prevLoad }, { limit: S.limit, noRepeat: S.noRepeat, unclaimed: S.unclaimed, order });
-      const wonRows = res.map(r => r.row).filter(Boolean);
-      bids.forEach(b => { b.ref.status = wonRows.indexOf(b.row) > -1 ? 'Won' : 'Lost'; });
-      const now = Date.now();
-      res.forEach(r => S.winners.push({ row: S.nextRow++, round: S.round, date: now, chore: r.chore, winner: r.kid, points: r.pts, total: r.total, status: r.status, statusDate: null, how: r.how }));
-      S.round++;
-      return 'Round ' + (S.round - 1) + ' is closed.';
     },
     joinCode(a) { needKid(a.kid); return { code: 'DEM-' + String(Math.floor(100 + Math.random() * 899)).replace(/[01]/g, '7'), seconds: 600, kid: a.kid, demo: true }; },
     bindDevice(a) {
@@ -974,34 +955,46 @@ const Demo = (function () {
     },
     markChore(a) {
       const w = win(a.row);
-      const to = { 'Done': 'Done', 'Not Done': 'Not Done', 'Again': 'Assigned', 'Skip': 'Skipped' }[a.status];
+      const to = { 'Done': 'Done', 'Not Done': 'Not Done', 'Again': 'Assigned' }[a.status];
       if (!to) throw new Error('Unknown status.');
-      if (a.status === 'Skip' && w.status !== 'No Bids') throw new Error('Only chores with no winner can be skipped.');
-      if (a.status === 'Again' && w.status !== 'Ready') throw new Error('Only chores waiting for inspection can be sent back.');
-      if ((a.status === 'Done' || a.status === 'Not Done') && w.status !== 'Assigned' && w.status !== 'Ready') throw new Error('That chore was already marked ' + w.status + '.');
+      if (a.status === 'Again' && w.status !== 'Ready') throw new Error('Only chores waiting to be checked can be sent back.');
+      if (a.status !== 'Again' && !isOpen(w)) throw new Error('That chore was already marked ' + w.status + '.');
       w.status = to; w.statusDate = Date.now();
-      if (to === 'Done') { S.ledger.push({ time: Date.now(), kid: w.winner, points: w.points, type: 'Earned', details: 'Round ' + w.round + ': ' + w.chore }); return w.winner + ' earned ' + P(w.points) + ' for ' + w.chore + '.'; }
+      if (to === 'Done') {
+        S.ledger.push({ time: Date.now(), kid: w.winner, points: w.points, type: 'Earned', details: w.chore });
+        choreDone(w.chore, w.winner);
+        return w.winner + ' earned ' + P(w.points) + ' for ' + w.chore + '.';
+      }
       if (to === 'Assigned') return w.chore + ' sent back to ' + w.winner + ' for a little more work.';
-      if (to === 'Skipped') return w.chore + ' skipped this round.';
-      return w.chore + ' marked Not done. No points given.';
+      return w.chore + ' marked Not done. No points given. It is back on the board.';
     },
     approveAll(a) {
       let n = 0, p = 0;
       (a.rows || []).forEach(row => { try { const w = win(row); H.markChore({ row, status: 'Done' }); n++; p += w.points; } catch (e) { /* skip */ } });
       return n ? 'Approved ' + n + (n === 1 ? ' chore' : ' chores') + '. ' + P(p) + ' given.' : 'Nothing needed approving.';
     },
+    assignChore(a) {
+      const kid = needKid(a.kid), c = choresOn().find(x => x.name === a.chore);
+      if (!c) throw new Error('That chore is not on the board.');
+      const b = board('').chores[choresOn().indexOf(c)];
+      if (b.state === 'taken') throw new Error(b.by + ' already has ' + c.name + '.');
+      const p = a.points === '' || a.points == null ? b.price : int(a.points, 0, 1000, 'Points');
+      S.winners.push({ row: S.nextRow++, date: Date.now(), chore: c.name, winner: kid, points: p, status: 'Assigned', statusDate: Date.now(), how: 'Given by a parent' });
+      return c.name + ' given to ' + kid + ' for ' + P(p) + '.';
+    },
+    putBack(a) {
+      const w = win(a.row);
+      if (!isOpen(w)) throw new Error('That chore was already marked ' + w.status + '.');
+      w.status = 'Put Back'; w.statusDate = Date.now();
+      return w.chore + ' is back on the board.';
+    },
     setKidCode(a) {
       const k = S.kids.find(x => x.active && x.name === a.kid);
       if (!k) throw new Error('Pick a kid.');
       if (!/^\d{4}$/.test(String(a.code))) throw new Error('A secret code is 4 numbers.');
-      k.code = String(a.code); return k.name + '\'s secret code was saved.';
+      k.code = String(a.code); return k.name + '\'s secret code is now ' + k.code + '.';
     },
-    assignChore(a) {
-      const w = win(a.row), kid = needKid(a.kid), p = int(a.points, 0, 1000, 'Points');
-      if (w.status !== 'No Bids') throw new Error('Only chores with no winner can be assigned.');
-      Object.assign(w, { winner: kid, points: p, status: 'Assigned', statusDate: Date.now(), how: 'Assigned by a parent' });
-      return w.chore + ' assigned to ' + kid + ' for ' + P(p) + '.';
-    },
+    emailKidCodes() { return NO_MAIL + 'A real family gets the codes by email.'; },
     redeem(a) {
       const kid = needKid(a.kid), r = S.rewards.find(x => x.active && x.name === a.reward);
       if (!r) throw new Error('Reward not found.');
@@ -1024,13 +1017,18 @@ const Demo = (function () {
       S.kids.push({ name: n, color: a.color || '#6c4bb6', active: true, code: a.code ? String(a.code) : '' }); return n + ' added.';
     },
     saveChore(a) {
-      const n = txt(a.name, 40, 'chore name'), mn = int(a.min, 1, 100, 'The lowest pay'), mx = int(a.max, mn, 100, 'The highest pay');
+      const n = txt(a.name, 40, 'chore name'), mn = int(a.min, 1, 100, 'The starting pay'), mx = int(a.max, mn, 100, 'The top pay');
       const old = S.chores.find(c => c.name.toLowerCase() === n.toLowerCase());
       let who = old ? old.who : [];
       if (Array.isArray(a.who)) { who = a.who.filter(k => kidsOn().indexOf(k) > -1); if (who.length === kidsOn().length) who = []; }
       const size = a.size == null ? (old ? old.size : 1) : Math.max(1, Math.min(3, Number(a.size) || 1));
-      if (old) { Object.assign(old, { min: mn, max: mx, size, who, active: true, desc: a.desc == null ? old.desc : String(a.desc).slice(0, 80) }); return old.name + ' saved.'; }
-      S.chores.push({ name: n, desc: String(a.desc || '').slice(0, 80), min: mn, max: mx, size, who, active: true }); return n + ' added.';
+      const often = [1, 2, 3, 7].indexOf(Number(a.often)) > -1 ? Number(a.often) : (old ? old.often : 7);
+      if (old) {
+        Object.assign(old, { min: mn, max: mx, size, who, often, desc: a.desc == null ? old.desc : String(a.desc).slice(0, 80) });
+        if (!old.active) { old.active = true; old.openSince = Date.now(); }
+        return old.name + ' saved.';
+      }
+      S.chores.push({ name: n, desc: String(a.desc || '').slice(0, 80), min: mn, max: mx, size, who, often, openSince: Date.now(), lastBy: '', active: true }); return n + ' added.';
     },
     saveReward(a) {
       const n = txt(a.name, 40, 'reward name'), cost = int(a.cost, 1, 1000, 'The cost');
@@ -1045,9 +1043,9 @@ const Demo = (function () {
       if (a.type === 'kid' && kidsOn().length <= 1) throw new Error('A family needs at least one kid.');
       it.active = false; return a.name + ' removed. Their history is kept.';
     },
-    saveSchedule(a) { S.day = a.day; S.hour = int(a.hour, 0, 23, 'The hour'); return 'The auction now closes every ' + S.day + ' at ' + hl(S.hour) + '.'; },
     saveFairness(a) {
-      S.limit = int(a.limit, 0, 30, 'The work limit'); S.noRepeat = !!a.noRepeat; S.unclaimed = a.unclaimed === 'parent' ? 'parent' : 'auto';
+      S.limit = int(a.limit, 0, 30, 'The work limit'); S.noRepeat = !!a.noRepeat;
+      if (a.grow != null) S.grow = !!a.grow;
       if (a.autoApprove != null) S.autoApprove = [0, 12, 24, 48].indexOf(Number(a.autoApprove)) > -1 ? Number(a.autoApprove) : 0;
       return 'Rules saved.';
     },
@@ -1085,12 +1083,12 @@ function netBar(on) {
   else { n.className = 'done'; setTimeout(() => { if (!inFlight) n.className = ''; }, 400); }
 }
 
-const SLOW = { createFamily: 75000, runAuction: 45000 };
+const SLOW = { createFamily: 75000 };
 async function api(action, args) {
   args = Object.assign({}, args || {});
   if (DEVICE && !('device' in args)) args.device = DEVICE;
   if (KSESS && !('ksess' in args)) args.ksess = KSESS;
-  if (isDemo() && action !== 'config' && action !== 'join' && action !== 'recover' && action !== 'createFamily') {
+  if (isDemo() && ['config', 'join', 'recover', 'createFamily'].indexOf(action) === -1) {
     netBar(true);
     try { await new Promise(r => setTimeout(r, 150)); return Demo.call(action, args); }
     finally { netBar(false); }
@@ -1137,11 +1135,36 @@ async function ensureParent(reason) {
 async function pinLogin(reason, remember) {
   const demo = isDemo() ? ' The demo PIN is 1234.' : '';
   const pin = await ask('Parent PIN', (reason ? reason + ' ' : '') + 'Enter the parent PIN.' + demo, 'pin');
+  if (pin === FORGOT) return await forgotPin();
   if (!pin) return false;
   try {
     const r = await api('login', { pin: pin, remember: !!remember });
     setToken(r.token);
     if (r.device) setDevice(r.device);
+    return true;
+  } catch (e) { toast(errMsg(e), true); return false; }
+}
+
+// Forgot PIN: a one-time code is emailed to the parent, then a new PIN is chosen here.
+async function forgotPin() {
+  let msg;
+  try { msg = await api('forgotPin'); } catch (e) { toast(errMsg(e), true); return false; }
+  const code = await ask('Check your email', msg + ' Type the code here.', 'code');
+  if (!code) return false;
+  let pin = '';
+  for (;;) {
+    pin = await ask('Choose a new parent PIN', '6 to 12 numbers. Pick one your kids could not guess.', 'newpin');
+    if (!pin) return false;
+    const pp = pinProblem(pin);
+    if (!pp) break;
+    toast(pp, true);
+  }
+  const again = await ask('Type the new PIN again', '', 'newpin');
+  if (again !== pin) { toast('The two PINs did not match. Tap "Forgot PIN?" to try again.', true); return false; }
+  try {
+    const r = await api('resetPin', { code: code, newPin: pin });
+    setToken(r.token);
+    toast(r.message);
     return true;
   } catch (e) { toast(errMsg(e), true); return false; }
 }
@@ -1194,7 +1217,7 @@ function renderLanding(msg) {
   const fam = cleanId(ls('ca_fid'));
   let html = '';
   if (fam) html += `<a class="btn" href="${esc(familyLink(fam))}">Open my family</a>`;
-  if (ls('ca_demo_v5')) html += `<a class="btn ghost" href="${esc(APP_LINK)}#demo">Continue the demo</a>`;
+  if (ls('ca_demo_v6')) html += `<a class="btn ghost" href="${esc(APP_LINK)}#demo">Continue the demo</a>`;
   $('landContinue').innerHTML = html;
   FID = null; DATA = null; KSESS = null;
   if (location.hash || location.search) history.replaceState(null, '', APP_LINK);
@@ -1262,10 +1285,10 @@ async function startWizard() {
   W = {
     step: 0, license: '', name: '', pin: '', pin2: '', email: '',
     kids: [{ name: '', color: COLORS[0], code: randomCode() }, { name: '', color: COLORS[1], code: randomCode() }],
-    chores: LIB_CHORES.map(c => ({ name: c[0], desc: c[1], min: c[2], max: c[3], on: !!c[4], size: c[5] })),
+    chores: LIB_CHORES.map(c => ({ name: c[0], desc: c[1], min: c[2], max: c[3], on: !!c[4], size: c[5], often: c[6] })),
     rewards: LIB_REWARDS.map(r => ({ name: r[0], cost: r[1], on: !!r[2] })),
-    newChore: { name: '', min: 2, max: 6, size: 1 }, newReward: { name: '', cost: 10 },
-    day: 'Sunday', hour: 18, limit: null, noRepeat: true, unclaimed: 'auto', autoApprove: 24
+    newChore: { name: '', min: 2, max: 6, size: 1, often: 7 }, newReward: { name: '', cost: 10 },
+    limit: 4, noRepeat: true, grow: true, autoApprove: 24
   };
   show('wizard');
   renderWizard();
@@ -1296,17 +1319,17 @@ function wFamily() {
     <input type="password" id="wPin2" data-k="pin2" value="${esc(W.pin2)}" inputmode="numeric" maxlength="12" autocomplete="new-password">
     <label for="wEmail">Parent email (recommended)</label>
     <input type="email" id="wEmail" data-k="email" value="${esc(W.email)}" maxlength="120" placeholder="you@example.com">
-    <p class="desc mt">Used for weekly results and to email your family link if you lose it.</p>
+    <p class="desc mt">This is how you get a <b>forgotten PIN reset</b>, your <b>kids' codes</b>, or a <b>lost family link</b>. We only email you when it matters, never weekly.</p>
     <p class="desc">By creating a family, you agree to the <a href="terms.html" target="_blank" rel="noopener">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</p>
-    <p class="tip">Only parents should know the PIN. Pick one your kids could not guess (not a birthday or 123456). It is needed to approve chores, set up kids' devices, and change settings. It is stored scrambled and checked on our server. With an email above, you will hear about wrong-PIN lockouts and new devices.</p>
+    <p class="tip">Only parents should know the PIN. Pick one your kids could not guess (not a birthday or 123456). It is needed to approve chores, set up kids' devices, and change settings. It is stored scrambled and checked on our server. With an email above, you can reset it if you forget it.</p>
   </div>`;
 }
 
 function wKids() {
   return `<div class="card">
-    <h2>Who is bidding?</h2>
+    <h2>Who is doing chores?</h2>
     <p class="desc">Add each kid and pick a color for their name. First names or nicknames only, no last names.</p>
-    <p class="tip">Each kid also gets a 4-number <b>secret code</b>. They type it to sign in on a shared family computer or tablet, so siblings cannot bid for each other. We picked random ones; change them to anything your kids will remember.</p>
+    <p class="tip">Each kid also gets a 4-number <b>secret code</b>. They type it to sign in on a shared family computer or tablet, so siblings cannot pick chores for each other. We picked random ones; change them to anything your kids will remember. You can always see them later in Settings, and we email them to you.</p>
     ${W.kids.map((k, i) => `
       <div class="row" style="margin-bottom:10px;align-items:center">
         <input type="color" data-k="kids.${i}.color" value="${esc(k.color)}" aria-label="Color">
@@ -1322,20 +1345,23 @@ function sizeSelect(path, val) {
   return `<select class="sel-mini" data-k="${path}" data-num="1" aria-label="Size">${[1, 2, 3].map(n => `<option value="${n}" ${Number(val) === n ? 'selected' : ''}>${SIZE_SHORT[n]}</option>`).join('')}</select>`;
 }
 function payInputs(path, item) {
-  return `<span class="pay">Pays <input type="number" class="mini" data-k="${path}.min" data-num="1" value="${esc(item.min)}" min="1" max="100"> to
+  return `<span class="pay">Starts at <input type="number" class="mini" data-k="${path}.min" data-num="1" value="${esc(item.min)}" min="1" max="100"> up to
     <input type="number" class="mini" data-k="${path}.max" data-num="1" value="${esc(item.max)}" min="1" max="100"> pts</span>`;
 }
+function oftenOpts(sel) { return [1, 2, 3, 7].map(n => `<option value="${n}" ${Number(sel) === n ? 'selected' : ''}>${OFTEN_NAMES[n]}</option>`).join(''); }
+function oftenSelect(path, val) { return `<select class="sel-mini" data-k="${path}" data-num="1" aria-label="Comes back">${oftenOpts(val)}</select>`; }
 
 function wChores() {
   return `<div class="card">
     <h2>Pick the chores</h2>
-    <p class="desc">Kids bid anywhere from the lowest to the highest pay. The lowest pay is your minimum reward. The size (small, medium, big) is how much work it is, so the work limit stays fair. You can change all of this later, and limit chores to certain kids.</p>
+    <p class="desc">Each chore <b>starts at</b> its lowest pay. If nobody picks it, it goes up a little every day, <b>up to</b> the top pay. The size (small, medium, big) is how much work it is. The last box is how often it comes back after it is done. You can change all of this later, and limit chores to certain kids.</p>
     ${W.chores.map((c, i) => `
       <div class="pick ${c.on ? '' : 'off'}">
         <input type="checkbox" data-k="chores.${i}.on" data-re="1" ${c.on ? 'checked' : ''} aria-label="${esc(c.name)}">
         <div class="nm"><b>${esc(c.name)}</b><small>${esc(c.desc)}</small></div>
         ${payInputs('chores.' + i, c)}
         ${sizeSelect('chores.' + i + '.size', c.size)}
+        ${oftenSelect('chores.' + i + '.often', c.often)}
       </div>`).join('')}
   </div>
   <div class="card">
@@ -1344,6 +1370,7 @@ function wChores() {
       <input type="text" data-k="newChore.name" value="${esc(W.newChore.name)}" maxlength="40" placeholder="Chore name">
       ${payInputs('newChore', W.newChore)}
       ${sizeSelect('newChore.size', W.newChore.size)}
+      ${oftenSelect('newChore.often', W.newChore.often)}
       <button class="btn shrink" data-w="addChore">Add</button>
     </div>
   </div>`;
@@ -1375,58 +1402,35 @@ function limitOpts(sel) {
   for (let i = 1; i <= 15; i++) s += `<option value="${i}" ${i === Number(sel) ? 'selected' : ''}>${plural(i, 'work point')}</option>`;
   return s;
 }
-function hourOpts(sel) { let s = ''; for (let h = 0; h < 24; h++) s += `<option value="${h}" ${h === Number(sel) ? 'selected' : ''}>${hl(h)}</option>`; return s; }
-function dayOpts(sel) { return DAYS.map(d => `<option ${d === sel ? 'selected' : ''}>${d}</option>`).join(''); }
 function toggleHtml(id, on, title, text, dataK) {
   return `<label class="toggle"><input type="checkbox" id="${id}" ${dataK ? `data-k="${dataK}"` : ''} ${on ? 'checked' : ''}>
     <div><b>${title}</b><span>${text}</span></div></label>`;
 }
-function unclaimedHtml(name, val, dataK) {
-  const opt = (v, t, d) => `<label class="radio"><input type="radio" name="${name}" value="${v}" ${dataK ? `data-k="${dataK}"` : ''} ${val === v ? 'checked' : ''}>
-    <div><b>${t}</b><span>${d}</span></div></label>`;
-  return opt('auto', 'Give them to the kid with the least work, at the lowest pay', 'Skipping the auction never pays more than bidding. The work limit still applies.') +
-         opt('parent', 'Wait for me to assign them', 'They show up on your Parent page with the kid and points for you to pick.');
-}
-const RULE_REPEAT = ['Rotate chores', 'A kid who did a chore last round only gets it again if nobody else bid on it.'];
+const RULE_REPEAT = ['Take turns', 'Whoever did a chore last time waits one day before picking it again, so someone else gets first try.'];
+const RULE_GROW = ['Raise points on waiting chores', 'A chore nobody picks goes up a little every day, reaching its top pay after 4 days. This is what gets the yucky jobs done.'];
 
 // Plain-language check that the rules can all be met
 function fairnessCheck(kidsCount, chores, limit) {
-  const total = chores.reduce((s, c) => s + (Number(c.size) || 1), 0);
-  if (!limit) return { cls: 'good', text: 'No work limit: the lowest bid always wins, even if one kid wins a lot.' };
-  const cap = kidsCount * limit;
+  if (!limit) return { cls: 'good', text: 'No limit: a kid can hold as many chores at once as they like.' };
   const tooBig = chores.filter(c => (Number(c.size) || 1) > limit).map(c => c.name);
-  if (tooBig.length) return { cls: 'warn', text: 'Heads up: ' + tooBig.join(', ') + (tooBig.length === 1 ? ' is' : ' are') + ' bigger than the work limit, so nobody can win ' + (tooBig.length === 1 ? 'it' : 'them') + '. Raise the limit or make the chore smaller.' };
-  if (total > cap) return { cls: 'warn', text: `Heads up: your chores add up to ${total} work points, but ${plural(kidsCount, 'kid')} × ${limit} = ${cap}. About ${total - cap} work points of chores will not fit each round and will wait for you to assign. The limit is never broken.` };
-  return { cls: 'good', text: `Your chores add up to ${total} work points. ${plural(kidsCount, 'kid')} × ${limit} = room for ${cap}, so every chore can find someone.` };
-}
-function suggestLimit(kidsCount, chores) {
-  const total = chores.reduce((s, c) => s + (Number(c.size) || 1), 0);
-  return Math.max(3, Math.min(15, Math.ceil(total / Math.max(1, kidsCount)) + 1));
+  if (tooBig.length) return { cls: 'warn', text: 'Heads up: ' + tooBig.join(', ') + (tooBig.length === 1 ? ' is' : ' are') + ' bigger than this limit, so nobody could pick ' + (tooBig.length === 1 ? 'it' : 'them') + '. Raise the limit or make the chore smaller.' };
+  return { cls: 'good', text: `Each kid can hold up to ${plural(limit, 'work point')} of chores at once (small 1, medium 2, big 3). When they finish one, they can pick another, so nobody can grab them all.` };
 }
 
 function wRules() {
-  const kids = W.kids.filter(k => k.name.trim()).length;
   const chores = W.chores.filter(c => c.on);
-  if (W.limit == null) W.limit = suggestLimit(kids, chores);
-  const chk = fairnessCheck(kids, chores, W.limit);
+  const chk = fairnessCheck(0, chores, W.limit);
   return `<div class="card">
-    <h2>When does the auction close?</h2>
-    <p class="desc">Kids bid all week. The auction closes on its own at this time every week, and you can also close it early.</p>
-    <div class="row">
-      <div><label>Day</label><select data-k="day">${dayOpts(W.day)}</select></div>
-      <div><label>Time</label><select data-k="hour" data-num="1">${hourOpts(W.hour)}</select></div>
-    </div>
+    <h2>How the chore board works</h2>
+    <p class="desc">There is no weekly round. Every chore is open on the board, showing what it pays right now. A kid taps <b>I'll do it</b> and it is theirs. After you approve it, it rests and comes back on its own schedule.</p>
+    ${toggleHtml('wGrow', W.grow, RULE_GROW[0], RULE_GROW[1], 'grow')}
   </div>
   <div class="card">
     <h2>Fairness rules</h2>
-    <label>Work limit per kid each round</label>
+    <label>Most work a kid can hold at once</label>
     <select data-k="limit" data-num="1" data-re="1">${limitOpts(W.limit)}</select>
-    <p class="desc mt">A small job counts 1, a medium job 2, and a big job 3. Once a kid's next win would go over the limit, that chore goes to the next lowest bid.</p>
-    <div class="${chk.cls}">${esc(chk.text)}</div>
+    <div class="${chk.cls} mt">${esc(chk.text)}</div>
     ${toggleHtml('wRepeat', W.noRepeat, RULE_REPEAT[0], RULE_REPEAT[1], 'noRepeat')}
-    <label>Chores nobody wins</label>
-    ${unclaimedHtml('wUnc', W.unclaimed, 'unclaimed')}
-    <p class="tip mt">Ties go to the kid with less work.</p>
   </div>
   <div class="card">
     <h2>Approving finished chores</h2>
@@ -1466,8 +1470,8 @@ function wizClick(e) {
     if (!name) return toast('Type a chore name first.', true);
     if (W.chores.some(c => c.name.toLowerCase() === name.toLowerCase())) return toast('That chore is already on the list.', true);
     if (!(n.min >= 1 && n.max >= n.min && n.max <= 100)) return toast('The pay should be from 1 to 100, lowest first.', true);
-    W.chores.push({ name: name, desc: 'Your chore', min: n.min, max: n.max, size: n.size || 1, on: true });
-    W.newChore = { name: '', min: 2, max: 6, size: 1 };
+    W.chores.push({ name: name, desc: 'Your chore', min: n.min, max: n.max, size: n.size || 1, often: n.often || 7, on: true });
+    W.newChore = { name: '', min: 2, max: 6, size: 1, often: 7 };
   }
   if (what === 'addReward') {
     const n = W.newReward, name = String(n.name || '').trim();
@@ -1500,8 +1504,7 @@ function wizCheck() {
     const on = W.chores.filter(c => c.on);
     if (!on.length) return 'Pick at least one chore.';
     const bad = on.find(c => !(c.min >= 1 && c.max >= c.min && c.max <= 100));
-    if (bad) return 'Check the pay for ' + bad.name + '. The lowest must be at least 1 and the highest can be up to 100.';
-    W.limit = null; // recompute the suggested limit for the chosen chores
+    if (bad) return 'Check the points for ' + bad.name + '. The starting pay must be at least 1, and the top pay can be up to 100.';
   }
   if (W.step === 3) {
     const bad = W.rewards.filter(r => r.on).find(r => !(r.cost >= 1 && r.cost <= 1000));
@@ -1516,9 +1519,9 @@ async function wizNext() {
   const payload = {
     license: W.license.trim(), name: W.name.trim(), pin: W.pin, email: W.email.trim(), tz: TZ, appLink: APP_LINK,
     kids: W.kids.filter(k => k.name.trim()).map(k => ({ name: k.name.trim(), color: k.color, code: String(k.code || '') })),
-    chores: W.chores.filter(c => c.on).map(c => ({ name: c.name, desc: c.desc, min: c.min, max: c.max, size: c.size })),
+    chores: W.chores.filter(c => c.on).map(c => ({ name: c.name, desc: c.desc, min: c.min, max: c.max, size: c.size, often: c.often })),
     rewards: W.rewards.filter(r => r.on).map(r => ({ name: r.name, cost: r.cost })),
-    day: W.day, hour: W.hour, limit: W.limit || 0, noRepeat: W.noRepeat, unclaimed: W.unclaimed, autoApprove: W.autoApprove
+    limit: W.limit || 0, noRepeat: W.noRepeat, grow: W.grow, autoApprove: W.autoApprove
   };
   const go = async () => {
     busy('Setting up your family...', ['Creating your family\'s private space...', 'Adding kids, chores, and rewards...', 'Almost ready...', 'Still working. Slow connections can take up to a minute...']);
@@ -1623,13 +1626,24 @@ function chip(name) { return `<span class="chip" style="background:${esc(kidColo
 function canDo(c, kid) { return !c.who || !c.who.length || c.who.indexOf(kid) > -1; }
 const readyRows = () => DATA.winners.filter(w => w.status === 'Ready');
 const todoRows = () => DATA.winners.filter(w => w.status === 'Assigned');
-const noWinnerRows = () => DATA.winners.filter(w => w.status === 'No Bids');
+const openChores = () => DATA.chores.filter(c => c.state === 'open');
+const claimOf = name => DATA.winners.find(w => w.chore === name && (w.status === 'Assigned' || w.status === 'Ready'));
+// "tomorrow", "Thursday", or a date, for chores that come back later
+function whenBack(ms) {
+  const d = new Date(ms), t = new Date(); t.setHours(0, 0, 0, 0);
+  const days = Math.round((new Date(d).setHours(0, 0, 0, 0) - t) / 864e5);
+  if (days <= 0) return 'later today';
+  if (days === 1) return 'tomorrow';
+  if (days < 7) return 'on ' + d.toLocaleDateString('en-US', { weekday: 'long' });
+  return 'on ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
 
 function renderApp() {
   const m = mode();
   document.title = DATA.family + ' - The Chore Auction';
   $('family').textContent = DATA.family;
-  $('closePill').textContent = 'Auction closes ' + DATA.schedule.label;
+  const nOpen = openChores().length;
+  $('closePill').textContent = nOpen ? plural(nOpen, 'chore') + ' open now' : 'All chores taken';
   $('demoBanner').classList.toggle('hidden', !DATA.demo);
   document.querySelectorAll('[data-demo]').forEach(b => b.classList.toggle('gold', DATA.demo && b.dataset.demo === role()));
 
@@ -1645,10 +1659,10 @@ function renderApp() {
   let tabs = [];
   if (m === 'kid') {
     const todo = todoRows().filter(w => w.winner === DATA.me).length;
-    tabs = [['bid', 'Bid on chores'], ['mine', 'My chores' + (todo ? ` <span class="count">${todo}</span>` : '')], ['points', 'My points']];
+    tabs = [['pick', 'Pick a chore'], ['mine', 'My chores' + (todo ? ` <span class="count">${todo}</span>` : '')], ['points', 'My points']];
   } else if (m === 'parent') {
     const n = readyRows().length;
-    tabs = [['approve', 'Approve' + (n ? ` <span class="count">${n}</span>` : '')], ['week', 'This week'], ['points', 'Points'], ['settings', 'Settings']];
+    tabs = [['approve', 'Approve' + (n ? ` <span class="count">${n}</span>` : '')], ['board', 'Chore board'], ['points', 'Points'], ['settings', 'Settings']];
   }
   const cur = m === 'kid' ? KTAB : PTAB;
   $('tabsIn').innerHTML = tabs.map(t => `<button data-tab="${t[0]}" class="${t[0] === cur ? 'on' : ''}">${t[1]}</button>`).join('');
@@ -1664,9 +1678,9 @@ function viewSetup() {
     <h2>Welcome to ${esc(DATA.family)}!</h2>
     <p class="desc">How will this device be used? You only answer this once.</p>
     <div class="choices">
-      <button class="choice" data-a="asParent"><b>A parent's phone</b><span>Approve chores and run the auction. Type your PIN once, and this phone remembers you.</span></button>
+      <button class="choice" data-a="asParent"><b>A parent's phone</b><span>Approve finished chores with one tap. Type your PIN once, and this phone remembers you.</span></button>
       <button class="choice" data-a="asShared"><b>Our family computer or tablet</b><span>Everyone shares it. Kids tap their name and type their own secret code. A parent sets it up once with the PIN.</span></button>
-      <button class="choice" data-a="asKid"><b>One kid's own device</b><span>Only that kid bids here. A parent picks the kid with the PIN, or the kid types a join code.</span></button>
+      <button class="choice" data-a="asKid"><b>One kid's own device</b><span>Only that kid picks chores here. A parent picks the kid with the PIN, or the kid types a join code.</span></button>
     </div>
   </div>`;
 }
@@ -1683,7 +1697,7 @@ function viewWho() {
     ${DATA.demo ? '<p class="tip mt">Demo secret codes: Maya 1111, Leo 2222, Sam 3333. Parent PIN: 1234.</p>' : ''}
   </div>
   <div class="card">
-    <p class="desc" style="margin:0">This week's auction closes <b>${esc(DATA.schedule.label)}</b>. ${plural(DATA.chores.length, 'chore')} are up for bids.</p>
+    <p class="desc" style="margin:0">${openChores().length ? `<b>${plural(openChores().length, 'chore')}</b> ${openChores().length === 1 ? 'is' : 'are'} open right now. Tap your name to pick one.` : 'Every chore is taken right now. Check back soon!'}</p>
   </div>`;
 }
 
@@ -1708,37 +1722,39 @@ function viewKid() {
   </div>`;
   if (KTAB === 'mine') return hello + kidMine();
   if (KTAB === 'points') return hello + kidPoints();
-  return hello + kidBid();
+  return hello + kidPick();
 }
 
-function kidBid() {
-  const me = DATA.me, f = DATA.fairness;
+function kidPick() {
+  const me = DATA.me, f = DATA.fairness, load = (DATA.load || {})[me] || 0;
   const list = DATA.chores.filter(c => canDo(c, me));
-  const bidOn = list.filter(c => c.mine != null).length;
-  const leftover = f.unclaimed === 'auto'
-    ? ' <b>Chores nobody bids on get handed out at the lowest pay</b>, so bid on the ones you want!'
-    : ' A parent hands out chores nobody bids on.';
-  const rules = `<div class="card"><div class="done-all"><h3 class="sec" style="margin:0">You have bid on ${bidOn} of ${plural(list.length, 'chore')}</h3></div>
-    <p class="desc" style="margin:6px 0 0">Pick the <b>fewest points</b> you would do a job for, then tap the gold button to send your bid. The lowest bid wins when the auction closes <b>${esc(DATA.schedule.label)}</b>.${leftover}${f.limit ? ' To keep it fair, each kid can only win so much work.' : ''}</p></div>`;
-  if (!list.length) return rules + '<div class="card empty">No chores up for auction right now.</div>';
-  return rules + `<div class="grid">${list.map(c => {
+  const order = { open: 0, taken: 1, later: 2 };
+  const sorted = list.slice().sort((a, b) => order[a.state] - order[b.state] || (a.state === 'open' ? b.price - a.price : 0));
+  const intro = `<div class="card">
+    <h3 class="sec" style="margin:0 0 6px">Pick any chore you want</h3>
+    <p class="desc" style="margin:0">Tap <b>I'll do it</b> and the chore is yours right away. ${f.grow ? 'Chores nobody picks <b>go up in points every day</b>. Waiting can pay more, but someone else might grab it first!' : ''}</p>
+    ${f.limit ? `<p class="desc mt" style="margin-bottom:0">You have <b>${load} of ${f.limit}</b> work points of chores right now. Small jobs count 1, medium 2, big 3.</p>` : ''}
+  </div>`;
+  if (!list.length) return intro + '<div class="card empty">No chores for you yet. Ask a parent to add some.</div>';
+  return intro + `<div class="grid">${sorted.map(c => {
     const i = DATA.chores.indexOf(c);
-    const mine = c.mine;
-    const v = BID_VALUES[c.name] != null ? BID_VALUES[c.name] : (mine != null ? mine : Math.round((c.min + c.max) / 2));
-    const others = c.bidders.filter(k => k !== me).length;
+    const tags = `<span class="tags"><span class="tag size">${SIZES[c.size] || ''}</span><span class="tag often">${esc(OFTEN_NAMES[c.often] || '')}</span></span>`;
+    if (c.state === 'taken') {
+      return `<div class="card chore off"><h3>${esc(c.name)}</h3>${c.desc ? `<p class="desc">${esc(c.desc)}</p>` : ''}
+        <div class="mine ${c.by === me ? 'sent' : ''}">${c.by === me ? '&#10003; You picked this. It is in My chores.' : `${chip(c.by)} is doing this one`}</div></div>`;
+    }
+    if (c.state === 'later') {
+      return `<div class="card chore off"><h3>${esc(c.name)}</h3>${c.desc ? `<p class="desc">${esc(c.desc)}</p>` : ''}
+        <div class="mine">Done for now. Back ${esc(whenBack(c.openAt))}.</div></div>`;
+    }
+    const rising = c.next > c.price ? `Goes up to ${pt(c.next)} tomorrow` : c.price >= c.max && c.max > c.min ? 'Top pay!' : '';
     return `<div class="card chore">
       <h3>${esc(c.name)}</h3>
       ${c.desc ? `<p class="desc">${esc(c.desc)}</p>` : ''}
-      <div class="meta"><span class="tags"><span class="tag">Pays ${c.min} to ${c.max}</span><span class="tag size">${SIZES[c.size] || ''}</span></span><span>${others ? plural(others, 'other bid') : 'No other bids yet'}</span></div>
-      ${mine != null ? `<div class="mine sent"><span>&#10003; Your bid is in: <b>${pt(mine)}</b></span><button class="link red" data-a="withdraw" data-i="${i}">Take back</button></div>`
-        : `<div class="mine notyet">You have not bid on this yet</div>`}
-      <div class="stepper">
-        <button data-a="dn" data-i="${i}" aria-label="Less">-</button>
-        <input type="number" id="bid${i}" value="${v}" min="${c.min}" max="${c.max}" aria-label="Bid">
-        <button data-a="up" data-i="${i}" aria-label="More">+</button>
-      </div>
-      <p class="unsent hidden" id="uns${i}">Not sent yet. Tap the button to bid.</p>
-      <button class="btn gold full" data-a="bid" data-i="${i}" id="bb${i}">${bidLabel(c, v)}</button>
+      <div class="price"><b>${c.price}</b><span>${c.price === 1 ? 'point' : 'points'}<br>now</span>${rising ? `<em class="${c.price >= c.max ? 'top' : ''}">${esc(rising)}</em>` : ''}</div>
+      <div class="meta">${tags}</div>
+      ${c.why ? `<p class="why">${esc(c.why)}</p><button class="btn full" disabled>I'll do it</button>`
+        : `<button class="btn gold full" data-a="claim" data-i="${i}">I'll do it for ${pt(c.price)}</button>`}
     </div>`;
   }).join('')}</div>`;
 }
@@ -1750,9 +1766,10 @@ function kidMine() {
   const done = DATA.winners.filter(w => w.winner === me && w.status === 'Done').slice(0, 5);
   return `<div class="card">
       <h3 class="sec">To do</h3>
-      ${todo.length ? todo.map(w => `<div class="approve"><div class="what"><b>${esc(w.chore)}</b><small>Worth ${pt(w.points)} · ${esc(howKid(w.how))}</small></div>
+      ${todo.length ? todo.map(w => `<div class="approve"><div class="what"><b>${esc(w.chore)}</b><small>Worth ${pt(w.points)} · ${esc(howKid(w.how))}</small>
+          <button class="link" data-a="giveBack" data-row="${w.row}">Give it back</button></div>
         <button class="btn green" data-a="ready" data-row="${w.row}">I finished it!</button></div>`).join('')
-        : '<p class="desc" style="margin:0">Nothing to do right now. Bid on chores to earn points!</p>'}
+        : `<p class="desc" style="margin:0">Nothing to do right now. <button class="link" data-tab-go="pick">Pick a chore</button> to earn points!</p>`}
     </div>
     ${waiting.length ? `<div class="card"><h3 class="sec">Waiting for a parent to check</h3>
       ${waiting.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>Worth ${pt(w.points)}</small></span><span class="status s-Ready">Waiting</span></div>`).join('')}</div>` : ''}
@@ -1777,36 +1794,19 @@ function kidPoints() {
 // Plain words for kids about how they got a chore
 function howKid(how) {
   const h = String(how || '');
-  if (/^Nobody won it/.test(h)) return 'Nobody bid on this, so it was given to you at the lowest pay';
+  if (h === 'Picked it') return 'You picked it';
   if (/parent/i.test(h)) return 'A parent gave you this one';
-  if (/Next lowest/.test(h)) return 'You won it (the lowest bidder already had enough work)';
-  if (/Tied/.test(h)) return 'You won a tie, because you had less work';
-  return 'You won this with your bid';
+  if (/^Nobody won it/.test(h)) return 'Given to you in the old weekly auction';
+  return 'You won it in the old weekly auction';
 }
 
 async function kidSignOut(msg) {
   const k = KSESS;
   KSESS = null;
   try { if (k) await api('kidLogout', { ksess: k }); } catch (e) { /* ignore */ }
-  KTAB = 'bid';
+  KTAB = 'pick';
   toast(msg || 'Signed out. See you next time!');
   await load();
-}
-
-function bidLabel(c, v) {
-  if (c.mine != null) return Number(v) === c.mine ? 'Bid sent: ' + pt(v) : 'Change my bid to ' + pt(v);
-  return 'Place my bid: ' + pt(v);
-}
-function clampBid(i, v) {
-  const c = DATA.chores[i];
-  v = Math.max(c.min, Math.min(c.max, Math.round(Number(v) || c.min)));
-  const el = $('bid' + i); if (el) el.value = v;
-  BID_VALUES[c.name] = v;
-  // make it obvious when a number was picked but not sent
-  const btn = $('bb' + i), uns = $('uns' + i);
-  if (btn) btn.textContent = bidLabel(c, v);
-  if (uns) uns.classList.toggle('hidden', c.mine === v);
-  return v;
 }
 
 /* ============================== PARENT VIEW ============================== */
@@ -1814,14 +1814,13 @@ function viewParent() {
   const d = DATA;
   let warn = '';
   if (d.weakPin) warn += `<div class="warn">Your parent PIN is short. Choose a new one with 6 to 12 numbers in Settings, then Family.</div>`;
-  if (!d.demo && !d.email) warn += `<div class="warn">Add a parent email in Settings, then Family, so you hear about security notices and can recover your link.</div>`;
-  const body = PTAB === 'week' ? parentWeek() : PTAB === 'points' ? parentPoints() : PTAB === 'settings' ? parentSettings() : parentApprove();
+  if (!d.demo && !d.email) warn += `<div class="warn">Add a parent email in Settings, then Family. Without one, we cannot send you a PIN reset code or your lost link.</div>`;
+  const body = PTAB === 'board' ? parentBoard() : PTAB === 'points' ? parentPoints() : PTAB === 'settings' ? parentSettings() : parentApprove();
   return warn + body;
 }
 
 function parentApprove() {
-  const d = DATA, ready = readyRows(), none = noWinnerRows(), todo = todoRows();
-  const kidOpts = d.kids.map(k => `<option>${esc(k.name)}</option>`).join('');
+  const d = DATA, ready = readyRows(), todo = todoRows();
   return `<div class="card hl">
     <div class="done-all"><h3 class="sec" style="margin:0">Finished chores to check</h3>
       ${ready.length > 1 ? `<button class="btn green" data-a="approveAll">Approve all ${ready.length}</button>` : ''}</div>
@@ -1832,46 +1831,36 @@ function parentApprove() {
       : `<div class="caught"><b>All caught up!</b><span class="desc">When a kid taps "I finished it," it shows up here. One tap to approve.</span></div>`}
     ${d.fairness.autoApprove ? `<p class="tip mt" style="margin-bottom:0">Not checked within ${d.fairness.autoApprove} hours? It is approved for you automatically. Change this in Settings, then Rules.</p>` : ''}
   </div>
-  ${none.length ? `<div class="card"><h3 class="sec">Chores with no winner</h3>
-    <p class="desc">Nobody won these. Pick who does it and the points, or skip it this week.</p>
-    ${none.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>Round ${w.round}</small></span>
-      <span class="acts"><select class="sel-mini" id="as${w.row}">${kidOpts}</select>
-      <input type="number" class="mini" id="ap${w.row}" placeholder="Pts" min="0">
-      <button class="btn small" data-a="assign" data-row="${w.row}">Assign</button>
-      <button class="btn ghost small" data-a="skip" data-row="${w.row}">Skip</button></span></div>`).join('')}</div>` : ''}
-  <div class="card"><p class="desc" style="margin:0">${todo.length ? `${plural(todo.length, 'chore')} still being worked on. ` : ''}See bids and progress in <button class="link" data-tab-go="week">This week</button>.</p></div>`;
+  <div class="card"><p class="desc" style="margin:0">${todo.length ? `${plural(todo.length, 'chore')} being worked on, and ` : ''}${plural(openChores().length, 'chore')} open on the <button class="link" data-tab-go="board">Chore board</button>.</p></div>`;
 }
 
-function parentWeek() {
-  const d = DATA, todo = todoRows();
-  const counts = {};
-  d.kids.forEach(k => counts[k.name] = 0);
-  d.chores.forEach(c => c.bidders.forEach(k => counts[k] = (counts[k] || 0) + 1));
-  const last = d.round - 1;
-  const latest = d.winners.filter(w => w.round === last);
+function parentBoard() {
+  const d = DATA, kidOpts = k => d.kids.filter(x => canDo(k, x.name)).map(x => `<option>${esc(x.name)}</option>`).join('');
+  const recent = d.winners.filter(w => w.status === 'Done').slice(0, 8);
+  const row = (c, i) => {
+    const sub = [SIZE_SHORT[c.size] + ' job', OFTEN_NAMES[c.often] || ''];
+    if (c.state === 'open') {
+      return `<div class="item"><span class="nm">${esc(c.name)}<small>Pays <b>${pt(c.price)}</b> now${c.next > c.price ? ', ' + c.next + ' tomorrow' : ''} · ${sub.join(' · ')}</small></span>
+        <span class="acts"><select class="sel-mini" id="gk${i}">${kidOpts(c)}</select><button class="btn small" data-a="give" data-i="${i}">Give</button></span></div>`;
+    }
+    if (c.state === 'later') {
+      return `<div class="item"><span class="nm">${esc(c.name)}<small>Done. Back ${esc(whenBack(c.openAt))} · ${sub.join(' · ')}</small></span><span class="status s-NoBids">Resting</span></div>`;
+    }
+    const w = claimOf(c.name);
+    if (!w) return '';
+    const isReady = w.status === 'Ready';
+    return `<div class="item"><span class="nm">${chip(w.winner)} ${esc(c.name)}<small>${pt(w.points)} · ${isReady ? 'finished, check it' : 'working on it'}</small></span>
+      <span class="acts"><button class="btn green small" data-a="approve" data-row="${w.row}">Done</button><button class="btn ghost small" data-a="notdone" data-row="${w.row}">Not done</button><button class="btn ghost small" data-a="putBack" data-row="${w.row}">Put back</button></span></div>`;
+  };
   return `<div class="card">
-    <h3 class="sec">This week's auction (round ${d.round})</h3>
-    <p class="desc">Kids are bidding now. It closes on its own <b>${esc(d.schedule.label)}</b>. Bid amounts stay secret until then.</p>
-    <label>Bids so far</label>
-    ${d.kids.map(k => `<div class="board-kid">${chip(k.name)}<b>${counts[k.name]} of ${d.chores.filter(c => canDo(c, k.name)).length} chores</b></div>`).join('')}
-    <button class="btn gold full mt" data-a="run">Close the auction now</button>
+    <h3 class="sec">Chore board</h3>
+    <p class="desc">Kids pick chores here any time.${d.fairness.grow ? ' Chores nobody picks go up in points every day, up to their top pay.' : ''} You can also give a chore to a kid yourself.</p>
+    ${d.chores.map(row).join('') || '<p class="desc">No chores yet. Add them in Settings.</p>'}
   </div>
-  <div class="card"><h3 class="sec">Being worked on</h3>
-    ${todo.length ? todo.map(w => `<div class="item"><span class="nm">${chip(w.winner)} ${esc(w.chore)}<small>Round ${w.round} · ${pt(w.points)}</small></span>
-      <span class="acts"><button class="btn green small" data-a="approve" data-row="${w.row}">Done</button><button class="btn ghost small" data-a="notdone" data-row="${w.row}">Not done</button></span></div>`).join('')
-      : '<p class="desc" style="margin:0">Nothing in progress right now.</p>'}
-  </div>
-  <div class="card"><h3 class="sec">${last >= 1 ? 'Last auction (round ' + last + ')' : 'Last auction'}</h3>
-    ${latest.length ? latest.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>${esc(howParent(w.how))}</small></span>
-      ${w.status === 'No Bids' ? '<span class="status s-NoBids">No winner</span>' : `<span>${chip(w.winner)} ${pt(w.points)}</span>`}</div>`).join('')
-      : '<p class="desc" style="margin:0">No auction has closed yet.</p>'}
+  <div class="card"><h3 class="sec">Recently done</h3>
+    ${recent.length ? recent.map(w => `<div class="item"><span class="nm">${chip(w.winner)} ${esc(w.chore)}<small>${esc(w.statusDate)}</small></span><span class="tag">+${pt(w.points)}</span></div>`).join('')
+      : '<p class="desc" style="margin:0">Nothing approved yet.</p>'}
   </div>`;
-}
-
-function howParent(how) {
-  const h = String(how || '');
-  if (/^Nobody won it/.test(h)) return 'Nobody bid, so it went to the kid with the least work, at the lowest pay';
-  return h;
 }
 
 function parentPoints() {
@@ -1948,9 +1937,10 @@ function parentSettings() {
       <button class="btn ghost small" data-a="rmDevice" data-key="${esc(x.key)}">Remove</button></div>`).join('') : '<p class="desc">No devices yet.</p>'}`)}
 
   ${section('kids', 'Kids and secret codes', `
-    <p class="desc">Kids type their secret code to sign in on the family computer. Only you can see or change them here.</p>
-    ${d.kids.map((k, i) => `<div class="item"><span class="nm">${chip(k.name)} <span class="codepill ${k.hasCode ? '' : 'no'}">${k.hasCode ? 'Secret code set' : 'No secret code yet'}</span></span>
+    <p class="desc">Kids type their secret code to sign in on the family computer. Only parents can see them here.</p>
+    ${d.kids.map((k, i) => `<div class="item"><span class="nm">${chip(k.name)} <span class="codepill ${k.hasCode ? '' : 'no'}">${k.code ? 'Code ' + esc(k.code) : k.hasCode ? 'Code hidden (made before codes could be shown)' : 'No secret code yet'}</span></span>
       <span class="acts"><button class="btn small" data-a="setCode" data-i="${i}">${k.hasCode ? 'Change code' : 'Set code'}</button><button class="btn ghost small" data-a="delKid" data-i="${i}">Remove</button></span></div>`).join('')}
+    <button class="btn ghost full mt" data-a="emailCodes">Email me all the codes</button>
     <label>Add a kid</label>
     <div class="row" style="align-items:center">
       <input type="color" id="nkColor" value="${COLORS[d.kids.length % COLORS.length]}" aria-label="Color">
@@ -1959,12 +1949,14 @@ function parentSettings() {
       <button class="btn shrink" data-a="addKid">Add</button>
     </div>`)}
 
-  ${section('chores', 'Chores, pay, and who can do them', `
+  ${section('chores', 'Chores, points, and who can do them', `
+    <p class="desc">Each chore starts at its lowest pay${d.fairness.grow ? ' and goes up every day nobody picks it, reaching the top pay after 4 days' : ''}. After it is approved, it comes back on the board when you choose.</p>
     ${d.chores.map((c, i) => `<div class="item" style="display:block">
       <div class="nm" style="margin-bottom:6px">${esc(c.name)}${c.desc ? `<small>${esc(c.desc)}</small>` : ''}</div>
       <div class="row" style="align-items:center">
-        <span class="pay">Pays <input type="number" class="mini" id="cmin${i}" value="${c.min}" min="1" max="100"> to <input type="number" class="mini" id="cmax${i}" value="${c.max}" min="1" max="100"></span>
-        <select class="sel-mini shrink" id="csize${i}">${[1, 2, 3].map(n => `<option value="${n}" ${c.size === n ? 'selected' : ''}>${SIZE_SHORT[n]}</option>`).join('')}</select>
+        <span class="pay">Starts at <input type="number" class="mini" id="cmin${i}" value="${c.min}" min="1" max="100"> up to <input type="number" class="mini" id="cmax${i}" value="${c.max}" min="1" max="100"></span>
+        <select class="sel-mini shrink" id="csize${i}" aria-label="Size">${[1, 2, 3].map(n => `<option value="${n}" ${c.size === n ? 'selected' : ''}>${SIZE_SHORT[n]}</option>`).join('')}</select>
+        <select class="sel-mini shrink" id="coft${i}" aria-label="Comes back">${oftenOpts(c.often)}</select>
       </div>
       <div class="kidchecks mt">Who can do it:
         ${d.kids.map(k => `<label><input type="checkbox" class="cwho${i}" value="${esc(k.name)}" ${canDo(c, k.name) ? 'checked' : ''}>${esc(k.name)}</label>`).join('')}</div>
@@ -1974,8 +1966,9 @@ function parentSettings() {
     <input type="text" id="ncName" maxlength="40" placeholder="Chore name">
     <input type="text" id="ncDesc" maxlength="80" placeholder="Short description (optional)" class="mt">
     <div class="row mt" style="align-items:center">
-      <span class="pay">Pays <input type="number" class="mini" id="ncMin" value="2" min="1" max="100"> to <input type="number" class="mini" id="ncMax" value="6" min="1" max="100"></span>
-      <select class="sel-mini shrink" id="ncSize"><option value="1">Small</option><option value="2">Medium</option><option value="3">Big</option></select>
+      <span class="pay">Starts at <input type="number" class="mini" id="ncMin" value="2" min="1" max="100"> up to <input type="number" class="mini" id="ncMax" value="6" min="1" max="100"></span>
+      <select class="sel-mini shrink" id="ncSize" aria-label="Size"><option value="1">Small</option><option value="2">Medium</option><option value="3">Big</option></select>
+      <select class="sel-mini shrink" id="ncOften" aria-label="Comes back">${oftenOpts(7)}</select>
       <button class="btn shrink" data-a="addChore">Add chore</button>
     </div>`)}
 
@@ -1989,24 +1982,20 @@ function parentSettings() {
       <button class="btn shrink" data-a="addReward">Add</button>
     </div>`)}
 
-  ${section('rules', 'Rules and schedule', `
-    <div class="row">
-      <div><label>Auction closes on</label><select id="pDay">${dayOpts(d.schedule.day)}</select></div>
-      <div><label>At</label><select id="pHour">${hourOpts(d.schedule.hour)}</select></div>
-    </div>
-    <label>Approve finished chores automatically after</label>
-    <select id="pAuto">${autoOpts(d.fairness.autoApprove)}</select>
-    <label>Work limit per kid each round</label>
+  ${section('rules', 'Rules', `
+    ${toggleHtml('pGrow', d.fairness.grow, RULE_GROW[0], RULE_GROW[1])}
+    <label>Most work a kid can hold at once</label>
     <select id="pLimit">${limitOpts(d.fairness.limit)}</select>
     <div class="${chk.cls}" id="pCheck">${esc(chk.text)}</div>
     ${toggleHtml('pRepeat', d.fairness.noRepeat, RULE_REPEAT[0], RULE_REPEAT[1])}
-    <label>Chores nobody wins</label>
-    ${unclaimedHtml('pUnc', d.fairness.unclaimed)}
-    <button class="btn full mt" data-a="saveRules">Save rules and schedule</button>`)}
+    <label>Approve finished chores automatically after</label>
+    <select id="pAuto">${autoOpts(d.fairness.autoApprove)}</select>
+    <button class="btn full mt" data-a="saveRules">Save rules</button>`)}
 
   ${section('family', 'Family', `
     <label>Family nickname (no last names)</label><input type="text" id="fName" maxlength="40" value="${esc(d.family)}">
-    <label>Parent email (weekly results, security notices, lost-link emails)</label><input type="email" id="fEmail" maxlength="120" value="${esc(d.email)}">
+    <label>Parent email</label><input type="email" id="fEmail" maxlength="120" value="${esc(d.email)}">
+    <p class="desc mt">We only email you when it matters: a PIN reset code, your kids' codes, or your lost link when you ask, plus a few security notices (someone guessing your PIN, your PIN changed, a new parent phone). Never weekly emails.</p>
     <button class="btn full mt" data-a="saveFam">Save</button>
     <label class="mt">Change the parent PIN</label>
     <div class="row">
@@ -2015,35 +2004,37 @@ function parentSettings() {
       <input type="password" id="pinNew2" inputmode="numeric" placeholder="New PIN again" autocomplete="new-password" maxlength="12">
     </div>
     <button class="btn ghost full mt" data-a="pin">Change PIN</button>
+    <p class="desc mt">Forgot your current PIN? <button class="link" data-a="forgotPin">Email me a reset code</button></p>
     <div class="card danger mt" style="margin-bottom:0">
       <h3 class="sec">${d.demo ? 'Start the demo over' : 'Delete this family'}</h3>
-      <p class="desc">${d.demo ? 'Puts the demo family back the way it started.' : 'Permanently deletes your kids, chores, bids, and points. This cannot be undone.'}</p>
+      <p class="desc">${d.demo ? 'Puts the demo family back the way it started.' : 'Permanently deletes your kids, chores, and points. This cannot be undone.'}</p>
       <button class="btn red" data-a="delete">${d.demo ? 'Start over' : 'Delete everything'}</button>
     </div>`)}`;
 }
 
 /* ============================== HELP ============================== */
 function showHelp() {
-  const m = DATA ? mode() : 'setup', when = DATA ? DATA.schedule.label : 'once a week';
+  const m = DATA ? mode() : 'setup', f = DATA ? DATA.fairness : { grow: true };
   const H = {
     setup: ['Getting started', `<p>Each device is set up once, as one of these:</p><ol class="helpsteps">
       <li><b>A parent's phone.</b> Type your PIN once. After that it opens straight to your approvals.</li>
       <li><b>A family computer or tablet</b> that everyone shares. Kids tap their name and type their 4-number secret code.</li>
-      <li><b>A kid's own device.</b> It only ever bids as that kid.</li></ol><p>You can mix them. Most families use a parent's phone and one shared tablet.</p>`],
-    who: ['Using the family computer', `<ol class="helpsteps"><li><b>Kids:</b> tap your name and type your secret code.</li>
-      <li>Bid on chores, or tap <b>I finished it!</b> on a chore you did.</li>
+      <li><b>A kid's own device.</b> It only ever picks chores as that kid.</li></ol><p>You can mix them. Most families use a parent's phone and one shared tablet.</p>`],
+    who: ['Using the family computer', `<ol class="helpsteps"><li><b>Kids:</b> tap your name and type your secret code. Forgot it? Tap <b>I forgot my code</b> and it is emailed to your parent.</li>
+      <li>Pick a chore, or tap <b>I finished it!</b> on a chore you did.</li>
       <li>Tap <b>I'm done, sign out</b> when you are finished. It also signs you out by itself after 3 minutes.</li>
       <li><b>Parents:</b> tap Parent and type your PIN. Tap Lock when you are done.</li></ol>`],
-    kid: ['How the Chore Auction works', `<ol class="helpsteps"><li><b>Bid on chores:</b> pick the fewest points you would do each job for and tap Place my bid.</li>
-      <li>The auction closes <b>${esc(when)}</b>. The lowest bid wins each chore.</li>
-      <li><b>My chores:</b> do your job, then tap <b>I finished it!</b></li>
+    kid: ['How it works', `<ol class="helpsteps"><li><b>Pick a chore:</b> every chore shows how many points it pays right now. Tap <b>I'll do it</b> and it is yours.</li>
+      ${f.grow ? '<li>Chores nobody picks go up in points every day. Waiting can pay more, but a brother or sister might grab it first!</li>' : ''}
+      <li><b>My chores:</b> do your job, then tap <b>I finished it!</b> Changed your mind? Tap Give it back.</li>
       <li>A parent checks it and approves it. The points go in your bank.</li>
       <li><b>My points:</b> see how close you are to a reward. Ask a parent to trade your points.</li></ol>`],
-    parent: ['How it works for parents', `<ol class="helpsteps"><li>Kids bid on chores during the week.</li>
-      <li>The auction closes by itself <b>${esc(when)}</b>, or tap Close the auction now in <b>This week</b>.</li>
+    parent: ['How it works for parents', `<ol class="helpsteps"><li>Kids pick chores from the board any time. ${f.grow ? 'Chores nobody picks go up in points every day, so even the yucky ones get done.' : ''}</li>
       <li>When a kid finishes a chore, it shows up in <b>Approve</b>. Tap Approve (or Approve all). That is it.${DATA && DATA.fairness.autoApprove ? ' If you forget, it is approved for you after ' + DATA.fairness.autoApprove + ' hours.' : ''}</li>
+      <li>After a chore is approved, it rests and comes back on the board when you chose (every day, every few days, or once a week).</li>
+      <li><b>Chore board:</b> see who is doing what, give a chore to a kid, or put one back.</li>
       <li><b>Points:</b> trade points for rewards, and give bonus points.</li>
-      <li><b>Settings:</b> devices, kids' secret codes, chores, rewards, and rules.</li></ol>`]
+      <li><b>Settings:</b> devices, kids' secret codes, chores, rewards, and rules. Forgot your PIN? Tap <b>Forgot PIN?</b> wherever it asks for it.</li></ol>`]
   }[m];
   $('hmTitle').textContent = H[0];
   $('hmBody').innerHTML = H[1] + `<p class="desc mt" style="margin-bottom:0;font-size:12px">App version ${APP_VERSION}</p>`;
@@ -2064,7 +2055,7 @@ async function lockParent(msg) {
 
 async function viewClick(e) {
   const tg = e.target.closest('[data-tab-go]');
-  if (tg) { PTAB = tg.dataset.tabGo; renderApp(); window.scrollTo(0, 0); return; }
+  if (tg) { if (mode() === 'kid') KTAB = tg.dataset.tabGo; else PTAB = tg.dataset.tabGo; renderApp(); window.scrollTo(0, 0); return; }
   const b = e.target.closest('[data-a]');
   if (!b) return;
   const d = DATA, i = Number(b.dataset.i), row = Number(b.dataset.row), v = id => $(id).value;
@@ -2085,23 +2076,22 @@ async function viewClick(e) {
       if (!how) return;
       if (how === 'I have a join code') return showJoin();
       if (!(await ensureParent('A parent needs to approve which kid uses this device.'))) return;
-      const kid = await chooseKid('This device will only ever bid as this kid.');
+      const kid = await chooseKid('This device will only ever pick chores as this kid.');
       if (!kid) return;
       return act(async () => {
         const r = await pcall('bindDevice', { role: 'kid', kid: kid, device: DEVICE || '' });
-        setDevice(r.device); await lockParent(); KTAB = 'bid';
+        setDevice(r.device); await lockParent(); KTAB = 'pick';
         return 'This device now belongs to ' + kid + '.';
       });
     }
     case 'switchKid': {
       if (!(await ensureParent('A parent needs to approve switching kids.'))) return;
-      const kid = await chooseKid('This device will bid only as this kid.');
+      const kid = await chooseKid('This device will pick chores only as this kid.');
       if (!kid) return;
       return act(async () => {
         const r = await pcall('bindDevice', { role: 'kid', kid: kid, device: DEVICE || '' });
-        setDevice(r.device); await lockParent(); KTAB = 'bid';
-        Object.keys(BID_VALUES).forEach(k => delete BID_VALUES[k]);
-        return 'This device now bids as ' + kid + '.';
+        setDevice(r.device); await lockParent(); KTAB = 'pick';
+        return 'This device now picks chores as ' + kid + '.';
       });
     }
 
@@ -2110,8 +2100,10 @@ async function viewClick(e) {
       const kid = b.dataset.kid;
       const r = await keypad('Hi ' + kid + '!', 'Type your secret code.', async code => {
         try { return await api('kidLogin', { kid: kid, code: code }); } catch (err) { toast(errMsg(err), true); return null; }
+      }, async () => {
+        try { toast(await api('forgotKidCode', { kid: kid })); } catch (err) { toast(errMsg(err), true); }
       });
-      if (r) { KSESS = r.ksess; KTAB = 'bid'; Object.keys(BID_VALUES).forEach(k => delete BID_VALUES[k]); await load(); }
+      if (r) { KSESS = r.ksess; KTAB = 'pick'; await load(); }
       return;
     }
     case 'whoParent':
@@ -2121,10 +2113,13 @@ async function viewClick(e) {
     case 'lock': await lockParent('Parent area locked.'); return load();
 
     /* ----- kids ----- */
-    case 'dn': return clampBid(i, Number($('bid' + i).value) - 1);
-    case 'up': return clampBid(i, Number($('bid' + i).value) + 1);
-    case 'bid': { const val = clampBid(i, $('bid' + i).value), name = d.chores[i].name; delete BID_VALUES[name]; return act(() => api('bid', { chore: name, points: val })); }
-    case 'withdraw': return act(() => api('withdraw', { chore: d.chores[i].name }));
+    case 'claim': { const c = d.chores[i]; return act(() => api('claim', { chore: c.name, points: c.price })); }
+    case 'giveBack':
+      return act(async () => {
+        const w = d.winners.find(x => x.row === row);
+        if (!(await ask('Give it back?', (w ? w.chore : 'This chore') + ' goes back on the board so someone else can do it.', 'confirm'))) throw new Error('CANCELLED');
+        return api('giveBack', { row: row });
+      });
     case 'ready': return act(() => api('ready', { row: row }));
 
     /* ----- parents: approvals ----- */
@@ -2136,14 +2131,10 @@ async function viewClick(e) {
         if (!(await ask('Mark not done?', 'No points will be given for this chore.', 'confirm'))) throw new Error('CANCELLED');
         return pcall('markChore', { row: row, status: 'Not Done' });
       });
-    case 'skip': return act(() => pcall('markChore', { row: row, status: 'Skip' }));
-    case 'assign': return act(() => pcall('assignChore', { row: row, kid: v('as' + row), points: v('ap' + row) === '' ? '' : Number(v('ap' + row)) }));
-    case 'run':
-      return act(async () => {
-        if (!(await ask('Close the auction now?', 'This closes round ' + d.round + ' and picks a winner for every chore. Unfinished chores from earlier stay open.', 'confirm'))) throw new Error('CANCELLED');
-        await pcall('runAuction');
-        return 'Auction closed! Winners can see their chores now.';
-      });
+    case 'give': return act(() => pcall('assignChore', { chore: d.chores[i].name, kid: v('gk' + i) }));
+    case 'putBack': return act(() => pcall('putBack', { row: row }));
+    case 'forgotPin': if (await forgotPin()) await load(); return;
+    case 'emailCodes': return act(() => pcall('emailKidCodes'));
 
     /* ----- parents: points ----- */
     case 'redeem': {
@@ -2192,23 +2183,20 @@ async function viewClick(e) {
     case 'saveChore': {
       const who = Array.from(document.querySelectorAll('.cwho' + i)).filter(x => x.checked).map(x => x.value);
       if (!who.length) return toast('Pick at least one kid who can do this chore.', true);
-      return act(() => pcall('saveChore', { name: d.chores[i].name, min: Number(v('cmin' + i)), max: Number(v('cmax' + i)), size: Number(v('csize' + i)), who: who }));
+      return act(() => pcall('saveChore', { name: d.chores[i].name, min: Number(v('cmin' + i)), max: Number(v('cmax' + i)), size: Number(v('csize' + i)), often: Number(v('coft' + i)), who: who }));
     }
     case 'delChore':
       return act(async () => {
-        if (!(await ask('Remove ' + d.chores[i].name + '?', 'It will no longer be up for auction. Bids already placed on it this round will not count.', 'confirm'))) throw new Error('CANCELLED');
+        if (!(await ask('Remove ' + d.chores[i].name + '?', 'It comes off the chore board. If a kid is doing it now, they can still finish it and get the points.', 'confirm'))) throw new Error('CANCELLED');
         return pcall('remove', { type: 'chore', name: d.chores[i].name });
       });
-    case 'addChore': return act(() => pcall('saveChore', { name: v('ncName'), desc: v('ncDesc'), min: Number(v('ncMin')), max: Number(v('ncMax')), size: Number(v('ncSize')) }));
+    case 'addChore': return act(() => pcall('saveChore', { name: v('ncName'), desc: v('ncDesc'), min: Number(v('ncMin')), max: Number(v('ncMax')), size: Number(v('ncSize')), often: Number(v('ncOften')) }));
     case 'saveReward': return act(() => pcall('saveReward', { name: d.rewards[i].name, cost: Number(v('rc' + i)) }));
     case 'delReward': return act(() => pcall('remove', { type: 'reward', name: d.rewards[i].name }));
     case 'addReward': return act(() => pcall('saveReward', { name: v('nrName'), cost: Number(v('nrCost')) }));
     case 'saveRules':
       return act(async () => {
-        const unc = (document.querySelector('input[name=pUnc]:checked') || {}).value || 'auto';
-        await pcall('saveFairness', { limit: Number(v('pLimit')), noRepeat: $('pRepeat').checked, unclaimed: unc, autoApprove: Number(v('pAuto')) });
-        await pcall('saveSchedule', { day: v('pDay'), hour: Number(v('pHour')) });
-        return 'Rules and schedule saved.';
+        return pcall('saveFairness', { limit: Number(v('pLimit')), noRepeat: $('pRepeat').checked, grow: $('pGrow').checked, autoApprove: Number(v('pAuto')) });
       });
     case 'saveFam': return act(() => pcall('saveFamily', { name: v('fName'), email: v('fEmail'), appLink: APP_LINK }));
     case 'pin': {
@@ -2218,8 +2206,9 @@ async function viewClick(e) {
       return act(() => pcall('changePin', { oldPin: v('pinOld'), newPin: v('pinNew') }));
     }
     case 'delete': {
-      if (d.demo) { Demo.reset(); setToken(null); KSESS = null; KTAB = 'bid'; PTAB = 'approve'; toast('The demo was reset.'); return load(); }
-      const pin = await ask('Delete this family?', 'This permanently deletes all kids, chores, bids, and points. It cannot be undone. Enter the parent PIN to confirm.', 'pin');
+      if (d.demo) { Demo.reset(); setToken(null); KSESS = null; KTAB = 'pick'; PTAB = 'approve'; toast('The demo was reset.'); return load(); }
+      const pin = await ask('Delete this family?', 'This permanently deletes all kids, chores, and points. It cannot be undone. Enter the parent PIN to confirm.', 'pin');
+      if (pin === FORGOT) { await forgotPin(); return load(); }
       if (!pin) return;
       try { await pcall('deleteFamily', { pin: pin }); forget(FID); setToken(null); renderLanding('Your family was deleted.'); }
       catch (err) { if (errMsg(err) !== 'CANCELLED') toast(errMsg(err), true); }
@@ -2229,8 +2218,6 @@ async function viewClick(e) {
 }
 
 function viewChange(e) {
-  const m = /^bid(\d+)$/.exec(e.target.id || '');
-  if (m) clampBid(+m[1], e.target.value);
   if (e.target.id === 'pLimit' && DATA) {
     const chk = fairnessCheck(DATA.kids.length, DATA.chores, Number(e.target.value));
     const el = $('pCheck'); el.className = chk.cls; el.textContent = chk.text;
@@ -2242,9 +2229,9 @@ $('btnDemo').onclick = openDemo;
 $('btnSetup').onclick = startWizard;
 $('btnJoin').onclick = showJoin;
 $('btnRealFamily').onclick = startWizard;
-$('btnDemoReset').onclick = () => { Demo.reset(); setToken(null); KSESS = null; KTAB = 'bid'; PTAB = 'approve'; toast('The demo was reset.'); load(); };
+$('btnDemoReset').onclick = () => { Demo.reset(); setToken(null); KSESS = null; KTAB = 'pick'; PTAB = 'approve'; toast('The demo was reset.'); load(); };
 document.querySelectorAll('[data-demo]').forEach(b => b.addEventListener('click', () => {
-  Demo.setRole(b.dataset.demo); setToken(null); KSESS = null; KTAB = 'bid'; PTAB = 'approve';
+  Demo.setRole(b.dataset.demo); setToken(null); KSESS = null; KTAB = 'pick'; PTAB = 'approve';
   load().then(() => toast({ parent: 'Now you are seeing a parent\'s phone.', kid: 'Now you are seeing Sam\'s own tablet.', shared: 'Now you are seeing the family computer. Kids tap their name and type a code.' }[b.dataset.demo]));
 }));
 $('btnHelp').onclick = showHelp;
