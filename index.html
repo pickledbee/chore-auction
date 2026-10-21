@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-TasG6WQR/svdLxsbl3Nee2mcA1T/qwUX8gAkPKMWm/4='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-+SvGcJlh4BOSJl0Za+QNXNJWxRrHWHJKDrFtLwmNrEE='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -301,6 +301,44 @@
   .chore.off h3{color:var(--muted)}
   .btn[disabled]{opacity:.45;cursor:not-allowed}
   .approve .what .link{display:block;margin-top:4px;font-size:13px}
+  .kidgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:14px}
+  .kidcard{display:flex;flex-direction:column;gap:8px;text-align:left;border:0;border-top:8px solid var(--kc);background:#fff;border-radius:18px;padding:14px 16px;cursor:pointer;font:inherit;color:var(--ink);box-shadow:0 2px 10px rgba(40,20,80,.08)}
+  .kidcard:hover,.kidcard:focus{outline:3px solid var(--kc);outline-offset:1px}
+  .kc-top{display:flex;justify-content:space-between;align-items:baseline}
+  .kc-name{font:700 24px 'Fredoka',sans-serif;color:var(--kc)}
+  .kc-pts{color:var(--muted);font-weight:800}.kc-pts b{font:700 26px 'Fredoka',sans-serif;color:var(--ink)}
+  .kc-lines{display:flex;flex-direction:column;gap:3px;font-weight:700;font-size:15px}
+  .kc-lines .hot{background:#dbe8ff;color:#1d4fa8;border-radius:8px;padding:3px 8px;align-self:flex-start}
+  .kc-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:8px;color:var(--muted)}
+  .kc-foot em{font-style:normal;font-weight:800;color:var(--purple)}
+  .warnword{color:#b45309;font-weight:800}
+  .readybar{display:flex;flex-direction:column;align-items:flex-start;width:100%;border:0;background:#dbe8ff;color:#1d4fa8;cursor:pointer;font:inherit;text-align:left}
+  .readybar b{font:600 20px 'Fredoka',sans-serif}
+  .steps .stepline{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .steps .stepline:last-child{border-bottom:0}
+  .steps .stepline b{width:28px;height:28px;border-radius:50%;background:var(--lav);color:var(--purple);display:flex;align-items:center;justify-content:center;flex:0 0 28px}
+  .steps .stepline span{flex:1;min-width:160px;font-weight:700}
+  .steps .stepline.ok b{background:var(--green);color:#fff}
+  .steps .stepline.ok span{color:var(--muted);text-decoration:line-through}
+  .overlay.sheet{align-items:flex-end}
+  @media (min-width:700px){.overlay.sheet{align-items:center}}
+  .sheetbox{position:relative;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;padding-top:18px}
+  .sheetx{position:absolute;top:10px;right:10px;width:40px;height:40px;border-radius:50%;border:0;background:var(--bg);font-size:26px;line-height:1;cursor:pointer;color:var(--ink);z-index:2}
+  .sheethead{display:flex;justify-content:space-between;align-items:center;color:#fff;border-radius:14px;padding:14px 16px;margin:0 46px 12px 0}
+  .sheethead .big{font:700 26px 'Fredoka',sans-serif}
+  .sheethead .pts b{font:700 28px 'Fredoka',sans-serif}
+  h4.sh{font:600 17px 'Fredoka',sans-serif;color:var(--purple);margin:20px 0 6px;padding-top:12px;border-top:1px solid var(--line)}
+  .desc.sm{font-size:14px;margin:4px 0}
+  .codeinline{font:700 20px 'Fredoka',sans-serif;color:var(--purple);letter-spacing:2px}
+  .tourstep{text-align:center;padding:6px 4px}
+  .tourstep h3{margin:6px 40px 8px}
+  .tourn{font-weight:800;color:var(--muted);font-size:13px}
+  .dots{display:flex;justify-content:center;gap:8px;margin:12px 0 16px}
+  .dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}.dots i.on{background:var(--purple2)}
+  .barbtns{display:flex;gap:6px;flex-wrap:wrap}
+  .btn.ghostw{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.6)}
+  #view.previewing .btn,#view.previewing [data-a],#view.previewing [data-tab-go]{pointer-events:none}
+  #view.previewing .btn{opacity:.6}
 </style>
 </head>
 <body>
@@ -529,6 +567,14 @@
   </div>
 </div>
 
+<!-- pop-up sheet: a kid's details, connecting a device, tours -->
+<div id="sheet" class="overlay sheet">
+  <div class="mbox sheetbox" id="sheetBox" role="dialog" aria-modal="true">
+    <button class="sheetx" id="sheetClose" aria-label="Close">&#215;</button>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
 <!-- "How it works" -->
 <div id="hm" class="overlay">
   <div class="mbox" style="max-width:520px">
@@ -570,7 +616,7 @@ const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
 const OFTEN_NAMES = { 1: 'Every day', 2: 'Every 2 days', 3: 'Every 3 days', 7: 'Once a week' };
 const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
-const APP_VERSION = '6.0';
+const APP_VERSION = '6.1';
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
@@ -581,7 +627,10 @@ let TOKEN = null;      // parent session (short-lived)
 let DEVICE = null;     // this device's key (kid device, parent phone, or family computer)
 let KSESS = null;      // a kid signed in on the family computer (memory only)
 let DATA = null, W = null, CONFIG = null;
-let KTAB = 'pick', PTAB = 'approve';
+let KTAB = 'pick', PTAB = 'home';
+let PREVIEW = '';      // a parent looking at one kid's screen
+let SHEET = null;     // the pop-up that is open: {type, kid, step}
+const ME = () => PREVIEW || (DATA && DATA.me) || '';
 const OPEN_SECTIONS = new Set();
 
 /* ============================== HELPERS ============================== */
@@ -1225,7 +1274,7 @@ function renderLanding(msg) {
 }
 
 function openDemo() {
-  FID = 'demo'; TOKEN = null; DEVICE = null; KSESS = null; KTAB = 'bid'; PTAB = 'approve';
+  FID = 'demo'; TOKEN = null; DEVICE = null; KSESS = null; KTAB = 'pick'; PTAB = 'home';
   history.replaceState(null, '', APP_LINK + '#demo');
   load(true);
 }
@@ -1614,6 +1663,10 @@ async function load(first) {
 
 // Which screen this device shows right now
 function mode() {
+  const r = role(), m = baseMode();
+  return m === 'parent' && PREVIEW && DATA.kids.some(k => k.name === PREVIEW) ? 'preview' : m;
+}
+function baseMode() {
   const r = role();
   if (r === 'parent') return 'parent';
   if (r === 'kid') return DATA.me ? 'kid' : 'setup';
@@ -1650,26 +1703,30 @@ function renderApp() {
   // the dark bar that says who is using a shared screen
   const bar = $('whoBar');
   let barHtml = '';
-  if (role() === 'shared' && m === 'kid') barHtml = `<span>${esc(DATA.me)} is using the family computer</span><button class="btn small white" data-a="kidOut">I'm done, sign out</button>`;
+  if (role() === 'shared' && m === 'kid') barHtml = `<span>${esc(DATA.me)} is using the family computer</span><span class="barbtns"><button class="btn small white" data-a="kidOut">I'm done, sign out</button><button class="btn small ghostw" data-a="kidToParent">Parent</button></span>`;
+  else if (m === 'preview') barHtml = previewBar();
   else if (m === 'parent' && role() !== 'parent') barHtml = `<span>A parent is using ${role() === 'shared' ? 'the family computer' : 'this device'}</span><button class="btn small white" data-a="lock">Lock</button>`;
   bar.innerHTML = barHtml ? `<div class="wrap">${barHtml}</div>` : '';
   bar.classList.toggle('hidden', !barHtml);
 
   // tabs
   let tabs = [];
-  if (m === 'kid') {
-    const todo = todoRows().filter(w => w.winner === DATA.me).length;
+  if (m === 'kid' || m === 'preview') {
+    const todo = todoRows().filter(w => w.winner === ME()).length;
     tabs = [['pick', 'Pick a chore'], ['mine', 'My chores' + (todo ? ` <span class="count">${todo}</span>` : '')], ['points', 'My points']];
   } else if (m === 'parent') {
     const n = readyRows().length;
-    tabs = [['approve', 'Approve' + (n ? ` <span class="count">${n}</span>` : '')], ['board', 'Chore board'], ['points', 'Points'], ['settings', 'Settings']];
+    tabs = [['home', 'Family'], ['approve', 'Approve' + (n ? ` <span class="count">${n}</span>` : '')], ['board', 'Chores'], ['settings', 'Settings']];
   }
-  const cur = m === 'kid' ? KTAB : PTAB;
+  const cur = m === 'kid' || m === 'preview' ? KTAB : PTAB;
   $('tabsIn').innerHTML = tabs.map(t => `<button data-tab="${t[0]}" class="${t[0] === cur ? 'on' : ''}">${t[1]}</button>`).join('');
   $('tabs').classList.toggle('hidden', !tabs.length);
 
-  $('view').innerHTML = m === 'setup' ? viewSetup() : m === 'who' ? viewWho() : m === 'kid' ? viewKid() : viewParent();
+  $('view').innerHTML = m === 'setup' ? viewSetup() : m === 'who' ? viewWho() : m === 'kid' || m === 'preview' ? viewKid() : viewParent();
+  $('view').classList.toggle('previewing', m === 'preview');
   if (m === 'parent' && PTAB === 'settings') tickJoin();
+  if (SHEET) renderSheet();
+  maybeTour(m);
 }
 
 /* ---------- first time on a device: how will it be used? ---------- */
@@ -1714,11 +1771,11 @@ function goalFor(kid) {
 }
 
 function viewKid() {
-  const me = DATA.me, g = goalFor(me);
+  const me = ME(), g = goalFor(me);
   const hello = `<div class="card hl">
     <div class="hello">${chip(me)}<span class="big">Hi ${esc(me)}!</span><div class="pts"><b>${g.pts}</b>points</div></div>
     ${g.text ? `<div class="goalbox">${esc(g.text)}<div class="goalbar"><i style="width:${Math.min(100, g.pct)}%"></i></div></div>` : ''}
-    ${role() === 'kid' ? `<p class="desc mt" style="margin-bottom:0">Not ${esc(me)}? <button class="link" data-a="switchKid">Switch kid</button> (a parent needs to approve).</p>` : ''}
+    ${role() === 'kid' && !PREVIEW ? `<p class="desc mt" style="margin-bottom:0">Not ${esc(me)}? <button class="link" data-a="switchKid">Switch kid</button> (a parent needs to approve).</p>` : ''}
   </div>`;
   if (KTAB === 'mine') return hello + kidMine();
   if (KTAB === 'points') return hello + kidPoints();
@@ -1726,8 +1783,9 @@ function viewKid() {
 }
 
 function kidPick() {
-  const me = DATA.me, f = DATA.fairness, load = (DATA.load || {})[me] || 0;
+  const me = ME(), f = DATA.fairness, load = (DATA.load || {})[me] || 0;
   const list = DATA.chores.filter(c => canDo(c, me));
+  if (PREVIEW) list.forEach(c => { if (c.state === 'open' && !c.why && f.limit && load + c.size > f.limit) c.why = 'You have enough chores right now. Finish one first.'; });
   const order = { open: 0, taken: 1, later: 2 };
   const sorted = list.slice().sort((a, b) => order[a.state] - order[b.state] || (a.state === 'open' ? b.price - a.price : 0));
   const intro = `<div class="card">
@@ -1760,7 +1818,7 @@ function kidPick() {
 }
 
 function kidMine() {
-  const me = DATA.me;
+  const me = ME();
   const todo = todoRows().filter(w => w.winner === me);
   const waiting = readyRows().filter(w => w.winner === me);
   const done = DATA.winners.filter(w => w.winner === me && w.status === 'Done').slice(0, 5);
@@ -1778,7 +1836,7 @@ function kidMine() {
 }
 
 function kidPoints() {
-  const me = DATA.me, b = (DATA.balances.find(x => x.name === me) || {}).points || 0;
+  const me = ME(), b = (DATA.balances.find(x => x.name === me) || {}).points || 0;
   const mine = DATA.ledger.filter(l => l.kid === me).slice(0, 15);
   return `<div class="card">
       <h3 class="sec">Rewards</h3>
@@ -1815,7 +1873,7 @@ function viewParent() {
   let warn = '';
   if (d.weakPin) warn += `<div class="warn">Your parent PIN is short. Choose a new one with 6 to 12 numbers in Settings, then Family.</div>`;
   if (!d.demo && !d.email) warn += `<div class="warn">Add a parent email in Settings, then Family. Without one, we cannot send you a PIN reset code or your lost link.</div>`;
-  const body = PTAB === 'board' ? parentBoard() : PTAB === 'points' ? parentPoints() : PTAB === 'settings' ? parentSettings() : parentApprove();
+  const body = PTAB === 'board' ? parentBoard() : PTAB === 'approve' ? parentApprove() : PTAB === 'settings' ? parentSettings() : parentHome();
   return warn + body;
 }
 
@@ -1907,8 +1965,9 @@ function tickJoin() {
   if (!JOIN) return;
   const update = () => {
     const left = Math.max(0, Math.round((JOIN.expires - Date.now()) / 1000));
-    if (!left) { JOIN = null; clearInterval(joinTimer); if ($('joinBox')) $('joinBox').innerHTML = ''; return; }
-    const el = $('joinLeft'); if (el) el.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+    if (!left) { JOIN = null; clearInterval(joinTimer); if ($('joinBox')) $('joinBox').innerHTML = ''; if (SHEET && SHEET.type === 'connect') renderSheet(); return; }
+    const t = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+    ['joinLeft', 'sJoinLeft'].forEach(id => { const el = $(id); if (el) el.textContent = t; });
   };
   update();
   joinTimer = setInterval(update, 1000);
@@ -2014,7 +2073,7 @@ function parentSettings() {
 
 /* ============================== HELP ============================== */
 function showHelp() {
-  const m = DATA ? mode() : 'setup', f = DATA ? DATA.fairness : { grow: true };
+  const m0 = DATA ? mode() : 'setup', m = m0 === 'preview' ? 'parent' : m0, f = DATA ? DATA.fairness : { grow: true };
   const H = {
     setup: ['Getting started', `<p>Each device is set up once, as one of these:</p><ol class="helpsteps">
       <li><b>A parent's phone.</b> Type your PIN once. After that it opens straight to your approvals.</li>
@@ -2029,15 +2088,18 @@ function showHelp() {
       <li><b>My chores:</b> do your job, then tap <b>I finished it!</b> Changed your mind? Tap Give it back.</li>
       <li>A parent checks it and approves it. The points go in your bank.</li>
       <li><b>My points:</b> see how close you are to a reward. Ask a parent to trade your points.</li></ol>`],
-    parent: ['How it works for parents', `<ol class="helpsteps"><li>Kids pick chores from the board any time. ${f.grow ? 'Chores nobody picks go up in points every day, so even the yucky ones get done.' : ''}</li>
+    parent: ['How it works for parents', `<ol class="helpsteps"><li><b>Family:</b> every kid has a card. Tap a kid to approve their chores, give them a chore, trade points, connect their device, or <b>see exactly what they see</b>.</li>
+      <li>Kids pick chores from the board any time. ${f.grow ? 'Chores nobody picks go up in points every day, so even the yucky ones get done.' : ''}</li>
       <li>When a kid finishes a chore, it shows up in <b>Approve</b>. Tap Approve (or Approve all). That is it.${DATA && DATA.fairness.autoApprove ? ' If you forget, it is approved for you after ' + DATA.fairness.autoApprove + ' hours.' : ''}</li>
       <li>After a chore is approved, it rests and comes back on the board when you chose (every day, every few days, or once a week).</li>
-      <li><b>Chore board:</b> see who is doing what, give a chore to a kid, or put one back.</li>
-      <li><b>Points:</b> trade points for rewards, and give bonus points.</li>
+      <li><b>Chores:</b> see every chore, who is doing it, and what it pays.</li>
       <li><b>Settings:</b> devices, kids' secret codes, chores, rewards, and rules. Forgot your PIN? Tap <b>Forgot PIN?</b> wherever it asks for it.</li></ol>`]
   }[m];
   $('hmTitle').textContent = H[0];
-  $('hmBody').innerHTML = H[1] + `<p class="desc mt" style="margin-bottom:0;font-size:12px">App version ${APP_VERSION}</p>`;
+  const tourFor = m === 'parent' ? 'parent' : m === 'kid' ? 'kid' : '';
+  $('hmBody').innerHTML = H[1] + (tourFor ? '<button class="btn ghost full mt" id="hmTour">Take the quick tour</button>' : '') +
+    `<p class="desc mt" style="margin-bottom:0;font-size:12px">App version ${APP_VERSION}</p>`;
+  if (tourFor) $('hmTour').onclick = () => { $('hm').className = 'overlay'; openTour(tourFor); };
   $('hm').className = 'overlay show';
 }
 
@@ -2048,6 +2110,7 @@ async function chooseKid(text) {
   return await ask('Which kid uses this device?', text, 'select', kids);
 }
 async function lockParent(msg) {
+  PREVIEW = ''; closeSheet();
   try { await api('logout'); } catch (e) { /* ignore */ }
   setToken(null);
   if (msg) toast(msg);
@@ -2055,14 +2118,15 @@ async function lockParent(msg) {
 
 async function viewClick(e) {
   const tg = e.target.closest('[data-tab-go]');
-  if (tg) { if (mode() === 'kid') KTAB = tg.dataset.tabGo; else PTAB = tg.dataset.tabGo; renderApp(); window.scrollTo(0, 0); return; }
+  if (tg) { closeSheet(); if (mode() === 'kid' || mode() === 'preview') KTAB = tg.dataset.tabGo; else PTAB = tg.dataset.tabGo; renderApp(); window.scrollTo(0, 0); return; }
   const b = e.target.closest('[data-a]');
   if (!b) return;
+  if (await familyClick(b)) return;
   const d = DATA, i = Number(b.dataset.i), row = Number(b.dataset.row), v = id => $(id).value;
   switch (b.dataset.a) {
     /* ----- first-time device setup ----- */
     case 'asParent':
-      if (await pinLogin('Make this your parent phone.', true)) { PTAB = 'approve'; toast('This is now your parent phone. You will not need your PIN here again.'); await load(); }
+      if (await pinLogin('Make this your parent phone.', true)) { PTAB = 'home'; toast('This is now your parent phone. You will not need your PIN here again.'); await load(); }
       return;
     case 'asShared':
       if (!(await ensureParent('A parent sets up the family computer once.'))) return;
@@ -2107,13 +2171,19 @@ async function viewClick(e) {
       return;
     }
     case 'whoParent':
-      if (await pinLogin('', false)) { PTAB = 'approve'; await load(); }
+      if (await pinLogin('', false)) { PTAB = 'home'; await load(); }
       return;
     case 'kidOut': return kidSignOut();
     case 'lock': await lockParent('Parent area locked.'); return load();
 
     /* ----- kids ----- */
-    case 'claim': { const c = d.chores[i]; return act(() => api('claim', { chore: c.name, points: c.price })); }
+    case 'claim': {
+      const c = d.chores[i];
+      return act(async () => {
+        if (!(await ask('Do ' + c.name + ' for ' + points(c.price) + '?', 'It will be yours right away. When you finish, go to My chores and tap I finished it. A parent checks it, and then the points are yours.', 'confirm'))) throw new Error('CANCELLED');
+        return api('claim', { chore: c.name, points: c.price });
+      });
+    }
     case 'giveBack':
       return act(async () => {
         const w = d.winners.find(x => x.row === row);
@@ -2206,7 +2276,7 @@ async function viewClick(e) {
       return act(() => pcall('changePin', { oldPin: v('pinOld'), newPin: v('pinNew') }));
     }
     case 'delete': {
-      if (d.demo) { Demo.reset(); setToken(null); KSESS = null; KTAB = 'pick'; PTAB = 'approve'; toast('The demo was reset.'); return load(); }
+      if (d.demo) { Demo.reset(); setToken(null); KSESS = null; KTAB = 'pick'; PTAB = 'home'; toast('The demo was reset.'); return load(); }
       const pin = await ask('Delete this family?', 'This permanently deletes all kids, chores, and points. It cannot be undone. Enter the parent PIN to confirm.', 'pin');
       if (pin === FORGOT) { await forgotPin(); return load(); }
       if (!pin) return;
@@ -2224,14 +2294,262 @@ function viewChange(e) {
   }
 }
 
+/* ============================== FAMILY HOME, POP-UPS, TOURS ==============================
+   The parent's home screen shows every kid as a card. Tapping a kid opens a pop-up with
+   everything about that kid, including "See what Maya sees", which shows the parent that
+   kid's exact screen with a "Back to parent" button at the top.                        */
+
+function kidDevices(name) {
+  const d = DATA, k = d.kids.find(x => x.name === name) || {};
+  const own = (d.devices || []).filter(x => x.role === 'kid' && x.kid === name);
+  const shared = (d.devices || []).some(x => x.role === 'shared');
+  const viaShared = shared && k.hasCode;
+  return { own: own.length, shared: shared, viaShared: viaShared, code: k.code || '', hasCode: !!k.hasCode, connected: own.length > 0 || viaShared };
+}
+
+function deviceLine(name) {
+  const x = kidDevices(name), parts = [];
+  if (x.own) parts.push(x.own === 1 ? 'Own device' : x.own + ' own devices');
+  if (x.viaShared) parts.push('Family computer');
+  return parts.length ? '&#10003; ' + parts.join(' + ') : '<span class="warnword">Not connected yet</span>';
+}
+
+/* ---------- getting started checklist ---------- */
+function setupSteps() {
+  const d = DATA;
+  const firstOff = d.kids.find(k => !kidDevices(k.name).connected);
+  return [
+    { done: true, text: 'Create your family and add your kids' },
+    { done: !firstOff, text: 'Connect each kid (their own device, or your family computer)',
+      btn: firstOff ? `<button class="btn small gold" data-a="connect" data-kid="${esc(firstOff.name)}">Connect ${esc(firstOff.name)}</button>` : '' },
+    { done: d.winners.length > 0, text: 'A kid picks their first chore',
+      btn: d.kids[0] ? `<button class="btn small" data-a="preview" data-kid="${esc(d.kids[0].name)}">See what ${esc(d.kids[0].name)} sees</button>` : '' },
+    { done: d.winners.some(w => w.status === 'Done'), text: 'Approve a finished chore with one tap',
+      btn: readyRows().length ? `<button class="btn small green" data-tab-go="approve">Approve now</button>` : '' }
+  ];
+}
+
+function parentHome() {
+  const d = DATA, steps = setupSteps(), left = steps.filter(x => !x.done).length;
+  const showSteps = !d.demo && left && !ls('ca_steps_off_' + FID);
+  const ready = readyRows();
+  return `${showSteps ? `<div class="card steps">
+      <div class="done-all"><h3 class="sec" style="margin:0">Getting started</h3><button class="link" data-a="hideSteps">Hide</button></div>
+      ${steps.map((x, i) => `<div class="stepline ${x.done ? 'ok' : ''}"><b>${x.done ? '&#10003;' : i + 1}</b><span>${x.text}</span>${x.done ? '' : x.btn || ''}</div>`).join('')}
+    </div>` : ''}
+    ${ready.length ? `<button class="card readybar" data-tab-go="approve"><b>${plural(ready.length, 'chore')} finished</b><span>Tap to check ${ready.length === 1 ? 'it' : 'them'} and give the points &#8250;</span></button>` : ''}
+    <p class="desc" style="margin:4px 4px 10px">Tap a kid to see everything about them.</p>
+    <div class="kidgrid">${d.kids.map(k => {
+      const pts = (d.balances.find(b => b.name === k.name) || {}).points || 0;
+      const r = ready.filter(w => w.winner === k.name), doing = todoRows().filter(w => w.winner === k.name);
+      const lines = [];
+      if (r.length) lines.push(`<span class="hot">${r.length} finished, check ${r.length === 1 ? 'it' : 'them'}</span>`);
+      if (doing.length) lines.push('Doing: ' + doing.map(w => esc(w.chore)).join(', '));
+      if (!lines.length) lines.push('No chores right now');
+      return `<button class="kidcard" data-a="kidSheet" data-kid="${esc(k.name)}" style="--kc:${esc(k.color)}">
+        <span class="kc-top"><span class="kc-name">${esc(k.name)}</span><span class="kc-pts"><b>${pts}</b> pts</span></span>
+        <span class="kc-lines">${lines.map(x => `<span>${x}</span>`).join('')}</span>
+        <span class="kc-foot"><small>${deviceLine(k.name)}</small><em>Open &#8250;</em></span>
+      </button>`;
+    }).join('')}</div>
+    <details class="sec card" data-sec="history" ${OPEN_SECTIONS.has('history') ? 'open' : ''}><summary>Every point, earned and spent</summary><div>
+      <div class="tablewrap">${d.ledger.length ? '<table><tr><th>When</th><th>Kid</th><th>Pts</th><th>What</th></tr>' + d.ledger.map(l =>
+        `<tr><td>${esc(l.date)}</td><td>${esc(l.kid)}</td><td class="${l.points >= 0 ? 'plus' : 'minus'}">${l.points > 0 ? '+' : ''}${l.points}</td><td>${esc(l.type)}: ${esc(l.details)}</td></tr>`).join('') + '</table>' : '<p class="desc">No points yet.</p>'}</div>
+    </div></details>`;
+}
+
+/* ---------- "see what Maya sees" ---------- */
+function previewBar() {
+  const others = DATA.kids.filter(k => k.name !== PREVIEW);
+  return `<span>You are seeing <b>${esc(PREVIEW)}</b>'s screen</span>
+    <span class="barbtns">${others.map(k => `<button class="btn small ghostw" data-a="preview" data-kid="${esc(k.name)}">${esc(k.name)}</button>`).join('')}
+    <button class="btn small white" data-a="endPreview">&#8249; Back to parent</button></span>`;
+}
+
+/* ---------- pop-ups ---------- */
+function openSheet(type, kid, step) {
+  SHEET = { type: type, kid: kid || '', step: step || 0 };
+  renderSheet();
+  $('sheet').className = 'overlay sheet show';
+}
+function closeSheet() {
+  SHEET = null;
+  const s = $('sheet'); if (s) s.className = 'overlay sheet';
+}
+function renderSheet() {
+  if (!SHEET || !DATA) return;
+  const html = SHEET.type === 'kid' ? sheetKid(SHEET.kid) : SHEET.type === 'connect' ? sheetConnect(SHEET.kid) : sheetTour();
+  if (!html) { closeSheet(); return; }
+  const box = $('sheetBox'), top = box.scrollTop;
+  $('sheetBody').innerHTML = html;
+  box.scrollTop = top;
+  if (SHEET.type === 'connect') tickJoin();
+}
+
+function sheetKid(name) {
+  const d = DATA, k = d.kids.find(x => x.name === name);
+  if (!k || mode() !== 'parent') return '';
+  const g = goalFor(name), dev = kidDevices(name);
+  const ready = readyRows().filter(w => w.winner === name), doing = todoRows().filter(w => w.winner === name);
+  const canGive = openChores().filter(c => canDo(c, name));
+  return `<div class="sheethead" style="background:${esc(k.color)}"><span class="big">${esc(name)}</span><span class="pts"><b>${g.pts}</b> points</span></div>
+    ${g.text ? `<div class="goalbox" style="margin-top:0">${esc(g.text)}<div class="goalbar"><i style="width:${Math.min(100, g.pct)}%"></i></div></div>` : ''}
+    <button class="btn gold full mt" data-a="preview" data-kid="${esc(name)}">See what ${esc(name)} sees</button>
+
+    <h4 class="sh">Finished, check it</h4>
+    ${ready.length ? ready.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>${pt(w.points)} · finished ${esc(w.statusDate)}</small></span>
+      <span class="acts"><button class="btn green small" data-a="approve" data-row="${w.row}">&#10003; Approve</button><button class="btn ghost small" data-a="redo" data-row="${w.row}">Redo</button></span></div>`).join('')
+      : `<p class="desc sm">Nothing to check right now.</p>`}
+
+    <h4 class="sh">Working on</h4>
+    ${doing.length ? doing.map(w => `<div class="item"><span class="nm">${esc(w.chore)}<small>${pt(w.points)} · ${esc(howKid(w.how).replace('You picked it', 'Picked it').replace('A parent gave you this one', 'You gave it'))}</small></span>
+      <span class="acts"><button class="btn green small" data-a="approve" data-row="${w.row}">Done</button><button class="btn ghost small" data-a="notdone" data-row="${w.row}">Not done</button><button class="btn ghost small" data-a="putBack" data-row="${w.row}">Put back</button></span></div>`).join('')
+      : `<p class="desc sm">${esc(name)} has no chores right now.</p>`}
+
+    <h4 class="sh">Give ${esc(name)} a chore</h4>
+    ${canGive.length ? `<div class="row"><select id="sGive">${canGive.map(c => `<option value="${esc(c.name)}">${esc(c.name)} (${pt(c.price)})</option>`).join('')}</select>
+      <button class="btn shrink" data-a="sGive" data-kid="${esc(name)}">Give</button></div>`
+      : `<p class="desc sm">No open chores ${esc(name)} can do right now.</p>`}
+
+    <h4 class="sh">Trade points for a reward</h4>
+    ${d.rewards.slice().sort((x, y) => x.cost - y.cost).map(r => `<div class="item"><span class="nm">${esc(r.name)}<small>${pt(r.cost)}</small></span>
+      ${g.pts >= r.cost ? `<button class="btn small" data-a="sRedeem" data-kid="${esc(name)}" data-r="${esc(r.name)}">Trade</button>` : `<span class="tag">${r.cost - g.pts} more</span>`}</div>`).join('') || '<p class="desc sm">No rewards yet. Add them in Settings.</p>'}
+
+    <h4 class="sh">Bonus points</h4>
+    <div class="row"><input type="number" id="sAdjPts" class="mini" style="width:90px!important" placeholder="5"><input type="text" id="sAdjReason" maxlength="80" placeholder="Reason (${esc(name)} sees this)">
+      <button class="btn shrink" data-a="sAdjust" data-kid="${esc(name)}">Save</button></div>
+    <p class="desc sm">Use a minus sign to take points away.</p>
+
+    <h4 class="sh">${esc(name)}'s devices and secret code</h4>
+    <p class="desc sm">${deviceLine(name)}${dev.code ? ` · Secret code <b>${esc(dev.code)}</b>` : dev.hasCode ? ' · Secret code hidden' : ' · No secret code yet'}</p>
+    <div class="row"><button class="btn ghost" data-a="connect" data-kid="${esc(name)}">Connect a device</button><button class="btn ghost" data-a="setCodeKid" data-kid="${esc(name)}">${dev.hasCode ? 'Change code' : 'Make a code'}</button></div>`;
+}
+
+function sheetConnect(name) {
+  const d = DATA, dev = kidDevices(name);
+  if (!d.kids.some(k => k.name === name) || mode() !== 'parent') return '';
+  const back = `<button class="btn ghost full mt" data-a="connectBack">&#8249; Back</button>`;
+  if (SHEET.step === 'own') {
+    const live = JOIN && JOIN.kid === name && JOIN.expires > Date.now();
+    return `<h3>Connect ${esc(name)}'s own device</h3>
+      ${live ? `<div class="codebig">${esc(JOIN.code)}</div><p class="desc" style="text-align:center">Works one time. Expires in <b id="sJoinLeft"></b>.${JOIN.demo ? ' (Demo codes are just for show.)' : ''}</p>`
+        : `<button class="btn gold full" data-a="connectOwn" data-kid="${esc(name)}">Make a new code</button>`}
+      <ol class="helpsteps">
+        <li>On ${esc(name)}'s phone or tablet, open <b>${esc(SITE)}</b></li>
+        <li>Tap <b>Enter a join code</b></li>
+        <li>Type the code above. That device now belongs to ${esc(name)}.</li>
+      </ol>${back}`;
+  }
+  if (SHEET.step === 'shared') {
+    const has = d.devices.some(x => x.role === 'shared');
+    return `<h3>${esc(name)} on the family computer</h3>
+      <ol class="helpsteps">
+        ${has ? '<li>Your family computer is already set up.</li>' : `<li>On the family computer or tablet, open your family link. <button class="link" data-a="share">Share the link</button></li>
+        <li>Tap <b>Our family computer or tablet</b> and type your PIN. You only do this once.</li>`}
+        <li>${esc(name)} taps their name and types their secret code: ${dev.code ? `<b class="codeinline">${esc(dev.code)}</b>` : dev.hasCode ? '(hidden, make a new one below)' : '(none yet, make one below)'}</li>
+        <li>When done, ${esc(name)} taps <b>I'm done, sign out</b>.</li>
+      </ol>
+      <button class="btn ghost full" data-a="setCodeKid" data-kid="${esc(name)}">${dev.hasCode ? 'Change ' + esc(name) + '\'s code' : 'Make ' + esc(name) + '\'s code'}</button>${back}`;
+  }
+  return `<h3>How will ${esc(name)} use it?</h3>
+    <div class="choices">
+      <button class="choice" data-a="connectPick" data-step="own" data-kid="${esc(name)}"><b>${esc(name)} has their own phone or tablet</b><span>We make a one-time code. ${esc(name)} types it on their device. Takes about a minute.</span></button>
+      <button class="choice" data-a="connectPick" data-step="shared" data-kid="${esc(name)}"><b>${esc(name)} uses our family computer</b><span>Everyone shares one screen. ${esc(name)} taps their name and types a 4-number secret code.</span></button>
+    </div>`;
+}
+
+/* ---------- first-time tours ---------- */
+const TOURS = {
+  parent: [
+    ['Welcome! This is your Family screen', 'Every kid has a card showing their points and what they are doing. <b>Tap a kid</b> to see everything about them: their chores, rewards, bonus points, and devices.'],
+    ['Approve with one tap', 'When a kid finishes a chore, a red number shows on <b>Approve</b>. Tap it, then tap Approve. The points are added right away.'],
+    ['See exactly what your kid sees', 'Inside a kid\'s card, tap <b>See what they see</b>. You will see their screen. Tap <b>Back to parent</b> at the top to come right back.'],
+    ['Chores and Settings', '<b>Chores</b> shows every chore, who has it, and what it pays. <b>Settings</b> is where you add kids, chores, rewards, and devices. Tap <b>How it works</b> at the top any time.']
+  ],
+  kid: [
+    ['Hi! Here is how it works', 'Look at the chores. Each one shows how many points it pays. Tap <b>I\'ll do it</b> on one you want. It is yours!'],
+    ['Do it, then tell us', 'Go to <b>My chores</b> and tap <b>I finished it!</b> A parent checks it, and the points are yours.'],
+    ['Earn rewards', '<b>My points</b> shows how close you are to a reward. Tip: chores nobody picks pay a little more every day!']
+  ]
+};
+function openTour(who) { openSheet('tour', who, 0); }
+function sheetTour() {
+  const list = TOURS[SHEET.kid] || TOURS.parent, i = Math.min(SHEET.step, list.length - 1), last = i === list.length - 1;
+  return `<div class="tourstep"><span class="tourn">${i + 1} of ${list.length}</span>
+      <h3>${list[i][0]}</h3><p class="desc">${list[i][1]}</p>
+      <div class="dots">${list.map((_, j) => `<i class="${j === i ? 'on' : ''}"></i>`).join('')}</div>
+      <div class="row">${i ? '<button class="btn ghost" data-a="tourBack">Back</button>' : '<button class="btn ghost" data-a="tourDone">Skip</button>'}
+      <button class="btn ${last ? 'gold' : ''}" data-a="${last ? 'tourDone' : 'tourNext'}">${last ? 'Got it!' : 'Next'}</button></div></div>`;
+}
+function maybeTour(m) {
+  if (SHEET || !DATA) return;
+  if (m === 'parent' && !ls('ca_tour_parent')) { ls('ca_tour_parent', '1'); openTour('parent'); }
+  else if (m === 'kid' && DATA.me && !ls('ca_tour_kid_' + FID + '_' + DATA.me)) { ls('ca_tour_kid_' + FID + '_' + DATA.me, '1'); openTour('kid'); }
+}
+
+/* ---------- what the new buttons do ---------- */
+async function familyClick(b) {
+  const kid = b.dataset.kid;
+  switch (b.dataset.a) {
+    case 'kidSheet': openSheet('kid', kid); return true;
+    case 'preview':
+      PREVIEW = kid; KTAB = 'pick'; closeSheet(); renderApp(); window.scrollTo(0, 0);
+      toast('This is ' + kid + '\'s screen. Tap Back to parent at the top when you are done.');
+      return true;
+    case 'endPreview': { const k = PREVIEW; PREVIEW = ''; PTAB = 'home'; renderApp(); window.scrollTo(0, 0); if (k) openSheet('kid', k); return true; }
+    case 'connect': openSheet('connect', kid, 0); return true;
+    case 'connectPick':
+      SHEET.step = b.dataset.step; renderSheet();
+      if (b.dataset.step === 'own' && !(JOIN && JOIN.kid === kid && JOIN.expires > Date.now())) await makeJoin(kid);
+      return true;
+    case 'connectOwn': await makeJoin(kid); return true;
+    case 'connectBack': if (SHEET) { SHEET.step = 0; renderSheet(); } return true;
+    case 'sGive': await act(() => pcall('assignChore', { chore: $('sGive').value, kid: kid })); return true;
+    case 'sRedeem':
+      await act(async () => {
+        if (!(await ask('Trade points for ' + b.dataset.r + '?', kid + ' gets ' + b.dataset.r + '. Remember to give it to them.', 'confirm'))) throw new Error('CANCELLED');
+        return pcall('redeem', { kid: kid, reward: b.dataset.r });
+      });
+      return true;
+    case 'sAdjust': {
+      const p = $('sAdjPts').value, r = $('sAdjReason').value;
+      if (p === '' || !Number(p)) { toast('Type how many points first, like 5 (or -5 to take some away).', true); return true; }
+      await act(() => pcall('adjust', { kid: kid, points: p === '' ? '' : Number(p), reason: r }));
+      return true;
+    }
+    case 'setCodeKid': {
+      const code = await keypad('New secret code for ' + kid, 'Type 4 numbers ' + kid + ' will remember.', async c => c);
+      if (code) await act(() => pcall('setKidCode', { kid: kid, code: code }));
+      return true;
+    }
+    case 'tourNext': SHEET.step++; renderSheet(); return true;
+    case 'tourBack': SHEET.step = Math.max(0, SHEET.step - 1); renderSheet(); return true;
+    case 'tourDone': closeSheet(); return true;
+    case 'hideSteps': ls('ca_steps_off_' + FID, '1'); renderApp(); return true;
+    case 'kidToParent':
+      await kidSignOut('');
+      if (await pinLogin('', false)) { PTAB = 'home'; await load(); }
+      return true;
+  }
+  return false;
+}
+
+async function makeJoin(kid) {
+  try {
+    const r = await pcall('joinCode', { kid: kid });
+    JOIN = { code: r.code, kid: r.kid, demo: !!r.demo, expires: Date.now() + r.seconds * 1000 };
+    renderSheet();
+  } catch (err) { if (errMsg(err) !== 'CANCELLED') toast(errMsg(err), true); }
+}
+
 /* ============================== START ============================== */
 $('btnDemo').onclick = openDemo;
 $('btnSetup').onclick = startWizard;
 $('btnJoin').onclick = showJoin;
 $('btnRealFamily').onclick = startWizard;
-$('btnDemoReset').onclick = () => { Demo.reset(); setToken(null); KSESS = null; KTAB = 'pick'; PTAB = 'approve'; toast('The demo was reset.'); load(); };
+$('btnDemoReset').onclick = () => { Demo.reset(); setToken(null); KSESS = null; KTAB = 'pick'; PTAB = 'home'; toast('The demo was reset.'); load(); };
 document.querySelectorAll('[data-demo]').forEach(b => b.addEventListener('click', () => {
-  Demo.setRole(b.dataset.demo); setToken(null); KSESS = null; KTAB = 'pick'; PTAB = 'approve';
+  Demo.setRole(b.dataset.demo); setToken(null); KSESS = null; PREVIEW = ''; closeSheet(); KTAB = 'pick'; PTAB = 'home';
   load().then(() => toast({ parent: 'Now you are seeing a parent\'s phone.', kid: 'Now you are seeing Sam\'s own tablet.', shared: 'Now you are seeing the family computer. Kids tap their name and type a code.' }[b.dataset.demo]));
 }));
 $('btnHelp').onclick = showHelp;
@@ -2248,12 +2566,15 @@ $('wizBody').addEventListener('change', wizInput);
 $('wizBody').addEventListener('click', wizClick);
 $('view').addEventListener('click', viewClick);
 $('whoBar').addEventListener('click', viewClick);
+$('sheetBody').addEventListener('click', viewClick);
+$('sheetClose').onclick = closeSheet;
+$('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
 $('view').addEventListener('change', viewChange);
 $('view').addEventListener('toggle', e => { const s = e.target.dataset && e.target.dataset.sec; if (s) { if (e.target.open) OPEN_SECTIONS.add(s); else OPEN_SECTIONS.delete(s); } }, true);
 $('tabsIn').addEventListener('click', e => {
   const b = e.target.closest('[data-tab]');
   if (!b || !DATA) return;
-  if (mode() === 'kid') KTAB = b.dataset.tab; else PTAB = b.dataset.tab;
+  if (mode() === 'kid' || mode() === 'preview') KTAB = b.dataset.tab; else PTAB = b.dataset.tab;
   renderApp(); window.scrollTo(0, 0);
   load();
 });
