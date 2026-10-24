@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ni4V3WSW/+Gi8OoyrohpDydKc5+ciadZ0mZ0C+z19yQ=' 'sha256-+hufKUZpd2Vc2KLLM7ltDJ6tlY0YOcbYfrchSgWPm98=' https://www.googletagmanager.com; style-src 'unsafe-inline'; font-src 'self'; img-src data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ni4V3WSW/+Gi8OoyrohpDydKc5+ciadZ0mZ0C+z19yQ=' 'sha256-0fp2SWKUyJNYuhVJZLONSr/eFrqR8L1KXXw9mXvEE1A=' https://www.googletagmanager.com; style-src 'unsafe-inline'; font-src 'self'; img-src data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -707,7 +707,7 @@ const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
 const OFTEN_NAMES = { 1: 'Every day', 2: 'Every 2 days', 3: 'Every 3 days', 7: 'Once a week' };
 const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
-const APP_VERSION = '6.8';
+const APP_VERSION = '6.9';
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
@@ -1752,6 +1752,9 @@ async function copyText(text) {
 /* ============================== FAMILY APP ============================== */
 async function openFamily(fid) {
   gaOff(true);   // no analytics inside a family's own app
+  // If Google Analytics was loaded on the start page, reload fresh so no outside script
+  // shares the page with this family's private keys.
+  if (!GA_START_IN_FAMILY && !isDemoId(fid)) { location.replace(APP_LINK + '#f=' + fid); location.reload(); return; }
   FID = fid; KSESS = null;
   if (location.hash !== '#f=' + fid) history.replaceState(null, '', APP_LINK + '#f=' + fid);
   TOKEN = cleanId(ss('ca_tok_' + fid)) || null;
@@ -1802,6 +1805,7 @@ function baseMode() {
   return DATA.parent ? 'parent' : 'setup';
 }
 
+function isDemoId(f) { return f === 'demo'; }
 function kidColor(name) { const k = DATA.kids.find(x => x.name === name); return k ? k.color : '#8a8a8a'; }
 function chip(name) { return `<span class="chip" style="background:${esc(kidColor(name))}">${esc(name)}</span>`; }
 function canDo(c, kid) { return !c.who || !c.who.length || c.who.indexOf(kid) > -1; }
@@ -2430,7 +2434,16 @@ async function viewClick(e) {
       return act(async () => {
         return pcall('saveFairness', { limit: Number(v('pLimit')), noRepeat: $('pRepeat').checked, grow: $('pGrow').checked, autoApprove: Number(v('pAuto')) });
       });
-    case 'saveFam': return act(() => pcall('saveFamily', { name: v('fName'), email: v('fEmail'), appLink: APP_LINK }));
+    case 'saveFam': {
+      const args = { name: v('fName'), email: v('fEmail'), appLink: APP_LINK };
+      if (!isDemo() && args.email.trim().toLowerCase() !== String(d.email || '').toLowerCase()) {
+        const pin = await ask('Type your PIN to change the email', 'PIN resets and lost links go to this email, so changing it needs your PIN.', 'pin');
+        if (pin === FORGOT) { await forgotPin(); return; }
+        if (!pin) return;
+        args.pin = pin;
+      }
+      return act(() => pcall('saveFamily', args));
+    }
     case 'pin': {
       const pp = isDemo() ? '' : pinProblem(v('pinNew'));
       if (pp) return toast(pp, true);
