@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ni4V3WSW/+Gi8OoyrohpDydKc5+ciadZ0mZ0C+z19yQ=' 'sha256-0fp2SWKUyJNYuhVJZLONSr/eFrqR8L1KXXw9mXvEE1A=' https://www.googletagmanager.com; style-src 'unsafe-inline'; font-src 'self'; img-src data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ni4V3WSW/+Gi8OoyrohpDydKc5+ciadZ0mZ0C+z19yQ=' 'sha256-j3JUbPkOCs3jf2FvMDpSETqk3T1yEaCYwQSx7jkhALE=' https://www.googletagmanager.com; style-src 'unsafe-inline'; font-src 'self'; img-src data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -1988,8 +1988,8 @@ function kidPoints() {
 // On the Pick screen, a chore the kid has: finish it right here
 function kidFinishBox(name) {
   const w = DATA.winners.find(x => x.chore === name && x.winner === ME() && (x.status === 'Assigned' || x.status === 'Ready'));
-  if (w && w.status === 'Ready') return '<div class="mine sent">&#10003; You finished this. A parent will check it soon.</div>';
-  return '<div class="mine sent">&#10003; This is your chore. When it is done, tap <b>I finished it!</b> at the top.</div>';
+  if (w && w.status === 'Ready') return '<div class="mine sent"><span>&#10003; You finished this. A parent will check it soon.</span></div>';
+  return '<div class="mine sent"><span>&#10003; This is your chore. When it is done, tap <b>I finished it!</b> at the top.</span></div>';
 }
 
 // Plain words for kids about how they got a chore
