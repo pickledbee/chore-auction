@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-YsC+EVgVzP6IdJzeYuOQLCwjNErLspQBYi+L9autLSk='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-kAO5kZmAXl1A//HytN/3SsrggXoMlsi5fPkB+y+al4c='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -366,6 +366,14 @@
   body.tutoff .btn.tutbig b{color:#ffb3b3}
   .js-tut::before{content:'';display:inline-block;width:30px;height:16px;border-radius:999px;background:var(--gold);margin-right:8px;vertical-align:-2px;box-shadow:inset 15px 0 0 0 #fff}
   body.tutoff .js-tut::before{background:#9a8fb5;box-shadow:inset -15px 0 0 0 #fff}
+  .shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:8px}
+  .shop.compact{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+  .shopitem{display:flex;flex-direction:column;gap:4px;border:2px solid var(--line);border-radius:14px;padding:12px 14px;text-decoration:none;color:var(--ink);background:#fff}
+  .shopitem:hover,.shopitem:focus{border-color:var(--gold)}
+  .shopitem b{font:600 16px 'Fredoka',sans-serif;color:var(--purple)}
+  .shopitem span{font-size:14px;color:var(--muted)}
+  .shopitem em{font-style:normal;font-weight:800;font-size:13px;color:#b45309;margin-top:auto}
+  .affnote{font-size:12px;color:var(--muted);margin:8px 0 0}
 </style>
 </head>
 <body>
@@ -430,6 +438,7 @@
       <h3 class="sec">Rewards and screen time</h3>
       <p class="desc" style="margin:0">You choose the rewards and what they cost. The app keeps track of points and what each kid buys. You hand out the reward yourself. The app does not lock, unlock, or time any devices.</p>
     </div>
+    <div class="card" id="landShop"></div>
     <div class="card">
       <h3 class="sec">What you get</h3>
       <ul class="plain desc" style="padding-left:20px;margin:0">
@@ -459,7 +468,7 @@
     </div>
   </div>
   <p style="text-align:center"><button class="btn ghost" id="btnAllTut">See all tutorials</button> <button class="btn ghost js-tut" id="tutLand"></button></p>
-  <footer class="small">The Chore Auction · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms and refunds</a></footer>
+  <footer class="small"><span class="affnote" style="display:block;margin-bottom:6px">As an Amazon Associate, The Chore Auction earns from qualifying purchases.</span>The Chore Auction · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms and refunds</a></footer>
 </div>
 
 <!-- ================= BUSY ================= -->
@@ -651,7 +660,7 @@ const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
 const OFTEN_NAMES = { 1: 'Every day', 2: 'Every 2 days', 3: 'Every 3 days', 7: 'Once a week' };
 const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
-const APP_VERSION = '6.5';
+const APP_VERSION = '6.6';
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
@@ -2081,7 +2090,9 @@ function parentSettings() {
       <select class="sel-mini shrink" id="ncSize" aria-label="Size"><option value="1">Small</option><option value="2">Medium</option><option value="3">Big</option></select>
       <select class="sel-mini shrink" id="ncOften" aria-label="Comes back">${oftenOpts(7)}</select>
       <button class="btn shrink" data-a="addChore">Add chore</button>
-    </div>`)}
+    </div>
+    <label class="mt">Kid-size tools that make chores easier</label>
+    ${shopList('chores', true)}`)}
 
   ${section('rewards', 'Rewards', `
     ${d.rewards.map((r, i) => `<div class="item"><span class="nm">${esc(r.name)}</span>
@@ -2091,6 +2102,10 @@ function parentSettings() {
       <input type="text" id="nrName" maxlength="40" placeholder="New reward">
       <span class="pay shrink">Costs <input type="number" class="mini" id="nrCost" value="10" min="1" max="1000"> pts</span>
       <button class="btn shrink" data-a="addReward">Add</button>
+    </div>
+    <label class="mt">Reward ideas kids love to save up for</label>
+    ${shopList('rewards', true)}
+    <div>
     </div>`)}
 
   ${section('rules', 'Rules', `
@@ -2418,6 +2433,9 @@ function parentHome() {
     <details class="sec card" data-sec="history" ${OPEN_SECTIONS.has('history') ? 'open' : ''}><summary>Every point, earned and spent</summary><div>
       <div class="tablewrap">${d.ledger.length ? '<table><tr><th>When</th><th>Kid</th><th>Pts</th><th>What</th></tr>' + d.ledger.map(l =>
         `<tr><td>${esc(l.date)}</td><td>${esc(l.kid)}</td><td class="${l.points >= 0 ? 'plus' : 'minus'}">${l.points > 0 ? '+' : ''}${l.points}</td><td>${esc(l.type)}: ${esc(l.details)}</td></tr>`).join('') + '</table>' : '<p class="desc">No points yet.</p>'}</div>
+    </div></details>
+    <details class="sec card shopcard" data-sec="shop" ${OPEN_SECTIONS.has('shop') ? 'open' : ''}><summary>Family favorites that make chores easier</summary><div>
+      <p class="desc">Things that help kids do chores on their own.</p>${shopList('family')}
     </div></details>`;
 }
 
@@ -2762,6 +2780,11 @@ const TUT = {
     ['Forgot it?', 'Tap <b>Forgot PIN?</b> under the PIN box. We email you a code to choose a new PIN.'],
     ['Too many wrong tries', 'After 5 wrong tries, the PIN locks for a while and you get an email. A reset code also unlocks it.']
   ] },
+  shop: { group: 'For parents', title: 'Family favorites (Amazon)', steps: [
+    ['What these are', 'Ideas that make chores easier for kids, and rewards worth saving points for. Each one opens Amazon in a new tab.'],
+    ['Only for grown-ups', 'These suggestions only show on the start page and parent screens, never on kids\' screens.'],
+    ['How it helps the app', 'As an Amazon Associate, The Chore Auction earns from qualifying purchases. It costs you nothing extra and helps keep the app running.']
+  ] },
   connect: { group: 'For parents', title: 'Connecting a kid', steps: [
     ['Their own device', 'Tap <b>has their own phone or tablet</b>. A one-time code appears. On their device, open the website, tap <b>Enter a join code</b>, and type it.'],
     ['The family computer', 'Tap <b>uses our family computer</b>. Set up the family computer once with your PIN. Then the kid taps their name and types their secret code.']
@@ -2818,7 +2841,7 @@ const TUT_GROUPS = ['Start here', 'Setting up', 'For parents', 'For kids'];
 /* ---------- which tutorial goes with which part of the screen ---------- */
 // First match wins, so the most specific parts are listed first.
 const HELP_MAP = [
-  ['#helpFab', 'helpHow'], ['.sheethead, #sheetBody [data-a=preview]', 'preview'], ['#sheetBody .choices, #sheetBody .codebig', 'connect'],
+  ['#helpFab', 'helpHow'], ['.shop, #landShop, .shopcard, .affnote', 'shop'], ['.sheethead, #sheetBody [data-a=preview]', 'preview'], ['#sheetBody .choices, #sheetBody .codebig', 'connect'],
   ['#sheetBody', 'kidPopup'], ['#kp', 'whoScreen'], ['#mForgot', 'lostLink'], ['#modal', 'parentPin'],
   ['#btnDemo, #demoBanner, [data-demo]', 'demo'], ['#btnJoin, #s-join', 'joinCode'], ['#recEmail, #recGo, #landRecover', 'lostLink'],
   ['#btnSetup, #btnRealFamily', 'setupWizard'], ['#s-done', 'doneScreen'], ['.ways', 'devices'],
@@ -2981,6 +3004,48 @@ document.addEventListener('click', e => {
   showHelpFor(e.target);
 }, true);
 
+/* ============================== FAMILY FAVORITES (Amazon affiliate links) ==============================
+   Only shown to grown-ups: the start page and parent screens. Never on kids' screens.
+   Each link is an Amazon search with the affiliate tag, so it never breaks when one product sells out. */
+
+const AMAZON_TAG = 'bumblepickleb-20';
+const AFFILIATE_NOTE = 'As an Amazon Associate, The Chore Auction earns from qualifying purchases.';
+// [id, name, why it helps, Amazon search words]
+const SHOP = [
+  ['timer', 'Visual timer for kids', 'Kids can see how much time is left, so a 10-minute chore stays a 10-minute chore.', 'visual timer for kids'],
+  ['cleankit', 'Kid-size cleaning set', 'A real broom, mop, and dustpan sized for small hands. Sweeping the kitchen gets a lot more fun.', 'kids cleaning set real broom mop'],
+  ['cloths', 'Microfiber cleaning cloths', 'One cloth and water wipes sinks, mirrors, and tables. Safe and simple for kids.', 'microfiber cleaning cloths pack'],
+  ['caddy', 'Cleaning caddy with handle', 'Everything for "Wipe bathroom sink" in one place, so kids can grab it and go.', 'cleaning caddy with handle'],
+  ['hamper', 'Laundry basket kids can carry', 'Light, with handles, for "Fold and deliver one full basket."', 'lightweight laundry basket with handles'],
+  ['stand', 'Tablet stand for the family tablet', 'Keeps a shared family tablet up on the counter, where everyone can tap their name.', 'tablet stand for kitchen counter'],
+  ['games', 'Family board games', 'A great reward: "Pick the family game night game."', 'family board games for kids'],
+  ['lego', 'LEGO Classic bricks', 'A bigger reward to save up points for.', 'LEGO Classic creative brick box'],
+  ['art', 'Kids art supplies kit', 'A popular reward that is not screen time.', 'kids art supplies kit'],
+  ['prize', 'Small prize box toys', 'Little rewards for little points. Keep a box on a high shelf.', 'prize box toys for kids']
+];
+const SHOP_SETS = {
+  landing: ['timer', 'cleankit', 'cloths', 'stand', 'games', 'art'],
+  family: ['timer', 'cleankit', 'caddy', 'hamper', 'stand', 'games'],
+  chores: ['timer', 'cleankit', 'cloths', 'caddy', 'hamper'],
+  rewards: ['games', 'lego', 'art', 'prize']
+};
+
+function amazonLink(words) {
+  return 'https://www.amazon.com/s?k=' + encodeURIComponent(words).replace(/%20/g, '+') + '&tag=' + AMAZON_TAG;
+}
+function shopList(set, compact) {
+  const items = SHOP_SETS[set].map(id => SHOP.find(x => x[0] === id)).filter(Boolean);
+  return `<div class="shop ${compact ? 'compact' : ''}">${items.map(p =>
+    `<a class="shopitem" href="${esc(amazonLink(p[3]))}" target="_blank" rel="sponsored noopener">
+      <b>${esc(p[1])}</b>${compact ? '' : `<span>${esc(p[2])}</span>`}<em>See on Amazon &#8599;</em></a>`).join('')}</div>
+    <p class="affnote">${esc(AFFILIATE_NOTE)}</p>`;
+}
+function renderLandingShop() {
+  const el = $('landShop');
+  if (el) el.innerHTML = `<h3 class="sec">Family favorites that make chores easier</h3>
+    <p class="desc">Tools that help kids do chores on their own, and rewards worth saving points for.</p>${shopList('landing')}`;
+}
+
 /* ============================== START ============================== */
 $('btnDemo').onclick = openDemo;
 $('btnSetup').onclick = startWizard;
@@ -2992,6 +3057,7 @@ document.querySelectorAll('[data-demo]').forEach(b => b.addEventListener('click'
   load().then(() => toast({ parent: 'Now you are seeing a parent\'s phone.', kid: 'Now you are seeing Sam\'s own tablet.', shared: 'Now you are seeing the family computer. Kids tap their name and type a code.' }[b.dataset.demo]));
 }));
 $('btnHelp').onclick = showHelp;
+renderLandingShop();
 $('btnLearn').onclick = () => openTutorial('overview', 0);
 $('btnAllTut').onclick = openLibrary;
 $('helpFab').onclick = () => setHelpMode(!HELP_MODE);
