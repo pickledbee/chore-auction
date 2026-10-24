@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ni4V3WSW/+Gi8OoyrohpDydKc5+ciadZ0mZ0C+z19yQ=' 'sha256-iFM8pt1QEJWj1vA/ImWMSwKKipjkACHLOolK999+Jcs=' https://www.googletagmanager.com; style-src 'unsafe-inline'; font-src 'self'; img-src data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ni4V3WSW/+Gi8OoyrohpDydKc5+ciadZ0mZ0C+z19yQ=' 'sha256-+hufKUZpd2Vc2KLLM7ltDJ6tlY0YOcbYfrchSgWPm98=' https://www.googletagmanager.com; style-src 'unsafe-inline'; font-src 'self'; img-src data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -385,14 +385,21 @@
   body.tutoff .btn.tutbig b{color:#ffb3b3}
   .js-tut::before{content:'';display:inline-block;width:30px;height:16px;border-radius:999px;background:var(--gold);margin-right:8px;vertical-align:-2px;box-shadow:inset 15px 0 0 0 #fff}
   body.tutoff .js-tut::before{background:#9a8fb5;box-shadow:inset -15px 0 0 0 #fff}
-  .shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:8px}
-  .shop.compact{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
-  .shopitem{display:flex;flex-direction:column;gap:4px;border:2px solid var(--line);border-radius:14px;padding:12px 14px;text-decoration:none;color:var(--ink);background:#fff}
-  .shopitem:hover,.shopitem:focus{border-color:var(--gold)}
-  .shopitem b{font:600 16px 'Fredoka',sans-serif;color:var(--purple)}
-  .shopitem span{font-size:14px;color:var(--muted)}
-  .shopitem em{font-style:normal;font-weight:800;font-size:13px;color:#b45309;margin-top:auto}
-  .affnote{font-size:12px;color:var(--muted);margin:8px 0 0}
+  .favs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:8px}
+  .favs.compact{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+  .favitem{display:flex;flex-direction:column;gap:4px;border:2px solid var(--line);border-radius:14px;padding:12px 14px;text-decoration:none;color:var(--ink);background:#fff}
+  .favitem:hover,.favitem:focus{border-color:var(--gold)}
+  .favitem b{font:600 16px 'Fredoka',sans-serif;color:var(--purple)}
+  .favitem span{font-size:14px;color:var(--muted)}
+  .favitem em{font-style:normal;font-weight:800;font-size:13px;color:#b45309;margin-top:auto}
+  .favnote{font-size:12px;color:var(--muted);margin:8px 0 0}
+  .login .logincols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+  .login .logbox{background:var(--bg);border-radius:14px;padding:14px}
+  .login .logbox > b{display:block;font:600 19px 'Fredoka',sans-serif;color:var(--purple);margin-bottom:4px}
+  .login label.keep{display:flex;gap:8px;align-items:center;font-weight:700;margin:10px 0;color:var(--ink)}
+  .login label.keep input{width:20px;height:20px}
+  .login .welcome{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:var(--goldl);border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:17px}
+  .login .continue:empty{display:none}
 </style>
 </head>
 <body>
@@ -405,16 +412,39 @@
       <h1>The Chore <span>Auction</span></h1>
       <p>Every chore shows what it pays. Kids pick the jobs they want, any time, and earn the points when a parent checks the work. Chores nobody picks pay a little more every day, so even the yucky jobs get done.</p>
       <div class="btns">
+        <button class="btn white" id="btnLogin">Log in</button>
         <button class="btn gold" id="btnDemo">Try the demo</button>
+        <button class="btn line" id="btnSetup">Set up my family</button>
         <button class="btn white" id="btnLearn">How does it work?</button>
         <button class="btn tutbig js-tut" id="tutHero"></button>
-        <button class="btn line" id="btnSetup">Set up my family</button>
-        <button class="btn white" id="btnJoin">Enter a join code</button>
       </div>
     </div>
   </div>
   <div class="wrap">
-    <div class="card lift">
+    <div class="card lift login" id="landLogin">
+      <h3 class="sec">Log in to your family</h3>
+      <div id="landMsg" class="notice hidden"></div>
+      <div id="landContinue" class="continue"></div>
+      <div class="logincols">
+        <div class="logbox">
+          <b>Parents</b>
+          <label for="liEmail">Parent email</label>
+          <input type="email" id="liEmail" maxlength="120" autocomplete="email" placeholder="you@example.com">
+          <label for="liPin">Parent PIN</label>
+          <input type="password" id="liPin" inputmode="numeric" maxlength="12" autocomplete="current-password" placeholder="6 to 12 numbers">
+          <label class="keep"><input type="checkbox" id="liKeep" checked> This is my phone. Keep me logged in.</label>
+          <button class="btn gold full" id="liGo">Log in</button>
+          <p class="desc sm">Forgot your PIN? Type your email above and tap <button class="link" id="liLink">Email me my link</button>. Open the link, then tap <b>Forgot PIN?</b></p>
+        </div>
+        <div class="logbox">
+          <b>Kids</b>
+          <p class="desc sm">Using your own phone or tablet for the first time? Ask a parent for a join code.</p>
+          <button class="btn full" id="btnJoin">Enter a join code</button>
+          <p class="desc sm mt">On the family computer, a parent opens your family once. After that, just tap your name.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
       <h3 class="sec">See it in action</h3>
       <div class="story">
         <div class="st"><b class="n">1</b>
@@ -431,8 +461,7 @@
           <p>She now has 16 points. 2 more and she can trade them for an hour of screen time.</p></div>
       </div>
     </div>
-    <div id="landMsg" class="notice hidden"></div>
-    <div id="landContinue" class="continue"></div>
+    <div class="card" id="landFavs"></div>
     <div class="card">
       <h3 class="sec">Works with the devices you have</h3>
       <div class="ways">
@@ -457,7 +486,6 @@
       <h3 class="sec">Rewards and screen time</h3>
       <p class="desc" style="margin:0">You choose the rewards and what they cost. The app keeps track of points and what each kid buys. You hand out the reward yourself. The app does not lock, unlock, or time any devices.</p>
     </div>
-    <div class="card" id="landShop"></div>
     <div class="card">
       <h3 class="sec">What you get</h3>
       <ul class="plain desc" style="padding-left:20px;margin:0">
@@ -487,7 +515,7 @@
     </div>
   </div>
   <p style="text-align:center"><button class="btn ghost" id="btnAllTut">See all tutorials</button> <button class="btn ghost js-tut" id="tutLand"></button></p>
-  <footer class="small"><span class="affnote" style="display:block;margin-bottom:6px">As an Amazon Associate, The Chore Auction earns from qualifying purchases.</span>The Chore Auction · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms and refunds</a></footer>
+  <footer class="small"><span class="favnote" style="display:block;margin-bottom:6px">As an Amazon Associate, The Chore Auction earns from qualifying purchases.</span>The Chore Auction · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms and refunds</a></footer>
 </div>
 
 <!-- ================= BUSY ================= -->
@@ -679,7 +707,7 @@ const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
 const OFTEN_NAMES = { 1: 'Every day', 2: 'Every 2 days', 3: 'Every 3 days', 7: 'Once a week' };
 const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
-const APP_VERSION = '6.7';
+const APP_VERSION = '6.8';
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
@@ -1329,7 +1357,7 @@ function renderLanding(msg) {
   m.classList.toggle('hidden', !msg);
   const fam = cleanId(ls('ca_fid'));
   let html = '';
-  if (fam) html += `<a class="btn" href="${esc(familyLink(fam))}">Open my family</a>`;
+  if (fam) html += `<div class="welcome"><span>Welcome back${ls('ca_fname_' + fam) ? ', <b>' + esc(ls('ca_fname_' + fam)) + '</b>' : ''}!</span><a class="btn gold" href="${esc(familyLink(fam))}">Open my family</a></div>`;
   if (ls('ca_demo_v6')) html += `<a class="btn ghost" href="${esc(APP_LINK)}#demo">Continue the demo</a>`;
   $('landContinue').innerHTML = html;
   FID = null; DATA = null; KSESS = null;
@@ -1342,6 +1370,34 @@ function openDemo() {
   FID = 'demo'; TOKEN = null; DEVICE = null; KSESS = null; KTAB = 'pick'; PTAB = 'home';
   history.replaceState(null, '', APP_LINK + '#demo');
   load(true);
+}
+
+// Log in from the start page with the parent email and PIN
+async function loginGo() {
+  const email = $('liEmail').value.trim(), pin = $('liPin').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast('Type the parent email you used during setup.', true);
+  if (!/^\d{4,12}$/.test(pin)) return toast('Type your parent PIN (numbers only).', true);
+  $('liGo').disabled = true;
+  try {
+    FID = null; DEVICE = null; KSESS = null;
+    const r = await api('emailLogin', { email: email, pin: pin, remember: $('liKeep').checked });
+    track('login');
+    FID = r.fid;
+    setToken(r.token);
+    if (r.device) setDevice(r.device);
+    ls('ca_fid', r.fid);
+    $('liPin').value = '';
+    PTAB = 'home';
+    await openFamily(r.fid);
+  } catch (e) {
+    const m = errMsg(e);
+    toast(/Unknown request/.test(m) ? 'Logging in with email needs the newest Code.gs. For now, tap Email me my link.' : m, true);
+  }
+  $('liGo').disabled = false;
+}
+async function loginLink() {
+  $('recEmail').value = $('liEmail').value;
+  return recover();
 }
 
 async function recover() {
@@ -1727,6 +1783,7 @@ async function load(first) {
   if (!isDemo()) {
     if (DEVICE && !DATA.device.role) setDevice(null);
     ls('ca_fid', FID);
+    ls('ca_fname_' + FID, DATA.family);
   }
   renderApp();
   if (first) show('app');
@@ -2461,9 +2518,9 @@ function parentHome() {
       <div class="tablewrap">${d.ledger.length ? '<table><tr><th>When</th><th>Kid</th><th>Pts</th><th>What</th></tr>' + d.ledger.map(l =>
         `<tr><td>${esc(l.date)}</td><td>${esc(l.kid)}</td><td class="${l.points >= 0 ? 'plus' : 'minus'}">${l.points > 0 ? '+' : ''}${l.points}</td><td>${esc(l.type)}: ${esc(l.details)}</td></tr>`).join('') + '</table>' : '<p class="desc">No points yet.</p>'}</div>
     </div></details>
-    <details class="sec card shopcard" data-sec="shop" ${OPEN_SECTIONS.has('shop') ? 'open' : ''}><summary>Family favorites that make chores easier</summary><div>
-      <p class="desc">Things that help kids do chores on their own.</p>${shopList('family')}
-    </div></details>`;
+    <div class="card favcard"><h3 class="sec">Family favorites that make chores easier</h3>
+      <p class="desc">Things that help kids do chores on their own.</p>${shopList('family', true)}
+    </div>`;
 }
 
 /* ---------- "see what Maya sees" ---------- */
@@ -2682,6 +2739,13 @@ const TUT = {
     ['A family computer or tablet', 'One screen everyone shares. Kids tap their name and type their own 4-number <b>secret code</b>. Great for kids who do not have a phone.'],
     ['Mix and match', 'Most families use a parent\'s phone plus one shared tablet. Set up each device once.']
   ] },
+  login: { group: 'Start here', title: 'Logging in', steps: [
+    ['Parents', 'On the start page, type the parent email you used during setup and your parent PIN, then tap <b>Log in</b>. Leave <b>Keep me logged in</b> checked on your own phone, and you will not need the PIN there again.'],
+    ['Kids with their own device', 'Tap <b>Enter a join code</b> and type the code a parent gives you. You only do this once.'],
+    ['The family computer', 'A parent opens the family on it once. After that, kids just tap their name and type their secret code.'],
+    ['Coming back', 'This device remembers your family. Tap <b>Open my family</b> at the top of the Log in box.'],
+    ['Forgot something?', 'Type your email and tap <b>Email me my link</b>. Open the link, then tap <b>Forgot PIN?</b> where it asks for the PIN.']
+  ] },
   demo: { group: 'Start here', title: 'Trying the demo', steps: [
     ['A pretend family', 'The demo has made-up kids (Maya, Leo, and Sam). Nothing is saved online, so tap anything you like.'],
     ['"Try it as" buttons', 'The yellow bar lets you switch between <b>A parent\'s phone</b>, <b>Sam\'s tablet</b> (a kid\'s own device), and <b>The family computer</b>. This shows how each person sees the app.'],
@@ -2868,9 +2932,9 @@ const TUT_GROUPS = ['Start here', 'Setting up', 'For parents', 'For kids'];
 /* ---------- which tutorial goes with which part of the screen ---------- */
 // First match wins, so the most specific parts are listed first.
 const HELP_MAP = [
-  ['#helpFab', 'helpHow'], ['.shop, #landShop, .shopcard, .affnote', 'shop'], ['.sheethead, #sheetBody [data-a=preview]', 'preview'], ['#sheetBody .choices, #sheetBody .codebig', 'connect'],
+  ['#helpFab', 'helpHow'], ['.favs, #landFavs, .favcard, .favnote', 'shop'], ['.sheethead, #sheetBody [data-a=preview]', 'preview'], ['#sheetBody .choices, #sheetBody .codebig', 'connect'],
   ['#sheetBody', 'kidPopup'], ['#kp', 'whoScreen'], ['#mForgot', 'lostLink'], ['#modal', 'parentPin'],
-  ['#btnDemo, #demoBanner, [data-demo]', 'demo'], ['#btnJoin, #s-join', 'joinCode'], ['#recEmail, #recGo, #landRecover', 'lostLink'],
+  ['#landLogin, #btnLogin', 'login'], ['#btnDemo, #demoBanner, [data-demo]', 'demo'], ['#btnJoin, #s-join', 'joinCode'], ['#recEmail, #recGo, #landRecover', 'lostLink'],
   ['#btnSetup, #btnRealFamily', 'setupWizard'], ['#s-done', 'doneScreen'], ['.ways', 'devices'],
   ['#closePill', 'pickChore'], ['#btnHelp', 'overview'],
   ['#whoBar [data-a=endPreview], #whoBar [data-a=preview]', 'preview'], ['#whoBar', 'kidBar'],
@@ -3064,21 +3128,21 @@ function amazonLink(words) {
 }
 function shopList(set, compact) {
   const items = SHOP_SETS[set].map(id => SHOP.find(x => x[0] === id)).filter(Boolean);
-  return `<div class="shop ${compact ? 'compact' : ''}">${items.map(p =>
-    `<a class="shopitem" href="${esc(amazonLink(p[3]))}" target="_blank" rel="sponsored noopener">
+  return `<div class="favs ${compact ? 'compact' : ''}">${items.map(p =>
+    `<a class="favitem" href="${esc(amazonLink(p[3]))}" target="_blank" rel="nofollow noopener">
       <b>${esc(p[1])}</b>${compact ? '' : `<span>${esc(p[2])}</span>`}<em>See on Amazon &#8599;</em></a>`).join('')}</div>
-    <p class="affnote">${esc(AFFILIATE_NOTE)}</p>`;
+    <p class="favnote">${esc(AFFILIATE_NOTE)}</p>`;
 }
 function renderLandingShop() {
-  const el = $('landShop');
+  const el = $('landFavs');
   if (el) el.innerHTML = `<h3 class="sec">Family favorites that make chores easier</h3>
     <p class="desc">Tools that help kids do chores on their own, and rewards worth saving points for.</p>${shopList('landing')}`;
 }
 
 // count clicks on product suggestions (only on public pages; analytics is off inside a family's app)
 document.addEventListener('click', e => {
-  const a = e.target.closest('a.shopitem');
-  if (a) track('amazon_click', { item: (a.querySelector('b') || {}).textContent || '', placement: a.closest('#landShop') ? 'start_page' : 'app' });
+  const a = e.target.closest('a.favitem');
+  if (a) track('amazon_click', { item: (a.querySelector('b') || {}).textContent || '', placement: a.closest('#landFavs') ? 'start_page' : 'app' });
 }, true);
 // Any link into a family turns analytics off first, so a family link is never sent to Google.
 document.addEventListener('click', e => { const a = e.target.closest('a[href*="#f="]'); if (a) gaOff(true); }, true);
@@ -3095,6 +3159,10 @@ document.querySelectorAll('[data-demo]').forEach(b => b.addEventListener('click'
   load().then(() => toast({ parent: 'Now you are seeing a parent\'s phone.', kid: 'Now you are seeing Sam\'s own tablet.', shared: 'Now you are seeing the family computer. Kids tap their name and type a code.' }[b.dataset.demo]));
 }));
 $('btnHelp').onclick = showHelp;
+$('liGo').onclick = loginGo;
+$('liPin').addEventListener('keydown', e => { if (e.key === 'Enter') loginGo(); });
+$('liLink').onclick = loginLink;
+$('btnLogin').onclick = () => { $('landLogin').scrollIntoView({ behavior: 'smooth', block: 'start' }); if (!ls('ca_fid')) setTimeout(() => $('liEmail').focus(), 400); };
 renderLandingShop();
 $('btnLearn').onclick = () => openTutorial('overview', 0);
 $('btnAllTut').onclick = openLibrary;
