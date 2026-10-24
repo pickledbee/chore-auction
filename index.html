@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-+SvGcJlh4BOSJl0Za+QNXNJWxRrHWHJKDrFtLwmNrEE='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-bqzatnASCGlST+2ZKvyD4UzjGpAjXHe+nNuyGktSEGg='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -339,6 +339,22 @@
   .btn.ghostw{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.6)}
   #view.previewing .btn,#view.previewing [data-a],#view.previewing [data-tab-go]{pointer-events:none}
   #view.previewing .btn{opacity:.6}
+  body{touch-action:manipulation}
+  #helpFab{position:fixed;right:16px;bottom:16px;width:56px;height:56px;border-radius:50%;border:0;background:var(--purple);color:#fff;font:700 28px 'Fredoka',sans-serif;box-shadow:0 6px 18px rgba(40,20,80,.3);cursor:pointer;z-index:45}
+  #helpFab.on{background:var(--gold);color:var(--ink);outline:4px solid #fff}
+  #helpTip{position:fixed;right:16px;bottom:82px;max-width:270px;text-align:left;border:0;background:var(--ink);color:#fff;border-radius:16px;padding:12px 14px;font:600 14px 'Nunito',sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:45;cursor:pointer}
+  #helpTip span{display:block;margin-top:6px;color:var(--gold);font-weight:800}
+  #helpTip.hidden{display:none}
+  body.helpmode{cursor:help}
+  body.helpmode::before{content:'Help mode: tap anything to learn what it does';position:fixed;left:0;right:0;top:0;z-index:44;background:var(--gold);color:var(--ink);text-align:center;font:800 15px 'Nunito',sans-serif;padding:10px}
+  body.helpmode .card:hover,body.helpmode button:hover,body.helpmode .kidcard:hover,body.helpmode details:hover{outline:3px dashed var(--gold);outline-offset:2px}
+  .tut h3{margin:6px 40px 2px}
+  .tuth{font:600 19px 'Fredoka',sans-serif;color:var(--purple);margin:14px 0 6px}
+  .tutlist{display:grid;gap:8px}
+  .tutitem{display:flex;justify-content:space-between;align-items:center;border:2px solid var(--line);background:#fff;border-radius:12px;padding:12px 14px;font:700 15px 'Nunito',sans-serif;color:var(--ink);cursor:pointer;text-align:left}
+  .tutitem:hover{border-color:var(--purple2)}
+  .tutitem span{color:var(--purple);font-size:20px}
+  main.wrap,#s-landing .wrap{padding-bottom:70px}
 </style>
 </head>
 <body>
@@ -352,6 +368,7 @@
       <p>Every chore shows what it pays. Kids pick the jobs they want, any time, and earn the points when a parent checks the work. Chores nobody picks pay a little more every day, so even the yucky jobs get done.</p>
       <div class="btns">
         <button class="btn gold" id="btnDemo">Try the demo</button>
+        <button class="btn white" id="btnLearn">How does it work?</button>
         <button class="btn line" id="btnSetup">Set up my family</button>
         <button class="btn white" id="btnJoin">Enter a join code</button>
       </div>
@@ -429,6 +446,7 @@
       <p class="desc mt" style="margin-bottom:0">Forgot your PIN? Open your family link and tap <b>Forgot PIN?</b> where it asks for the PIN. We will email you a code to choose a new one.</p>
     </div>
   </div>
+  <p style="text-align:center"><button class="btn ghost" id="btnAllTut">See all tutorials</button></p>
   <footer class="small">The Chore Auction · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms and refunds</a></footer>
 </div>
 
@@ -567,6 +585,10 @@
   </div>
 </div>
 
+<!-- help: the round ? button, and a one-time tip -->
+<button id="helpFab" aria-label="Help: tap, then tap anything to learn about it" aria-pressed="false">?</button>
+<button id="helpTip" class="hidden">New here? <b>Double-click</b> anything to learn what it does, or tap <b>?</b> then tap anything. <span>Got it</span></button>
+
 <!-- pop-up sheet: a kid's details, connecting a device, tours -->
 <div id="sheet" class="overlay sheet">
   <div class="mbox sheetbox" id="sheetBox" role="dialog" aria-modal="true">
@@ -616,7 +638,7 @@ const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
 const OFTEN_NAMES = { 1: 'Every day', 2: 'Every 2 days', 3: 'Every 3 days', 7: 'Once a week' };
 const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
-const APP_VERSION = '6.1';
+const APP_VERSION = '6.2';
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
@@ -2100,6 +2122,8 @@ function showHelp() {
   $('hmBody').innerHTML = H[1] + (tourFor ? '<button class="btn ghost full mt" id="hmTour">Take the quick tour</button>' : '') +
     `<p class="desc mt" style="margin-bottom:0;font-size:12px">App version ${APP_VERSION}</p>`;
   if (tourFor) $('hmTour').onclick = () => { $('hm').className = 'overlay'; openTour(tourFor); };
+  $('hmBody').insertAdjacentHTML('beforeend', '<button class="btn full mt" id="hmLib">All tutorials</button><p class="desc mt" style="margin-bottom:0">Tip: double-click (or double-tap) anything to learn what it does, or tap the round ? button, then tap anything.</p>');
+  $('hmLib').onclick = () => { $('hm').className = 'overlay'; openLibrary(); };
   $('hm').className = 'overlay show';
 }
 
@@ -2121,6 +2145,11 @@ async function viewClick(e) {
   if (tg) { closeSheet(); if (mode() === 'kid' || mode() === 'preview') KTAB = tg.dataset.tabGo; else PTAB = tg.dataset.tabGo; renderApp(); window.scrollTo(0, 0); return; }
   const b = e.target.closest('[data-a]');
   if (!b) return;
+  if (tutClick(b)) return;
+  // Wait a moment: if this turns out to be a double-click, show the tutorial instead of doing the action.
+  const at = Date.now();
+  await new Promise(r => setTimeout(r, 300));
+  if (lastDoubleAt >= at) return;
   if (await familyClick(b)) return;
   const d = DATA, i = Number(b.dataset.i), row = Number(b.dataset.row), v = id => $(id).value;
   switch (b.dataset.a) {
@@ -2375,10 +2404,12 @@ function openSheet(type, kid, step) {
 function closeSheet() {
   SHEET = null;
   const s = $('sheet'); if (s) s.className = 'overlay sheet';
+  const body = $('sheetBody'); if (body) body.innerHTML = '';
 }
 function renderSheet() {
-  if (!SHEET || !DATA) return;
-  const html = SHEET.type === 'kid' ? sheetKid(SHEET.kid) : SHEET.type === 'connect' ? sheetConnect(SHEET.kid) : sheetTour();
+  if (!SHEET) return;
+  if (!DATA && SHEET.type !== 'tut' && SHEET.type !== 'lib') return;
+  const html = SHEET.type === 'tut' ? sheetTut() : SHEET.type === 'lib' ? sheetLib() : SHEET.type === 'kid' ? sheetKid(SHEET.kid) : SHEET.type === 'connect' ? sheetConnect(SHEET.kid) : sheetTour();
   if (!html) { closeSheet(); return; }
   const box = $('sheetBox'), top = box.scrollTop;
   $('sheetBody').innerHTML = html;
@@ -2490,6 +2521,8 @@ function maybeTour(m) {
 /* ---------- what the new buttons do ---------- */
 async function familyClick(b) {
   const kid = b.dataset.kid;
+  // buttons inside a pop-up do nothing if the pop-up was closed in the meantime
+  if (b.closest('#sheet') && !SHEET) return true;
   switch (b.dataset.a) {
     case 'kidSheet': openSheet('kid', kid); return true;
     case 'preview':
@@ -2524,7 +2557,7 @@ async function familyClick(b) {
     }
     case 'tourNext': SHEET.step++; renderSheet(); return true;
     case 'tourBack': SHEET.step = Math.max(0, SHEET.step - 1); renderSheet(); return true;
-    case 'tourDone': closeSheet(); return true;
+    case 'tourDone': closeSheet(); if (!ls('ca_help_seen')) $('helpTip').classList.remove('hidden'); return true;
     case 'hideSteps': ls('ca_steps_off_' + FID, '1'); renderApp(); return true;
     case 'kidToParent':
       await kidSignOut('');
@@ -2542,6 +2575,348 @@ async function makeJoin(kid) {
   } catch (err) { if (errMsg(err) !== 'CANCELLED') toast(errMsg(err), true); }
 }
 
+/* ============================== TUTORIALS AND HELP ==============================
+   Every part of the app has a short tutorial.
+   - Double-click (or double-tap) anything to open the tutorial for that part.
+   - Or tap the ? button, then tap anything.
+   - "All tutorials" lists every tutorial, grouped.                              */
+
+const TUT = {
+  /* ---------- everyone ---------- */
+  overview: { group: 'Start here', title: 'What is The Chore Auction?', steps: [
+    ['Chores pay points', 'Every chore in your house shows how many <b>points</b> it pays. Parents choose the chores and the points.'],
+    ['Kids pick the chores they want', 'A kid taps <b>I\'ll do it</b> on a chore. It is theirs right away. Nobody has to argue about who does what.'],
+    ['The "auction" part', 'If nobody picks a chore, it <b>pays a little more every day</b> until someone grabs it. Waiting can pay more, but a brother or sister might take it first. That is how even the yucky jobs get done.'],
+    ['Finish, then a parent checks', 'When the job is done, the kid taps <b>I finished it!</b> A parent checks it and taps <b>Approve</b>. Now the points are earned.'],
+    ['Points buy rewards', 'Parents choose rewards like screen time or picking the movie. Kids trade points for them. The parent hands out the reward.'],
+    ['Need help any time?', 'Double-click (or double-tap) anything in the app to learn what it does. Or tap the round <b>?</b> button, then tap anything.']
+  ] },
+  helpHow: { group: 'Start here', title: 'How to get help', steps: [
+    ['Double-click anything', 'On a computer, <b>double-click</b> any part of the app. A short tutorial about that exact part opens.'],
+    ['On a phone or tablet', 'Tap the round <b>?</b> button in the corner. The screen turns into help mode. Now tap anything, and its tutorial opens instead of the button doing its job. You can also double-tap.'],
+    ['Every tutorial in one place', 'Tap <b>All tutorials</b> at the bottom of any tutorial, or in <b>How it works</b>, to see the full list.']
+  ] },
+  devices: { group: 'Start here', title: 'Three ways to use it', steps: [
+    ['A parent\'s phone', 'Type your PIN one time. After that the phone remembers you, so you can approve chores with one tap and never type the PIN there again.'],
+    ['A kid\'s own phone or tablet', 'A parent connects it to one kid. On that device, the kid can only ever pick chores as themselves.'],
+    ['A family computer or tablet', 'One screen everyone shares. Kids tap their name and type their own 4-number <b>secret code</b>. Great for kids who do not have a phone.'],
+    ['Mix and match', 'Most families use a parent\'s phone plus one shared tablet. Set up each device once.']
+  ] },
+  demo: { group: 'Start here', title: 'Trying the demo', steps: [
+    ['A pretend family', 'The demo has made-up kids (Maya, Leo, and Sam). Nothing is saved online, so tap anything you like.'],
+    ['"Try it as" buttons', 'The yellow bar lets you switch between <b>A parent\'s phone</b>, <b>Sam\'s tablet</b> (a kid\'s own device), and <b>The family computer</b>. This shows how each person sees the app.'],
+    ['Demo codes', 'The demo parent PIN is <b>1234</b>. Kid codes are Maya 1111, Leo 2222, Sam 3333.'],
+    ['Start over or go real', '<b>Start over</b> resets the demo. <b>Set up my real family</b> starts your own family.']
+  ] },
+  joinCode: { group: 'Start here', title: 'Entering a join code', steps: [
+    ['What it is', 'A join code connects a kid\'s own phone or tablet to that kid. It looks like <b>K7M-4QP</b>.'],
+    ['Getting a code', 'A parent opens the Family screen, taps the kid, then taps <b>Connect a device</b> and <b>has their own phone or tablet</b>. The code appears.'],
+    ['Typing it in', 'On the kid\'s device, go to the website, tap <b>Enter a join code</b>, type the code, and tap <b>Join</b>.'],
+    ['Good to know', 'Each code works one time and expires after 10 minutes. If it expires, just make a new one.']
+  ] },
+  lostLink: { group: 'Start here', title: 'Lost your link or forgot your PIN', steps: [
+    ['Your family link', 'Every family has a private link. Treat it like a house key. Your welcome email has it.'],
+    ['Lost the link?', 'On the start page, type the parent email you used during setup and tap <b>Email me my link</b>.'],
+    ['Forgot your PIN?', 'Wherever the app asks for the PIN, tap <b>Forgot PIN?</b> We email a 6-number code. Type it in, then choose a new PIN.'],
+    ['A kid forgot their code?', 'On the family computer, the kid taps their name, then <b>I forgot my code</b>. The code is emailed to the parent. Parents can also see every code in the kid\'s pop-up.']
+  ] },
+
+  /* ---------- setting up ---------- */
+  setupWizard: { group: 'Setting up', title: 'Setting up your family', steps: [
+    ['1. Your family', 'Pick a fun <b>family nickname</b> (no last names). Choose a <b>parent PIN</b> of 6 to 12 numbers your kids could not guess. Add your email so you can reset the PIN if you forget it.'],
+    ['2. Your kids', 'Type each kid\'s first name and pick a color. Each kid gets a 4-number <b>secret code</b> for signing in on a shared family computer. Change the codes to ones they will remember.'],
+    ['3. Chores', 'Check the chores you want. <b>Starts at</b> is what it pays at first. <b>Up to</b> is the most it can grow to if nobody picks it. <b>Size</b> (small, medium, big) is how much work it is. The last box is how often it comes back after it is done.'],
+    ['4. Rewards', 'Check the rewards kids can buy and set what each costs in points. You hand out the rewards yourself.'],
+    ['5. Rules', 'Choose whether points rise on waiting chores, how much work a kid can hold at once, whether kids take turns, and whether finished chores get approved automatically if you forget.'],
+    ['Done!', 'Tap <b>Create my family</b>. The phone you used becomes your parent phone, and we email you your link and the kids\' codes.']
+  ] },
+  doneScreen: { group: 'Setting up', title: 'Your family is ready', steps: [
+    ['Save your link', 'Your private family link is shown here. Tap <b>Share</b> to send it to the other parent, or save it. It was also emailed to you.'],
+    ['Open the app', 'Tap <b>Open my Chore Auction</b>. Start on the Family screen and follow the <b>Getting started</b> checklist.']
+  ] },
+  deviceChoice: { group: 'Setting up', title: 'First time on a device', steps: [
+    ['Why it asks', 'Each phone, tablet, or computer is set up once, so the app knows who uses it.'],
+    ['A parent\'s phone', 'Type your PIN once. This device opens straight to your Family screen from then on.'],
+    ['Our family computer', 'A parent types the PIN once. After that, kids tap their name and type their secret code to use it.'],
+    ['One kid\'s own device', 'A parent types the PIN and picks the kid, or the kid types a join code. It only ever works as that kid.']
+  ] },
+  checklist: { group: 'Setting up', title: 'The Getting started checklist', steps: [
+    ['Your to-do list', 'New families see this on the Family screen. Each step checks itself off when it is done.'],
+    ['Buttons on each step', 'Tap the button next to a step to jump right to it, like <b>Connect Maya</b>.'],
+    ['Hide it', 'Tap <b>Hide</b> when you do not need it anymore.']
+  ] },
+
+  /* ---------- parents ---------- */
+  familyHome: { group: 'For parents', title: 'The Family screen', steps: [
+    ['Your home base', 'Every kid has a card with their points and what they are doing right now.'],
+    ['Something to check?', 'When chores are finished, a blue bar at the top says so. Tap it to approve them.'],
+    ['Tap a kid', 'Tap any kid\'s card to open their pop-up. Everything about that kid is in one place.'],
+    ['Points history', 'At the bottom, <b>Every point, earned and spent</b> lists every point for every kid.']
+  ] },
+  kidCard: { group: 'For parents', title: 'A kid\'s card', steps: [
+    ['What it shows', 'The kid\'s name and points, any chores they <b>finished</b> (blue, needs checking), and chores they are <b>doing</b>.'],
+    ['Devices', 'The bottom line shows how the kid uses the app: their own device, the family computer, or <b>Not connected yet</b>.'],
+    ['Open it', 'Tap the card to open the kid\'s pop-up.']
+  ] },
+  kidPopup: { group: 'For parents', title: 'A kid\'s pop-up', steps: [
+    ['See what they see', 'The gold button shows you this kid\'s exact screen.'],
+    ['Finished, check it', 'Tap <b>Approve</b> to give the points, or <b>Redo</b> to send it back for a little more work.'],
+    ['Working on', '<b>Done</b> approves it now. <b>Not done</b> gives no points and puts the chore back on the board. <b>Put back</b> takes it away so someone else can do it.'],
+    ['Give a chore', 'Pick an open chore and tap <b>Give</b> to hand it to this kid at today\'s points.'],
+    ['Rewards and bonus points', 'Tap <b>Trade</b> when a kid buys a reward. Under Bonus points, type a number and a reason. Use a minus sign to take points away.'],
+    ['Devices and code', 'See the kid\'s secret code, change it, or connect a new device for them.']
+  ] },
+  preview: { group: 'For parents', title: 'See what your kid sees', steps: [
+    ['Their exact screen', 'This shows exactly what this kid sees on their device. The buttons are turned off so nothing happens by accident.'],
+    ['Switch kids', 'The dark bar at the top has a button for each of your other kids. Tap one to see their screen.'],
+    ['Come back', 'Tap <b>Back to parent</b>. You land back in that kid\'s pop-up.']
+  ] },
+  approve: { group: 'For parents', title: 'Approving finished chores', steps: [
+    ['The red number', 'The red number on <b>Approve</b> is how many chores are waiting for you to check.'],
+    ['One tap', 'Look at the work, then tap <b>Approve</b>. The points go to the kid right away. Several waiting? Tap <b>Approve all</b>.'],
+    ['Not quite right?', 'Tap <b>Redo</b>. It goes back to the kid\'s list so they can finish it.'],
+    ['If you forget', 'If automatic approval is on, a finished chore is approved for you after 12, 24, or 48 hours. Change this in Settings, then Rules.']
+  ] },
+  choresTab: { group: 'For parents', title: 'The Chores tab', steps: [
+    ['Every chore in one list', 'This is the chore board as a parent sees it.'],
+    ['Open chores', 'Shows what it pays now and tomorrow. Pick a kid and tap <b>Give</b> to hand it to them.'],
+    ['Being done', 'Shows which kid has it. <b>Done</b> approves it, <b>Not done</b> gives no points, <b>Put back</b> returns it to the board.'],
+    ['Resting', 'Chores that were just done rest until they come back (every day, every few days, or once a week).'],
+    ['Recently done', 'The bottom card lists the latest approved chores.']
+  ] },
+  settings: { group: 'For parents', title: 'Settings', steps: [
+    ['Tap a section to open it', '<b>Devices</b>, <b>Kids and secret codes</b>, <b>Chores</b>, <b>Rewards</b>, <b>Rules</b>, and <b>Family</b>. Double-click any section for its own tutorial.'],
+    ['Changes save when you tap Save', 'Each section has its own Save button.']
+  ] },
+  setDevices: { group: 'For parents', title: 'Settings: Devices', steps: [
+    ['Every device in your family', 'The list shows each parent phone, family computer, and kid device, when it was added, and when it was last used.'],
+    ['Connect a kid\'s device', 'Pick the kid and tap <b>Get a join code</b>, then type it on their device.'],
+    ['Remove a device', 'Lost a phone, or a device you do not recognize? Tap <b>Remove</b>. It stops working right away.']
+  ] },
+  setKids: { group: 'For parents', title: 'Settings: Kids and secret codes', steps: [
+    ['Secret codes', 'Each kid\'s 4-number code is shown here (only parents can see it). Tap <b>Change code</b> to pick a new one.'],
+    ['Email me all the codes', 'Sends every kid\'s code to the parent email.'],
+    ['Add or remove a kid', 'Type a first name, pick a color and code, and tap <b>Add</b>. Removing a kid keeps their history.']
+  ] },
+  setChores: { group: 'For parents', title: 'Settings: Chores', steps: [
+    ['Starts at and up to', '<b>Starts at</b> is the pay when the chore first opens. <b>Up to</b> is the most it can grow to if nobody picks it for 4 days.'],
+    ['Size', 'Small counts 1, medium 2, big 3. This is used by the work limit.'],
+    ['Comes back', 'How long a chore rests after it is approved: every day, every 2 days, every 3 days, or once a week.'],
+    ['Who can do it', 'Uncheck kids who are too young for a chore. They will not see it.'],
+    ['Add your own', 'Type a name, set the points, size, and how often, then tap <b>Add chore</b>.']
+  ] },
+  setRewards: { group: 'For parents', title: 'Settings: Rewards', steps: [
+    ['What points can buy', 'Change any cost and tap <b>Save</b>, or add your own reward.'],
+    ['You hand it out', 'The app keeps track of points. It does not control screen time on any device.']
+  ] },
+  setRules: { group: 'For parents', title: 'Settings: Rules', steps: [
+    ['Raise points on waiting chores', 'When on, a chore nobody picks pays a little more each day, reaching its top pay after 4 days.'],
+    ['Most work a kid can hold at once', 'Stops one kid from grabbing every chore. When they finish one, they can pick another.'],
+    ['Take turns', 'Whoever did a chore last time waits a day before picking it again, so someone else gets a turn.'],
+    ['Approve automatically', 'If you forget to check a finished chore, it is approved for you after the time you pick.']
+  ] },
+  setFamily: { group: 'For parents', title: 'Settings: Family', steps: [
+    ['Nickname and email', 'Change your family nickname or parent email. We only email you when it matters: things you ask for and a few security notices.'],
+    ['Change or reset the PIN', 'Type the old PIN and the new one twice. Forgot it? Tap <b>Email me a reset code</b>.'],
+    ['Delete everything', 'Permanently deletes your family. It needs the PIN and cannot be undone.']
+  ] },
+  parentPin: { group: 'For parents', title: 'The parent PIN', steps: [
+    ['What it protects', 'The PIN is needed to approve chores, change settings, and set up devices. Only parents should know it.'],
+    ['Type it once', 'On your own phone, you only type it once. On a family computer, you type it each time, then tap <b>Lock</b> when done.'],
+    ['Forgot it?', 'Tap <b>Forgot PIN?</b> under the PIN box. We email you a code to choose a new PIN.'],
+    ['Too many wrong tries', 'After 5 wrong tries, the PIN locks for a while and you get an email. A reset code also unlocks it.']
+  ] },
+  connect: { group: 'For parents', title: 'Connecting a kid', steps: [
+    ['Their own device', 'Tap <b>has their own phone or tablet</b>. A one-time code appears. On their device, open the website, tap <b>Enter a join code</b>, and type it.'],
+    ['The family computer', 'Tap <b>uses our family computer</b>. Set up the family computer once with your PIN. Then the kid taps their name and types their secret code.']
+  ] },
+
+  /* ---------- kids ---------- */
+  pickChore: { group: 'For kids', title: 'Picking a chore', steps: [
+    ['Look at the points', 'Each chore shows how many <b>points</b> it pays right now.'],
+    ['Tap I\'ll do it', 'Tap the gold button on a chore you want, then tap <b>OK</b>. It is yours right away.'],
+    ['Wait for more points?', 'Chores nobody picks go up every day. You could wait, but someone else might grab it first!'],
+    ['Gray chores', 'Gray chores are taken by someone else, or resting until they come back.']
+  ] },
+  price: { group: 'For kids', title: 'Points now and tomorrow', steps: [
+    ['Points now', 'The big number is what this chore pays if you pick it right now.'],
+    ['Goes up tomorrow', 'If nobody picks it today, it will pay more tomorrow. The yellow tag tells you how much.'],
+    ['Top pay!', 'A red <b>Top pay</b> tag means it cannot go any higher. Grab it!']
+  ] },
+  tags: { group: 'For kids', title: 'Job size and how often', steps: [
+    ['Small, medium, big', 'How much work the job is. Small counts 1, medium 2, big 3.'],
+    ['Your limit', 'You can only hold so much work at once. The box at the top says how much you have.'],
+    ['Every day, every few days, once a week', 'How soon a chore comes back after it is done.']
+  ] },
+  why: { group: 'For kids', title: 'Why can\'t I pick this?', steps: [
+    ['You have enough chores', 'You already have as much work as you can hold. Finish one, then you can pick another.'],
+    ['You did it last time', 'When taking turns is on, someone else gets first try for a day.'],
+    ['Not on your list', 'A parent decided this chore is for someone else.']
+  ] },
+  myChores: { group: 'For kids', title: 'My chores', steps: [
+    ['To do', 'Chores you picked. Do the job, then tap <b>I finished it!</b>'],
+    ['Changed your mind?', 'Tap <b>Give it back</b>. The chore goes back on the board for someone else.'],
+    ['Waiting for a parent', 'After you tap I finished it, a parent checks it. When they approve it, the points are yours.'],
+    ['Done and paid', 'Your latest finished chores and the points you got.']
+  ] },
+  myPoints: { group: 'For kids', title: 'My points', steps: [
+    ['Your points', 'The big number at the top is how many points you have. The bar shows how close you are to the next reward.'],
+    ['Rewards', 'See what each reward costs. To trade your points, ask a parent.'],
+    ['History', 'Every point you earned or spent, with the reason.']
+  ] },
+  whoScreen: { group: 'For kids', title: 'The family computer', steps: [
+    ['Who\'s using this?', 'Tap your name.'],
+    ['Type your secret code', 'Type your 4-number code on the number pad. Forgot it? Tap <b>I forgot my code</b> and it is emailed to your parent.'],
+    ['When you are done', 'Tap <b>I\'m done, sign out</b> so nobody else uses your name. It also signs you out by itself after 3 minutes.'],
+    ['Parents', 'Tap <b>Parent</b> and type the PIN. Tap <b>Lock</b> when you are done.']
+  ] },
+  kidBar: { group: 'For kids', title: 'The dark bar at the top', steps: [
+    ['Who is signed in', 'It shows whose turn it is on the family computer.'],
+    ['I\'m done, sign out', 'Signs you out so the next person can use it.'],
+    ['Parent', 'Lets a parent switch to the parent screens with the PIN.']
+  ] }
+};
+const TUT_GROUPS = ['Start here', 'Setting up', 'For parents', 'For kids'];
+
+/* ---------- which tutorial goes with which part of the screen ---------- */
+// First match wins, so the most specific parts are listed first.
+const HELP_MAP = [
+  ['#helpFab', 'helpHow'], ['.sheethead, #sheetBody [data-a=preview]', 'preview'], ['#sheetBody .choices, #sheetBody .codebig', 'connect'],
+  ['#sheetBody', 'kidPopup'], ['#kp', 'whoScreen'], ['#mForgot', 'lostLink'], ['#modal', 'parentPin'],
+  ['#btnDemo, #demoBanner, [data-demo]', 'demo'], ['#btnJoin, #s-join', 'joinCode'], ['#recEmail, #recGo, #landRecover', 'lostLink'],
+  ['#btnSetup, #btnRealFamily', 'setupWizard'], ['#s-done', 'doneScreen'], ['.ways', 'devices'],
+  ['#closePill', 'pickChore'], ['#btnHelp', 'overview'],
+  ['#whoBar [data-a=endPreview], #whoBar [data-a=preview]', 'preview'], ['#whoBar', 'kidBar'],
+  ['#tabsIn [data-tab=home]', 'familyHome'], ['#tabsIn [data-tab=approve]', 'approve'], ['#tabsIn [data-tab=board]', 'choresTab'],
+  ['#tabsIn [data-tab=settings]', 'settings'], ['#tabsIn [data-tab=pick]', 'pickChore'], ['#tabsIn [data-tab=mine]', 'myChores'], ['#tabsIn [data-tab=points]', 'myPoints'],
+  ['.steps', 'checklist'], ['.readybar', 'approve'], ['.kidcard', 'kidCard'],
+  ['details[data-sec=devices]', 'setDevices'], ['details[data-sec=kids]', 'setKids'], ['details[data-sec=chores]', 'setChores'],
+  ['details[data-sec=rewards]', 'setRewards'], ['details[data-sec=rules]', 'setRules'], ['details[data-sec=family]', 'setFamily'],
+  ['details[data-sec=history]', 'familyHome'],
+  ['.choices', 'deviceChoice'], ['.tiles', 'whoScreen'],
+  ['.why', 'why'], ['.price', 'price'], ['.tag.size, .tag.often', 'tags'], ['[data-a=claim]', 'pickChore'],
+  ['[data-a=ready], [data-a=giveBack]', 'myChores']
+];
+
+// The tutorial for the screen as a whole, when nothing more specific matches
+function screenHelp() {
+  const on = id => $('s-' + id).classList.contains('on');
+  if (on('wizard')) return ['setupWizard', W ? W.step : 0];
+  if (on('done')) return ['doneScreen', 0];
+  if (on('join')) return ['joinCode', 0];
+  if (!on('app') || !DATA) return ['overview', 0];
+  const m = mode();
+  if (m === 'setup') return ['deviceChoice', 0];
+  if (m === 'who') return ['whoScreen', 0];
+  if (m === 'preview') return ['preview', 0];
+  if (m === 'kid') return [{ mine: 'myChores', points: 'myPoints' }[KTAB] || 'pickChore', 0];
+  return [{ approve: 'approve', board: 'choresTab', settings: 'settings' }[PTAB] || 'familyHome', 0];
+}
+
+function helpFor(el) {
+  for (const [sel, key] of HELP_MAP) { if (el && el.closest && el.closest(sel)) return [key, 0]; }
+  return screenHelp();
+}
+
+/* ---------- showing a tutorial ---------- */
+let SHEET_BEFORE = null;
+function openTutorial(key, step) {
+  if (!TUT[key]) key = 'overview';
+  if (SHEET && SHEET.type !== 'tut' && SHEET.type !== 'lib') SHEET_BEFORE = SHEET;
+  openSheet('tut', key, step || 0);
+}
+function openLibrary() {
+  if (SHEET && SHEET.type !== 'tut' && SHEET.type !== 'lib') SHEET_BEFORE = SHEET;
+  openSheet('lib');
+}
+function sheetTut() {
+  const t = TUT[SHEET.kid], n = t.steps.length, i = Math.max(0, Math.min(SHEET.step, n - 1)), last = i === n - 1;
+  return `<div class="tourstep tut"><span class="tourn">${esc(t.group)} · ${i + 1} of ${n}</span>
+    <h3>${esc(t.title)}</h3>
+    <h4 class="tuth">${t.steps[i][0]}</h4><p class="desc">${t.steps[i][1]}</p>
+    <div class="dots">${t.steps.map((_, j) => `<i class="${j === i ? 'on' : ''}"></i>`).join('')}</div>
+    <div class="row">${i ? '<button class="btn ghost" data-a="tutBack">Back</button>' : ''}
+      <button class="btn ${last ? 'gold' : ''}" data-a="${last ? 'tutDone' : 'tutNext'}">${last ? 'Got it!' : 'Next'}</button></div>
+    <button class="link mt" data-a="tutLib">All tutorials</button></div>`;
+}
+function sheetLib() {
+  return `<h3>All tutorials</h3>
+    <p class="desc">Tip: double-click (or double-tap) anything in the app to open its tutorial. On a phone, tap the round <b>?</b> button, then tap anything.</p>
+    ${TUT_GROUPS.map(g => `<h4 class="sh">${esc(g)}</h4><div class="tutlist">${Object.keys(TUT).filter(k => TUT[k].group === g)
+      .map(k => `<button class="tutitem" data-a="tut" data-key="${k}">${esc(TUT[k].title)}<span>&#8250;</span></button>`).join('')}</div>`).join('')}`;
+}
+function tutClick(b) {
+  if (/^tut/.test(b.dataset.a) && !SHEET) return true;
+  switch (b.dataset.a) {
+    case 'tut': openSheet('tut', b.dataset.key, 0); return true;
+    case 'tutNext': SHEET.step++; renderSheet(); return true;
+    case 'tutBack': SHEET.step = Math.max(0, SHEET.step - 1); renderSheet(); return true;
+    case 'tutLib': openSheet('lib'); return true;
+    case 'tutDone': {
+      const back = SHEET_BEFORE; SHEET_BEFORE = null;
+      if (back) { SHEET = back; renderSheet(); } else closeSheet();
+      return true;
+    }
+  }
+  return false;
+}
+
+/* ---------- double-click, double-tap, and help mode ---------- */
+let HELP_MODE = false, lastPopupAt = 0, lastDoubleAt = 0, lastTap = { t: 0, x: 0, y: 0 };
+// the second click of a double-click never does anything; it only marks the double-click
+document.addEventListener('click', e => {
+  if (e.detail >= 2 && !e.target.closest('input, select, textarea, #kpKeys, .stepper')) { lastDoubleAt = Date.now(); e.stopPropagation(); e.preventDefault(); }
+}, true);
+// remember when a question pops up, so a double-click can cancel what its first click started
+new MutationObserver(() => {
+  if ($('modal').classList.contains('show') || $('kp').classList.contains('show')) lastPopupAt = Date.now();
+}).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] });
+
+function showHelpFor(el) {
+  lastDoubleAt = Date.now();
+  if (Date.now() - lastPopupAt < 800) {
+    if ($('modal').classList.contains('show')) $('mCancel').click();
+    if ($('kp').classList.contains('show')) $('kp').querySelector('[data-k=cancel]').click();
+  }
+  try { window.getSelection().removeAllRanges(); } catch (e) { /* ignore */ }
+  const inSheet = el && el.closest && el.closest('#sheet');
+  if (inSheet && SHEET && (SHEET.type === 'tut' || SHEET.type === 'lib')) return;   // already reading one
+  const [key, step] = helpFor(el);
+  openTutorial(key, step);
+}
+function setHelpMode(on) {
+  HELP_MODE = on;
+  document.body.classList.toggle('helpmode', on);
+  $('helpFab').classList.toggle('on', on);
+  $('helpFab').setAttribute('aria-pressed', on ? 'true' : 'false');
+  $('helpTip').classList.add('hidden');
+  ls('ca_help_seen', '1');
+  if (on) toast('Help mode: tap anything to learn what it does.');
+}
+
+document.addEventListener('dblclick', e => {
+  if (e.target.closest('input, select, textarea')) return;
+  e.preventDefault();
+  showHelpFor(e.target);
+});
+// phones and tablets: two quick taps in the same spot
+document.addEventListener('touchend', e => {
+  if (e.target.closest('input, select, textarea, #kpKeys')) return;
+  const p = e.changedTouches && e.changedTouches[0];
+  if (!p) return;
+  const now = Date.now(), near = Math.abs(p.clientX - lastTap.x) < 30 && Math.abs(p.clientY - lastTap.y) < 30;
+  if (now - lastTap.t < 320 && near) { e.preventDefault(); lastTap.t = 0; showHelpFor(e.target); return; }
+  lastTap = { t: now, x: p.clientX, y: p.clientY };
+}, { passive: false });
+// help mode: the next tap explains instead of doing
+document.addEventListener('click', e => {
+  if (!HELP_MODE || e.target.closest('#helpFab')) return;
+  if (e.target.closest('#sheet') && SHEET && (SHEET.type === 'tut' || SHEET.type === 'lib')) return;
+  e.preventDefault(); e.stopPropagation();
+  setHelpMode(false);
+  showHelpFor(e.target);
+}, true);
+
 /* ============================== START ============================== */
 $('btnDemo').onclick = openDemo;
 $('btnSetup').onclick = startWizard;
@@ -2553,6 +2928,11 @@ document.querySelectorAll('[data-demo]').forEach(b => b.addEventListener('click'
   load().then(() => toast({ parent: 'Now you are seeing a parent\'s phone.', kid: 'Now you are seeing Sam\'s own tablet.', shared: 'Now you are seeing the family computer. Kids tap their name and type a code.' }[b.dataset.demo]));
 }));
 $('btnHelp').onclick = showHelp;
+$('btnLearn').onclick = () => openTutorial('overview', 0);
+$('btnAllTut').onclick = openLibrary;
+$('helpFab').onclick = () => setHelpMode(!HELP_MODE);
+$('helpTip').onclick = () => { $('helpTip').classList.add('hidden'); ls('ca_help_seen', '1'); };
+if (!ls('ca_help_seen')) $('helpTip').classList.remove('hidden');
 $('hmClose').onclick = () => { $('hm').className = 'overlay'; };
 $('recGo').onclick = recover;
 $('joinGo').onclick = joinGo;
