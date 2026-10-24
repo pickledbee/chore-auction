@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-a79PFNajHSIvHeDNotz0hKNINNRhMwF19eMTX9FEUBA='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-wOuAen6+rh0H/h5Cr0ax7Bm7jOsmG0d5GGYRFCJXokk='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -361,6 +361,11 @@
   #sheetBody .pill.tutswitch,#s-landing .js-tut{background:var(--lav);color:var(--purple)}
   #sheetBody .pill.tutswitch b,#s-landing .js-tut b{color:var(--purple)}
   body.tutoff #helpFab,body.tutoff #helpTip{display:none}
+  .btn.tutbig{background:rgba(255,255,255,.14);color:#fff;border:2px solid rgba(255,255,255,.55)}
+  .btn.tutbig b{color:var(--gold)}
+  body.tutoff .btn.tutbig b{color:#ffb3b3}
+  .js-tut::before{content:'';display:inline-block;width:30px;height:16px;border-radius:999px;background:var(--gold);margin-right:8px;vertical-align:-2px;box-shadow:inset 15px 0 0 0 #fff}
+  body.tutoff .js-tut::before{background:#9a8fb5;box-shadow:inset -15px 0 0 0 #fff}
 </style>
 </head>
 <body>
@@ -375,6 +380,7 @@
       <div class="btns">
         <button class="btn gold" id="btnDemo">Try the demo</button>
         <button class="btn white" id="btnLearn">How does it work?</button>
+        <button class="btn tutbig js-tut" id="tutHero"></button>
         <button class="btn line" id="btnSetup">Set up my family</button>
         <button class="btn white" id="btnJoin">Enter a join code</button>
       </div>
@@ -645,7 +651,7 @@ const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
 const OFTEN_NAMES = { 1: 'Every day', 2: 'Every 2 days', 3: 'Every 3 days', 7: 'Once a week' };
 const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
-const APP_VERSION = '6.3';
+const APP_VERSION = '6.4';
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
@@ -2972,7 +2978,7 @@ $('btnAllTut').onclick = openLibrary;
 $('helpFab').onclick = () => setHelpMode(!HELP_MODE);
 $('helpTip').onclick = () => { $('helpTip').classList.add('hidden'); ls('ca_help_seen', '1'); };
 if (!ls('ca_help_seen') && tutOn()) $('helpTip').classList.remove('hidden');
-['tutPill', 'tutLand'].forEach(id => { $(id).onclick = () => setTutorials(!tutOn()); });
+['tutPill', 'tutLand', 'tutHero'].forEach(id => { $(id).onclick = () => setTutorials(!tutOn()); });
 showTutState();
 $('hmClose').onclick = () => { $('hm').className = 'overlay'; };
 $('recGo').onclick = recover;
