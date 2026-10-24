@@ -2,11 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-wOuAen6+rh0H/h5Cr0ax7Bm7jOsmG0d5GGYRFCJXokk='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-iU1YlDv+ZGZv9S2fghmZnykqDtpnHTFhhPLpo2192qQ=' 'sha256-wOuAen6+rh0H/h5Cr0ax7Bm7jOsmG0d5GGYRFCJXokk='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
-<meta name="description" content="Kids bid for chores. The lowest bid wins the job and earns those points. Less negotiating, clearer expectations.">
+<meta name="description" content="A family chore board. Every chore shows what it pays, kids pick the jobs they want, and points buy rewards.">
+<!-- =====================================================================
+     SETTINGS YOU CAN CHANGE (safe to edit right here on GitHub)
+     ca-api:     your Apps Script web app link (ends in /exec)
+     ca-support: where families can reach you for help
+     ca-price:   what the home page says about price
+     ===================================================================== -->
+<meta name="ca-api" content="https://script.google.com/macros/s/AKfycbx1XSIkao8m2vuZzXi6nGD892w2RIAXFkhpBoqZbBrWoH5-myMEBJ66X3SMXYxBj11UGg/exec">
+<meta name="ca-support" content="stradman100@gmail.com">
+<meta name="ca-price" content="Free during early access. No subscription and no ads.">
 <meta name="theme-color" content="#4a2c82">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234a2c82'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23f6b93b' font-family='Arial' font-weight='bold'%3E$%3C/text%3E%3C/svg%3E">
 
@@ -16,15 +25,12 @@
     document.documentElement.style.display = 'none';
     try { window.top.location = window.self.location.href; } catch (e) { /* stay hidden */ }
   }
-  /* =====================================================================
-     SETTINGS YOU CAN CHANGE
-     API_URL:       your Apps Script web app link (ends in /exec)
-     SUPPORT_EMAIL: where families can reach you for help
-     PRICE_NOTE:    what the home page says about price
-     ===================================================================== */
-  const API_URL = 'https://script.google.com/macros/s/AKfycbx1XSIkao8m2vuZzXi6nGD892w2RIAXFkhpBoqZbBrWoH5-myMEBJ66X3SMXYxBj11UGg/exec';
-  const SUPPORT_EMAIL = 'stradman100@gmail.com';
-  const PRICE_NOTE = 'Free during early access. No subscription and no ads.';
+  // The settings are in the <meta name="ca-..."> lines above, so they can be changed
+  // without touching this script (which would break the page's security fingerprint).
+  const setting = n => { const m = document.querySelector('meta[name="' + n + '"]'); return m ? m.getAttribute('content').trim() : ''; };
+  const API_URL = setting('ca-api');
+  const SUPPORT_EMAIL = setting('ca-support');
+  const PRICE_NOTE = setting('ca-price');
 </script>
 
 <style>
