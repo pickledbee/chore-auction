@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-bqzatnASCGlST+2ZKvyD4UzjGpAjXHe+nNuyGktSEGg='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-a79PFNajHSIvHeDNotz0hKNINNRhMwF19eMTX9FEUBA='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -355,6 +355,12 @@
   .tutitem:hover{border-color:var(--purple2)}
   .tutitem span{color:var(--purple);font-size:20px}
   main.wrap,#s-landing .wrap{padding-bottom:70px}
+  .pill.tutswitch{border:0;cursor:pointer;font:800 13px 'Nunito',sans-serif;background:rgba(255,255,255,.18);color:#fff}
+  .pill.tutswitch b{color:var(--gold)}
+  body.tutoff .pill.tutswitch b{color:#ffb3b3}
+  #sheetBody .pill.tutswitch,#s-landing .js-tut{background:var(--lav);color:var(--purple)}
+  #sheetBody .pill.tutswitch b,#s-landing .js-tut b{color:var(--purple)}
+  body.tutoff #helpFab,body.tutoff #helpTip{display:none}
 </style>
 </head>
 <body>
@@ -446,7 +452,7 @@
       <p class="desc mt" style="margin-bottom:0">Forgot your PIN? Open your family link and tap <b>Forgot PIN?</b> where it asks for the PIN. We will email you a code to choose a new one.</p>
     </div>
   </div>
-  <p style="text-align:center"><button class="btn ghost" id="btnAllTut">See all tutorials</button></p>
+  <p style="text-align:center"><button class="btn ghost" id="btnAllTut">See all tutorials</button> <button class="btn ghost js-tut" id="tutLand"></button></p>
   <footer class="small">The Chore Auction · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms and refunds</a></footer>
 </div>
 
@@ -532,6 +538,7 @@
       <div class="pills">
         <div class="pill" id="closePill"></div>
         <button class="pill help" id="btnHelp">How it works</button>
+        <button class="pill tutswitch js-tut" id="tutPill"></button>
       </div>
     </div>
   </header>
@@ -638,7 +645,7 @@ const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
 const OFTEN_NAMES = { 1: 'Every day', 2: 'Every 2 days', 3: 'Every 3 days', 7: 'Once a week' };
 const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
-const APP_VERSION = '6.2';
+const APP_VERSION = '6.3';
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
@@ -2122,8 +2129,10 @@ function showHelp() {
   $('hmBody').innerHTML = H[1] + (tourFor ? '<button class="btn ghost full mt" id="hmTour">Take the quick tour</button>' : '') +
     `<p class="desc mt" style="margin-bottom:0;font-size:12px">App version ${APP_VERSION}</p>`;
   if (tourFor) $('hmTour').onclick = () => { $('hm').className = 'overlay'; openTour(tourFor); };
-  $('hmBody').insertAdjacentHTML('beforeend', '<button class="btn full mt" id="hmLib">All tutorials</button><p class="desc mt" style="margin-bottom:0">Tip: double-click (or double-tap) anything to learn what it does, or tap the round ? button, then tap anything.</p>');
+  $('hmBody').insertAdjacentHTML('beforeend', '<button class="btn ghost full mt js-tut" id="hmTut"></button><button class="btn full mt" id="hmLib">All tutorials</button><p class="desc mt" style="margin-bottom:0">Tip: double-click (or double-tap) anything to learn what it does, or tap the round ? button, then tap anything.</p>');
   $('hmLib').onclick = () => { $('hm').className = 'overlay'; openLibrary(); };
+  $('hmTut').onclick = () => setTutorials(!tutOn());
+  showTutState();
   $('hm').className = 'overlay show';
 }
 
@@ -2147,9 +2156,11 @@ async function viewClick(e) {
   if (!b) return;
   if (tutClick(b)) return;
   // Wait a moment: if this turns out to be a double-click, show the tutorial instead of doing the action.
-  const at = Date.now();
-  await new Promise(r => setTimeout(r, 300));
-  if (lastDoubleAt >= at) return;
+  if (tutOn()) {
+    const at = Date.now();
+    await new Promise(r => setTimeout(r, 300));
+    if (lastDoubleAt >= at) return;
+  }
   if (await familyClick(b)) return;
   const d = DATA, i = Number(b.dataset.i), row = Number(b.dataset.row), v = id => $(id).value;
   switch (b.dataset.a) {
@@ -2510,10 +2521,11 @@ function sheetTour() {
       <h3>${list[i][0]}</h3><p class="desc">${list[i][1]}</p>
       <div class="dots">${list.map((_, j) => `<i class="${j === i ? 'on' : ''}"></i>`).join('')}</div>
       <div class="row">${i ? '<button class="btn ghost" data-a="tourBack">Back</button>' : '<button class="btn ghost" data-a="tourDone">Skip</button>'}
-      <button class="btn ${last ? 'gold' : ''}" data-a="${last ? 'tourDone' : 'tourNext'}">${last ? 'Got it!' : 'Next'}</button></div></div>`;
+      <button class="btn ${last ? 'gold' : ''}" data-a="${last ? 'tourDone' : 'tourNext'}">${last ? 'Got it!' : 'Next'}</button></div>
+      <p class="mt" style="margin-bottom:0"><button class="link" data-a="tutOff">Turn tutorials off</button></p></div>`;
 }
 function maybeTour(m) {
-  if (SHEET || !DATA) return;
+  if (SHEET || !DATA || !tutOn()) return;
   if (m === 'parent' && !ls('ca_tour_parent')) { ls('ca_tour_parent', '1'); openTour('parent'); }
   else if (m === 'kid' && DATA.me && !ls('ca_tour_kid_' + FID + '_' + DATA.me)) { ls('ca_tour_kid_' + FID + '_' + DATA.me, '1'); openTour('kid'); }
 }
@@ -2557,7 +2569,7 @@ async function familyClick(b) {
     }
     case 'tourNext': SHEET.step++; renderSheet(); return true;
     case 'tourBack': SHEET.step = Math.max(0, SHEET.step - 1); renderSheet(); return true;
-    case 'tourDone': closeSheet(); if (!ls('ca_help_seen')) $('helpTip').classList.remove('hidden'); return true;
+    case 'tourDone': closeSheet(); if (tutOn() && !ls('ca_help_seen')) $('helpTip').classList.remove('hidden'); return true;
     case 'hideSteps': ls('ca_steps_off_' + FID, '1'); renderApp(); return true;
     case 'kidToParent':
       await kidSignOut('');
@@ -2837,21 +2849,24 @@ function sheetTut() {
     <div class="dots">${t.steps.map((_, j) => `<i class="${j === i ? 'on' : ''}"></i>`).join('')}</div>
     <div class="row">${i ? '<button class="btn ghost" data-a="tutBack">Back</button>' : ''}
       <button class="btn ${last ? 'gold' : ''}" data-a="${last ? 'tutDone' : 'tutNext'}">${last ? 'Got it!' : 'Next'}</button></div>
-    <button class="link mt" data-a="tutLib">All tutorials</button></div>`;
+    <p class="mt" style="margin-bottom:0"><button class="link" data-a="tutLib">All tutorials</button> &nbsp;·&nbsp; <button class="link" data-a="tutOff">Turn tutorials off</button></p></div>`;
 }
 function sheetLib() {
   return `<h3>All tutorials</h3>
+    <p class="desc"><button class="pill tutswitch js-tut" data-a="tutToggle"></button></p>
     <p class="desc">Tip: double-click (or double-tap) anything in the app to open its tutorial. On a phone, tap the round <b>?</b> button, then tap anything.</p>
     ${TUT_GROUPS.map(g => `<h4 class="sh">${esc(g)}</h4><div class="tutlist">${Object.keys(TUT).filter(k => TUT[k].group === g)
       .map(k => `<button class="tutitem" data-a="tut" data-key="${k}">${esc(TUT[k].title)}<span>&#8250;</span></button>`).join('')}</div>`).join('')}`;
 }
 function tutClick(b) {
-  if (/^tut/.test(b.dataset.a) && !SHEET) return true;
+  if (/^tut/.test(b.dataset.a) && b.dataset.a !== 'tutToggle' && !SHEET) return true;
   switch (b.dataset.a) {
     case 'tut': openSheet('tut', b.dataset.key, 0); return true;
     case 'tutNext': SHEET.step++; renderSheet(); return true;
     case 'tutBack': SHEET.step = Math.max(0, SHEET.step - 1); renderSheet(); return true;
     case 'tutLib': openSheet('lib'); return true;
+    case 'tutOff': setTutorials(false); return true;
+    case 'tutToggle': setTutorials(!tutOn()); showTutState(); return true;
     case 'tutDone': {
       const back = SHEET_BEFORE; SHEET_BEFORE = null;
       if (back) { SHEET = back; renderSheet(); } else closeSheet();
@@ -2861,10 +2876,34 @@ function tutClick(b) {
   return false;
 }
 
+/* ---------- turning tutorials on and off (remembered on this device) ---------- */
+// Off means: double-click and double-tap act normally, no ? button, no tip, no first-time tours,
+// and buttons answer instantly. The All tutorials list can still be opened from "How it works".
+function tutOn() { return ls('ca_tut_off') !== '1'; }
+function setTutorials(on, quiet) {
+  ls('ca_tut_off', on ? null : '1');
+  if (!on && HELP_MODE) setHelpMode(false);
+  if (!on && SHEET && (SHEET.type === 'tut' || SHEET.type === 'lib' || SHEET.type === 'tour')) closeSheet();
+  showTutState();
+  if (!quiet) toast(on ? 'Tutorials are on. Double-click anything, or tap ?, to learn what it does.'
+                       : 'Tutorials are off. Turn them back on any time with the Tutorials button at the top.');
+}
+function showTutState() {
+  const on = tutOn();
+  document.body.classList.toggle('tutoff', !on);
+  document.querySelectorAll('.js-tut').forEach(b => {
+    b.innerHTML = 'Tutorials: <b>' + (on ? 'On' : 'Off') + '</b>';
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.title = on ? 'Tap to turn tutorials off' : 'Tap to turn tutorials on';
+  });
+  if (!on) $('helpTip').classList.add('hidden');
+}
+
 /* ---------- double-click, double-tap, and help mode ---------- */
 let HELP_MODE = false, lastPopupAt = 0, lastDoubleAt = 0, lastTap = { t: 0, x: 0, y: 0 };
 // the second click of a double-click never does anything; it only marks the double-click
 document.addEventListener('click', e => {
+  if (!tutOn()) return;
   if (e.detail >= 2 && !e.target.closest('input, select, textarea, #kpKeys, .stepper')) { lastDoubleAt = Date.now(); e.stopPropagation(); e.preventDefault(); }
 }, true);
 // remember when a question pops up, so a double-click can cancel what its first click started
@@ -2895,13 +2934,13 @@ function setHelpMode(on) {
 }
 
 document.addEventListener('dblclick', e => {
-  if (e.target.closest('input, select, textarea')) return;
+  if (!tutOn() || e.target.closest('input, select, textarea')) return;
   e.preventDefault();
   showHelpFor(e.target);
 });
 // phones and tablets: two quick taps in the same spot
 document.addEventListener('touchend', e => {
-  if (e.target.closest('input, select, textarea, #kpKeys')) return;
+  if (!tutOn() || e.target.closest('input, select, textarea, #kpKeys')) return;
   const p = e.changedTouches && e.changedTouches[0];
   if (!p) return;
   const now = Date.now(), near = Math.abs(p.clientX - lastTap.x) < 30 && Math.abs(p.clientY - lastTap.y) < 30;
@@ -2932,7 +2971,9 @@ $('btnLearn').onclick = () => openTutorial('overview', 0);
 $('btnAllTut').onclick = openLibrary;
 $('helpFab').onclick = () => setHelpMode(!HELP_MODE);
 $('helpTip').onclick = () => { $('helpTip').classList.add('hidden'); ls('ca_help_seen', '1'); };
-if (!ls('ca_help_seen')) $('helpTip').classList.remove('hidden');
+if (!ls('ca_help_seen') && tutOn()) $('helpTip').classList.remove('hidden');
+['tutPill', 'tutLand'].forEach(id => { $(id).onclick = () => setTutorials(!tutOn()); });
+showTutState();
 $('hmClose').onclick = () => { $('hm').className = 'overlay'; };
 $('recGo').onclick = recover;
 $('joinGo').onclick = joinGo;
