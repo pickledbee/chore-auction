@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-wOuAen6+rh0H/h5Cr0ax7Bm7jOsmG0d5GGYRFCJXokk='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-YsC+EVgVzP6IdJzeYuOQLCwjNErLspQBYi+L9autLSk='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -651,7 +651,7 @@ const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
 const OFTEN_NAMES = { 1: 'Every day', 2: 'Every 2 days', 3: 'Every 3 days', 7: 'Once a week' };
 const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
-const APP_VERSION = '6.4';
+const APP_VERSION = '6.5';
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
@@ -1829,12 +1829,16 @@ function kidPick() {
     ${f.limit ? `<p class="desc mt" style="margin-bottom:0">You have <b>${load} of ${f.limit}</b> work points of chores right now. Small jobs count 1, medium 2, big 3.</p>` : ''}
   </div>`;
   if (!list.length) return intro + '<div class="card empty">No chores for you yet. Ask a parent to add some.</div>';
-  return intro + `<div class="grid">${sorted.map(c => {
+  const mineNow = todoRows().filter(w => w.winner === me);
+  const todoCard = mineNow.length ? `<div class="card hl"><h3 class="sec" style="margin:0 0 6px">Your chores to finish</h3>
+    ${mineNow.map(w => `<div class="approve"><div class="what"><b>${esc(w.chore)}</b><small>Worth ${pt(w.points)}. When it is done, tap the green button.</small></div>
+      <button class="btn green" data-a="ready" data-row="${w.row}">I finished it!</button></div>`).join('')}</div>` : '';
+  return intro + todoCard + `<div class="grid">${sorted.map(c => {
     const i = DATA.chores.indexOf(c);
     const tags = `<span class="tags"><span class="tag size">${SIZES[c.size] || ''}</span><span class="tag often">${esc(OFTEN_NAMES[c.often] || '')}</span></span>`;
     if (c.state === 'taken') {
       return `<div class="card chore off"><h3>${esc(c.name)}</h3>${c.desc ? `<p class="desc">${esc(c.desc)}</p>` : ''}
-        <div class="mine ${c.by === me ? 'sent' : ''}">${c.by === me ? '&#10003; You picked this. It is in My chores.' : `${chip(c.by)} is doing this one`}</div></div>`;
+        ${c.by === me ? kidFinishBox(c.name) : `<div class="mine">${chip(c.by)} is doing this one</div>`}</div>`;
     }
     if (c.state === 'later') {
       return `<div class="card chore off"><h3>${esc(c.name)}</h3>${c.desc ? `<p class="desc">${esc(c.desc)}</p>` : ''}
@@ -1884,6 +1888,13 @@ function kidPoints() {
     </div>`;
 }
 
+// On the Pick screen, a chore the kid has: finish it right here
+function kidFinishBox(name) {
+  const w = DATA.winners.find(x => x.chore === name && x.winner === ME() && (x.status === 'Assigned' || x.status === 'Ready'));
+  if (w && w.status === 'Ready') return '<div class="mine sent">&#10003; You finished this. A parent will check it soon.</div>';
+  return '<div class="mine sent">&#10003; This is your chore. When it is done, tap <b>I finished it!</b> at the top.</div>';
+}
+
 // Plain words for kids about how they got a chore
 function howKid(how) {
   const h = String(how || '');
@@ -1924,7 +1935,13 @@ function parentApprove() {
       : `<div class="caught"><b>All caught up!</b><span class="desc">When a kid taps "I finished it," it shows up here. One tap to approve.</span></div>`}
     ${d.fairness.autoApprove ? `<p class="tip mt" style="margin-bottom:0">Not checked within ${d.fairness.autoApprove} hours? It is approved for you automatically. Change this in Settings, then Rules.</p>` : ''}
   </div>
-  <div class="card"><p class="desc" style="margin:0">${todo.length ? `${plural(todo.length, 'chore')} being worked on, and ` : ''}${plural(openChores().length, 'chore')} open on the <button class="link" data-tab-go="board">Chore board</button>.</p></div>`;
+  ${todo.length ? `<div class="card"><h3 class="sec">Still being worked on</h3>
+    <p class="desc">The kid has not tapped "I finished it" yet. If you can see it is done, tap Done to give the points now.</p>
+    ${todo.map(w => `<div class="approve">${chip(w.winner)}
+        <div class="what"><b>${esc(w.chore)}</b><small>${pt(w.points)} · picked ${esc(w.date)}</small></div>
+        <button class="btn green" data-a="approve" data-row="${w.row}">Done</button>
+        <button class="btn ghost" data-a="notdone" data-row="${w.row}">Not done</button></div>`).join('')}</div>` : ''}
+  <div class="card"><p class="desc" style="margin:0">${plural(openChores().length, 'chore')} open on the <button class="link" data-tab-go="board">Chore board</button>. This page updates by itself every 30 seconds.</p></div>`;
 }
 
 function parentBoard() {
@@ -2226,7 +2243,7 @@ async function viewClick(e) {
     case 'claim': {
       const c = d.chores[i];
       return act(async () => {
-        if (!(await ask('Do ' + c.name + ' for ' + points(c.price) + '?', 'It will be yours right away. When you finish, go to My chores and tap I finished it. A parent checks it, and then the points are yours.', 'confirm'))) throw new Error('CANCELLED');
+        if (!(await ask('Do ' + c.name + ' for ' + points(c.price) + '?', 'It will be yours right away. When the job is done, tap the green I finished it! button. Then a parent checks it, and the points are yours.', 'confirm'))) throw new Error('CANCELLED');
         return api('claim', { chore: c.name, points: c.price });
       });
     }
@@ -2693,6 +2710,7 @@ const TUT = {
     ['The red number', 'The red number on <b>Approve</b> is how many chores are waiting for you to check.'],
     ['One tap', 'Look at the work, then tap <b>Approve</b>. The points go to the kid right away. Several waiting? Tap <b>Approve all</b>.'],
     ['Not quite right?', 'Tap <b>Redo</b>. It goes back to the kid\'s list so they can finish it.'],
+    ['Not showing up?', 'A chore shows here only after the kid taps <b>I finished it!</b> Chores a kid picked but has not finished are listed below under <b>Still being worked on</b>. Tap <b>Done</b> there if you can see it is finished.'],
     ['If you forget', 'If automatic approval is on, a finished chore is approved for you after 12, 24, or 48 hours. Change this in Settings, then Rules.']
   ] },
   choresTab: { group: 'For parents', title: 'The Chores tab', steps: [
@@ -2753,6 +2771,7 @@ const TUT = {
   pickChore: { group: 'For kids', title: 'Picking a chore', steps: [
     ['Look at the points', 'Each chore shows how many <b>points</b> it pays right now.'],
     ['Tap I\'ll do it', 'Tap the gold button on a chore you want, then tap <b>OK</b>. It is yours right away.'],
+    ['Then tap I finished it!', 'When the job is done, tap the green <b>I finished it!</b> button. It is at the top of this screen and in My chores. That is what tells a parent to check it.'],
     ['Wait for more points?', 'Chores nobody picks go up every day. You could wait, but someone else might grab it first!'],
     ['Gray chores', 'Gray chores are taken by someone else, or resting until they come back.']
   ] },
@@ -3032,6 +3051,22 @@ window.addEventListener('hashchange', routeHash);
   if (old) history.replaceState(null, '', APP_LINK + '#f=' + old);
   if (!routeHash()) renderLanding();
 })();
+
+// Keep the screen up to date by itself: every 30 seconds while the app is showing,
+// and right away when someone comes back to it. Never while someone is typing or a pop-up is open.
+async function autoRefresh() {
+  if (!DATA || !$('s-app').classList.contains('on') || document.hidden) return;
+  const a = document.activeElement;
+  if (a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)) return;
+  if ($('modal').classList.contains('show') || $('kp').classList.contains('show') || inFlight > 0) return;
+  if (SHEET && SHEET.type !== 'kid') return;
+  if (mode() === 'parent' && PTAB === 'settings') return;
+  const y = window.scrollY;
+  try { await load(); window.scrollTo(0, y); } catch (e) { /* try again next time */ }
+}
+setInterval(autoRefresh, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) autoRefresh(); });
+window.addEventListener('focus', autoRefresh);
 </script>
 </body>
 </html>
