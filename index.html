@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+Ahh9DeQfrgHd+v5H4gd8BizG/qbrUzfp34eZZNBMt8=' 'sha256-kAO5kZmAXl1A//HytN/3SsrggXoMlsi5fPkB+y+al4c='; style-src 'unsafe-inline'; font-src 'self'; img-src data:; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ni4V3WSW/+Gi8OoyrohpDydKc5+ciadZ0mZ0C+z19yQ=' 'sha256-iFM8pt1QEJWj1vA/ImWMSwKKipjkACHLOolK999+Jcs=' https://www.googletagmanager.com; style-src 'unsafe-inline'; font-src 'self'; img-src data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://script.google.com https://script.googleusercontent.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Chore Auction</title>
@@ -25,6 +25,25 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbx1XSIkao8m2vuZzXi6nGD892w2RIAXFkhpBoqZbBrWoH5-myMEBJ66X3SMXYxBj11UGg/exec';
   const SUPPORT_EMAIL = 'stradman100@gmail.com';
   const PRICE_NOTE = 'Free during early access. No subscription and no ads.';
+
+  /* Google Analytics: counts visits to the public pages (start page, demo, setup, tutorials).
+     It is never loaded inside a family's own app, so family links, names, and kids' screens
+     are never sent to Google. The page address is sent without the part after # or ?. */
+  const GA_ID = 'G-53YR3GCZBP';
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  const GA_START_IN_FAMILY = /^#f=/.test(location.hash) || /[?&]f=/.test(location.search);
+  function gaOff(off) { window['ga-disable-' + GA_ID] = !!off; }
+  function track(name, params) { if (!window['ga-disable-' + GA_ID]) gtag('event', name, params || {}); }
+  gaOff(GA_START_IN_FAMILY);
+  if (!GA_START_IN_FAMILY) {
+    gtag('js', new Date());
+    gtag('config', GA_ID, { page_location: location.origin + location.pathname, page_referrer: '', allow_google_signals: false, allow_ad_personalization_signals: false });
+    const ga = document.createElement('script');
+    ga.async = true;
+    ga.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    document.head.appendChild(ga);
+  }
 </script>
 
 <style>
@@ -660,7 +679,7 @@ const SIZES = { 1: 'Small job', 2: 'Medium job', 3: 'Big job' };
 const SIZE_SHORT = { 1: 'Small', 2: 'Medium', 3: 'Big' };
 const OFTEN_NAMES = { 1: 'Every day', 2: 'Every 2 days', 3: 'Every 3 days', 7: 'Once a week' };
 const ROLE_NAMES = { parent: "Parent's phone", kid: "Kid's device", shared: 'Family computer' };
-const APP_VERSION = '6.6';
+const APP_VERSION = '6.7';
 
 /* ============================== STATE ============================== */
 const APP_LINK = location.origin + location.pathname;
@@ -1304,6 +1323,7 @@ setInterval(async () => {
 
 /* ============================== LANDING ============================== */
 function renderLanding(msg) {
+  gaOff(GA_START_IN_FAMILY);
   const m = $('landMsg');
   m.textContent = msg || '';
   m.classList.toggle('hidden', !msg);
@@ -1318,6 +1338,7 @@ function renderLanding(msg) {
 }
 
 function openDemo() {
+  gaOff(GA_START_IN_FAMILY); track('try_demo');
   FID = 'demo'; TOKEN = null; DEVICE = null; KSESS = null; KTAB = 'pick'; PTAB = 'home';
   history.replaceState(null, '', APP_LINK + '#demo');
   load(true);
@@ -1327,6 +1348,7 @@ async function recover() {
   const email = $('recEmail').value.trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast('Enter the parent email you used during setup.', true);
   $('recGo').disabled = true;
+  track('lost_link_request');
   try { toast(await api('recover', { email: email, appLink: APP_LINK })); }
   catch (e) { toast(errMsg(e), true); }
   $('recGo').disabled = false;
@@ -1357,6 +1379,7 @@ async function joinGo() {
   try {
     FID = null; DEVICE = null; KSESS = null;
     const r = await api('join', { code: code });
+    track('join_device');
     ls('ca_fid', r.fid);
     ls('ca_dev_' + r.fid, r.device);
     $('joinGo').disabled = false;
@@ -1375,6 +1398,7 @@ async function startWizard() {
     try { CONFIG = await api('config'); }
     catch (e) { busyFail(errMsg(e), startWizard, () => (DATA ? show('app') : renderLanding())); return; }
   }
+  gaOff(GA_START_IN_FAMILY); track('begin_setup');
   W = {
     step: 0, license: '', name: '', pin: '', pin2: '', email: '',
     kids: [{ name: '', color: COLORS[0], code: randomCode() }, { name: '', color: COLORS[1], code: randomCode() }],
@@ -1625,6 +1649,7 @@ async function wizNext() {
       FID = r.fid;
       let remembered = false;
       try { const l = await api('login', { pin: payload.pin, remember: true }); setToken(l.token); setDevice(l.device); remembered = true; } catch (e) { /* they can choose later */ }
+      track('sign_up', { method: 'setup_wizard' });
       W = null;
       ls('ca_fid', r.fid);
       renderDone(r.fid, remembered);
@@ -1640,6 +1665,7 @@ function wizBack() {
 }
 
 function renderDone(fid, remembered) {
+  gaOff(true);   // a real family exists now: no analytics from here on
   const link = familyLink(fid);
   $('doneThis').textContent = remembered
     ? 'This device is now your parent phone, so you will not need your PIN here again. To approve chores, just open the app and tap Approve.'
@@ -1669,6 +1695,7 @@ async function copyText(text) {
 
 /* ============================== FAMILY APP ============================== */
 async function openFamily(fid) {
+  gaOff(true);   // no analytics inside a family's own app
   FID = fid; KSESS = null;
   if (location.hash !== '#f=' + fid) history.replaceState(null, '', APP_LINK + '#f=' + fid);
   TOKEN = cleanId(ss('ca_tok_' + fid)) || null;
@@ -2884,6 +2911,7 @@ function openTutorial(key, step) {
   if (!TUT[key]) key = 'overview';
   if (SHEET && SHEET.type !== 'tut' && SHEET.type !== 'lib') SHEET_BEFORE = SHEET;
   openSheet('tut', key, step || 0);
+  track('open_tutorial', { tutorial: key });
 }
 function openLibrary() {
   if (SHEET && SHEET.type !== 'tut' && SHEET.type !== 'lib') SHEET_BEFORE = SHEET;
@@ -2933,6 +2961,7 @@ function setTutorials(on, quiet) {
   if (!on && HELP_MODE) setHelpMode(false);
   if (!on && SHEET && (SHEET.type === 'tut' || SHEET.type === 'lib' || SHEET.type === 'tour')) closeSheet();
   showTutState();
+  track(on ? 'tutorials_on' : 'tutorials_off');
   if (!quiet) toast(on ? 'Tutorials are on. Double-click anything, or tap ?, to learn what it does.'
                        : 'Tutorials are off. Turn them back on any time with the Tutorials button at the top.');
 }
@@ -3045,6 +3074,15 @@ function renderLandingShop() {
   if (el) el.innerHTML = `<h3 class="sec">Family favorites that make chores easier</h3>
     <p class="desc">Tools that help kids do chores on their own, and rewards worth saving points for.</p>${shopList('landing')}`;
 }
+
+// count clicks on product suggestions (only on public pages; analytics is off inside a family's app)
+document.addEventListener('click', e => {
+  const a = e.target.closest('a.shopitem');
+  if (a) track('amazon_click', { item: (a.querySelector('b') || {}).textContent || '', placement: a.closest('#landShop') ? 'start_page' : 'app' });
+}, true);
+// Any link into a family turns analytics off first, so a family link is never sent to Google.
+document.addEventListener('click', e => { const a = e.target.closest('a[href*="#f="]'); if (a) gaOff(true); }, true);
+['hashchange', 'popstate'].forEach(ev => window.addEventListener(ev, () => { if (/^#f=/.test(location.hash)) gaOff(true); }, true));
 
 /* ============================== START ============================== */
 $('btnDemo').onclick = openDemo;
